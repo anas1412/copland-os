@@ -20,7 +20,7 @@ firefox-esr
 # Copland OS look and tools (same as the installer's package list)
 fonts-urw-base35 fonts-dejavu-core fonts-dejavu-mono fonts-terminus
 adwaita-icon-theme gtk2-engines-murrine libgtk-3-bin python3
-fastfetch devilspie2 curl git
+fastfetch devilspie2 btop curl git
 
 # boot: animation, and grub-mkfont for the boot menu theme
 plymouth plymouth-themes grub-common

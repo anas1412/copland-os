@@ -40,10 +40,22 @@ Hover on navy: `rgba(70,186,239,0.18)` (cyan at 18 %).
 `#141c3a #e0507a #5fd7a7 #e6d28a #197aba #9a7cf0 #46baef #c5cfee`
 `#4a5c9a #ff7096 #8af0c8 #f5e6a8 #5aa8e8 #b8a0ff #8fd6fa #ffffff`
 
-Same order as ANSI 0–15. Source: `core/settings.tsv` (`terminal`), and the text
+Same order as ANSI 0–15, named `term0` to `term15` where other files refer to them. Source: `core/settings.tsv` (`terminal`), and the text
 console's `vt.default_red/grn/blu` in `lib/system.sh` (background `#101838` first).
 Red, green and yellow keep their meaning (errors, success, warnings) in a cooler,
 softer form.
+
+### btop
+
+`core/config/btop/copland.theme` uses only the tokens above; each line in the file
+names its token. Roles follow the desktop's: box outlines `cyan` (borders), selection
+`blue` with `white` text, secondary text `text-dim`, empty meter bars `navy` (they read
+as background), divider lines and the start of cached memory `term8` (the terminal's
+own faint colour). Graphs fade `blue` to `cyan` to `term14`; memory in use goes
+`term5` violet to `term1` red (taken); available memory is green (success).
+`btop.conf` sets only five things: the theme; no background, so the terminal's
+transparency shows through; 24-bit colour for the gradients; square corners, matching
+the fastfetch frame; braille graphs, the finest btop has.
 
 ## Typography
 

@@ -9,7 +9,8 @@ Before any component runs, the installer copies your current settings to
 - the XFCE settings channels `xsettings`, `xfwm4`, `xfce4-panel`, `xfce4-desktop`,
   `xfce4-terminal`, `xfce4-keyboard-shortcuts` and `xfce4-notifyd`
 - `~/.bashrc`
-- `~/.config/fastfetch/config.jsonc` and `~/.config/devilspie2/layers.lua`, if present
+- `~/.config/fastfetch/config.jsonc`, `~/.config/btop/btop.conf` and
+  `~/.config/devilspie2/layers.lua`, if present
 
 `./install.sh --restore` puts those back. Theme, icon and cursor folders stay on
 disk; delete them by hand if you want them gone.
@@ -79,13 +80,15 @@ You get the Copland OS Enterprise boot frame as your wallpaper.
 
 ### `terminal` (on)
 
-You get the Copland colours in xfce4-terminal, plus a fastfetch banner in each new terminal.
+You get the Copland colours in xfce4-terminal and btop, plus a fastfetch banner in each new terminal.
 
 | Changes | Value |
 |---|---|
 | `xfce4-terminal` | background `#101838`, text `#ccddff`, cursor `#46baef`, 16-colour palette, transparent background at darkness 0.92, `DejaVu Sans Mono 9`, `120x34` |
 | `~/.config/fastfetch/config.jsonc` | replaced |
 | `~/.bashrc` | appends a marked `copland-os fastfetch` block, unless fastfetch is already there |
+| `~/.config/btop/themes/copland.theme` | the Copland btop theme |
+| `~/.config/btop/btop.conf` | created if missing; otherwise only `color_theme`, `theme_background`, `truecolor`, `rounded_corners` and `graph_symbol` are set, the rest is kept. Your old file goes into the backup |
 
 ### `layers` (on)
 

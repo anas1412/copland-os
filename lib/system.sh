@@ -158,6 +158,10 @@ sys_panel() {
 
 sys_terminal() {
     put_file 644 "$CONFIG/fastfetch/config.jsonc" /etc/skel/.config/fastfetch/config.jsonc
+    # btop: the theme in btop's own system folder (every account can pick it), the
+    # settings for new accounts
+    put_file 644 "$CONFIG/btop/copland.theme" /usr/share/btop/themes/copland.theme
+    put_file 644 "$CONFIG/btop/btop.conf" /etc/skel/.config/btop/btop.conf
     put_text 644 /etc/copland-os/bashrc <<'EOF'
 # Copland OS: show fastfetch in new interactive terminals (sourced from ~/.bashrc)
 if [[ $- == *i* ]] && [ -z "${CLAUDECODE:-}" ] && command -v fastfetch >/dev/null; then

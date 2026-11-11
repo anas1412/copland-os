@@ -100,6 +100,7 @@ make_backup() {
     done
     [ -f "$HOME/.bashrc" ] && cp -a "$HOME/.bashrc" "$BACKUP/bashrc"
     [ -f "$HOME/.config/fastfetch/config.jsonc" ] && cp -a "$HOME/.config/fastfetch/config.jsonc" "$BACKUP/fastfetch-config.jsonc"
+    [ -f "$HOME/.config/btop/btop.conf" ] && cp -a "$HOME/.config/btop/btop.conf" "$BACKUP/btop.conf"
     [ -f "$HOME/.config/devilspie2/layers.lua" ] && cp -a "$HOME/.config/devilspie2/layers.lua" "$BACKUP/layers.lua"
     printf 'Copland OS installer backup, %s\nRestore with: %s/install.sh --restore\n' "$STAMP" "$SRC" > "$BACKUP/README"
     ln -sfn "$BACKUP" "$STATE/backups/latest"
@@ -177,6 +178,7 @@ restore() {
     [ -f "$HOME/.bashrc" ] && sed -i '/^# >>> copland-os fastfetch >>>$/,/^# <<< copland-os fastfetch <<<$/d' "$HOME/.bashrc"
     [ -f "$src/face" ] && cp -a "$src/face" "$HOME/.face"
     [ -f "$src/fastfetch-config.jsonc" ] && cp -a "$src/fastfetch-config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
+    [ -f "$src/btop.conf" ] && cp -a "$src/btop.conf" "$HOME/.config/btop/btop.conf"
     rm -f "$HOME/.config/autostart/devilspie2.desktop" "$HOME/.local/share/applications/copland-layers.desktop"
     pkill -u "$EUID" -x devilspie2 2>/dev/null || true
     if [ -f "$GREETER.copland-bak" ] && confirm "Also restore the login screen config (sudo)?"; then

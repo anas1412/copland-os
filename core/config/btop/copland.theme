@@ -1,0 +1,68 @@
+# Copland OS Enterprise: btop theme
+# Every colour is a Copland palette token from docs/DESIGN.md ("Palette" and the
+# 16 terminal colours, written here as term0 to term15), so btop matches
+# xfce4-terminal, fastfetch and the desktop. "Present day, present time."
+
+# Background: navy-deep (drawn only when theme_background = True; Copland keeps it
+# off so the terminal's transparency shows through)
+theme[main_bg]="#101838"
+
+# Text
+theme[main_fg]="#ccddff"        # text
+theme[title]="#8fd6fa"          # term14, bright cyan: box titles glow above the text
+theme[hi_fg]="#46baef"          # cyan: key hints, as accents everywhere else
+theme[inactive_fg]="#738dc1"    # text-dim: secondary text, as in the rest of the desktop
+theme[graph_text]="#c5cfee"     # term7: labels drawn over graphs
+theme[proc_misc]="#46baef"      # cyan
+
+# Selection: blue with white text, the desktop's selection colours
+theme[selected_bg]="#197aba"
+theme[selected_fg]="#ffffff"
+
+# Meters and dividers: quieter than any text
+theme[meter_bg]="#25346a"       # navy: an empty bar reads as background
+theme[div_line]="#4a5c9a"       # term8: the terminal's own faint colour
+
+# Box outlines: cyan, the desktop's border colour; memory and network in term12
+theme[cpu_box]="#46baef"
+theme[mem_box]="#5aa8e8"
+theme[net_box]="#5aa8e8"
+theme[proc_box]="#46baef"
+
+# Temperature: cyan, then term5 violet, then term1 red when hot
+theme[temp_start]="#46baef"
+theme[temp_mid]="#9a7cf0"
+theme[temp_end]="#e0507a"
+
+# CPU graph: blue, cyan, term14
+theme[cpu_start]="#197aba"
+theme[cpu_mid]="#46baef"
+theme[cpu_end]="#8fd6fa"
+
+# Memory. Free and cached are calm blues, available is term2/term10 green (success),
+# used goes violet to red (taken)
+theme[free_start]="#197aba"
+theme[free_mid]="#46baef"
+theme[free_end]="#8fd6fa"
+theme[cached_start]="#4a5c9a"   # term8: cached memory can be reclaimed, so it starts faint
+theme[cached_mid]="#5aa8e8"
+theme[cached_end]="#8fd6fa"
+theme[available_start]="#5fd7a7"
+theme[available_mid]="#8af0c8"
+theme[available_end]="#c5cfee"
+theme[used_start]="#9a7cf0"
+theme[used_mid]="#b8a0ff"
+theme[used_end]="#e0507a"
+
+# Network: download in the blues, upload in violet to term9 pink
+theme[download_start]="#197aba"
+theme[download_mid]="#46baef"
+theme[download_end]="#8fd6fa"
+theme[upload_start]="#9a7cf0"
+theme[upload_mid]="#b8a0ff"
+theme[upload_end]="#ff7096"
+
+# Process list: cyan, violet, red
+theme[process_start]="#46baef"
+theme[process_mid]="#9a7cf0"
+theme[process_end]="#e0507a"

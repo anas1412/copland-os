@@ -11,7 +11,7 @@ TITLE[icons]="Icons";              DESC[icons]="Mac OS 9 icons (NineIcons)"     
 TITLE[cursors]="Cursors";          DESC[cursors]="classic Mac pixel cursors (Retrosmart)";         ON[cursors]=1;   SUDO[cursors]=0
 TITLE[wallpaper]="Wallpaper";      DESC[wallpaper]="Copland OS Enterprise boot frame";             ON[wallpaper]=1; SUDO[wallpaper]=0
 TITLE[panel]="Top bar";            DESC[panel]="replaces your panel layout (backed up)";           ON[panel]=1;     SUDO[panel]=0
-TITLE[terminal]="Terminal";        DESC[terminal]="palette, font, fastfetch";                      ON[terminal]=1;  SUDO[terminal]=0
+TITLE[terminal]="Terminal";        DESC[terminal]="palette, font, fastfetch, btop";                ON[terminal]=1;  SUDO[terminal]=0
 TITLE[layers]="Layers";            DESC[layers]="4 workspaces; you choose which apps go where";               ON[layers]=1;    SUDO[layers]=0
 TITLE[keys]="Shortcuts";           DESC[keys]="Super menu, Super+1-4 go, +Shift send";                ON[keys]=1;      SUDO[keys]=0
 TITLE[browsers]="Browsers";       DESC[browsers]="Copland colour for Chromium-family browsers";  ON[browsers]=0;  SUDO[browsers]=1
@@ -158,6 +158,25 @@ fi
 EOF
     else
         run append-fastfetch-hook "$HOME/.bashrc"
+    fi
+    # btop: the Copland theme, and these five settings in btop.conf (btop keeps the rest)
+    run install -D -m 644 "$CONFIG/btop/copland.theme" "$HOME/.config/btop/themes/copland.theme"
+    local bconf="$HOME/.config/btop/btop.conf"
+    if [ ! -f "$bconf" ]; then
+        run install -D -m 644 "$CONFIG/btop/btop.conf" "$bconf"
+    elif [ "$DRY" -eq 0 ]; then
+        local line key
+        while IFS= read -r line; do
+            case "$line" in ''|'#'*) continue ;; esac
+            key="${line%% =*}"
+            if grep -q "^$key = " "$bconf"; then
+                sed -i "s|^$key = .*|$line|" "$bconf"
+            else
+                printf '%s\n' "$line" >> "$bconf"
+            fi
+        done < "$CONFIG/btop/btop.conf"
+    else
+        run set-btop-options "$bconf"
     fi
     local logos=""
     if have fastfetch; then logos="$(fastfetch --list-logos 2>/dev/null || true)"; fi

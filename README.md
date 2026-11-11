@@ -107,7 +107,7 @@ Every file and setting each component touches, and how to undo it: [docs/WHAT-CH
 | `cursors` | on | classic Mac pixel-art cursors ([Retrosmart](https://github.com/useless-anvil/retrosmart-cursor), Mac-ish) |
 | `wallpaper` | on | the Copland OS Enterprise boot frame |
 | `panel` | on | top bar: Copland menu (with the Copland logo as its profile picture), window list, Layer:01–04, tray, clock with date, power. **Replaces your current panel layout** |
-| `terminal` | on | xfce4-terminal palette and font, fastfetch config, `~/.bashrc` hook |
+| `terminal` | on | xfce4-terminal palette and font, fastfetch config, `~/.bashrc` hook, btop theme |
 | `layers` | on | 4 workspaces named Layer:01–04, plus `copland-layers`, a small picker to choose which app opens on which layer. Nothing is assigned until you choose |
 | `keys` | on | the Super (Windows) key opens the Copland menu; Super+1–4 (number row or numpad) jump to Layer:01–04; Super+Shift+1–4 send the focused window there |
 | `browsers` | off | Copland colour for Chromium-family browsers (Brave, Chromium, Chrome, Edge) by managed policy; Firefox follows the GTK theme on its own (sudo) |
@@ -172,7 +172,9 @@ sudo ./install.sh --system
 - The XFCE settings go to `/etc/xdg/copland-os` as defaults, and
   `/etc/X11/Xsession.d/55copland-os` puts that folder first in XFCE's search path.
   Anyone's own changes still win over these defaults.
-- New accounts get the menu picture, fastfetch and the layer rules from `/etc/skel`.
+- New accounts get the menu picture, fastfetch, the btop settings and the layer rules
+  from `/etc/skel`; the btop theme goes to `/usr/share/btop/themes`, so every account
+  can pick it.
   The top bar appears for users logging in to XFCE for the first time; existing
   users keep theirs (run `./install.sh` as that user to switch them).
 - The login screen, the X11 session as the default (XFCE's Wayland session entry
@@ -250,7 +252,7 @@ install.sh                    the installer: per-user (default) or --system
 lib/                          the installer's parts: ui, common, components (per-user), system
 core/settings.tsv             every XFCE setting, once (used by both modes)
 core/assets/                  theme (with logo), icons, cursors, wallpaper
-core/config/                  fastfetch config, devilspie2 layer rules
+core/config/                  fastfetch config, btop theme and settings, devilspie2 layer rules
 core/bin/                     copland-layers, copland-goto, copland-send
 core/boot/                    full-screen boot script, GRUB theme, copland-boot.sh
 core/browsers/                browser colour policy and copland-browsers.sh
