@@ -1,0 +1,26 @@
+/* Copland OS Enterprise notification bubble */
+#XfceNotifyWindow {
+    background-color: rgba(16, 24, 56, 0.94);
+    border-radius: 0;
+    border: 1px solid #46baef;
+    padding: 14px;
+}
+#XfceNotifyWindow:hover { border-color: #ccddff; }
+#XfceNotifyWindow label,
+#XfceNotifyWindow image { color: #ccddff; }
+#XfceNotifyWindow label#summary {
+    font-family: "C059";
+    font-style: italic;
+    font-weight: bold;
+    color: #46baef;
+}
+#XfceNotifyWindow button {
+    border: 1px solid #197aba;
+    border-radius: 0;
+    background-image: none;
+    background-color: #1c2852;
+    color: #ccddff;
+}
+#XfceNotifyWindow button:hover { background-color: #197aba; color: #ffffff; }
+#XfceNotifyWindow progressbar progress { background-image: none; background-color: #46baef; }
+#XfceNotifyWindow progressbar trough { background-image: none; background-color: #141c3a; }

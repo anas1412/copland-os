@@ -1,0 +1,2 @@
+copland-logo-*.png: "Copland Os Enterprise Icon" by PsyBear, https://www.deviantart.com/psybear/art/Copland-Os-Enterprise-Icon-65838629 (personal use, credit PsyBear). Scaled 2026-11-11.
+cropped-backup/: previous logos cropped from the wallpaper.

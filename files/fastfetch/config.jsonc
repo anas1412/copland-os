@@ -1,0 +1,40 @@
+// Copland OS fastfetch: built-in LainOS logo (Navi eye) in Copland blues.
+// Keys follow Lain lore: PSYCHE (the Navi chip), PROTOCOL (kernel), LAYER (desktop), WIRED (network).
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "type": "builtin",
+    "source": "LainOS",
+    "color": { "1": "blue", "2": "cyan", "3": "bright_cyan", "4": "blue", "5": "cyan", "6": "bright_blue" },
+    "padding": { "top": 1, "left": 2, "right": 4 }
+  },
+  "display": {
+    "separator": " ",
+    "color": { "keys": "cyan", "title": "bright_cyan", "output": "white", "separator": "90" },
+    "key": { "width": 14 },
+    "bar": { "charElapsed": "▰", "charTotal": "▱", "borderLeft": " ", "borderRight": "", "width": 10 },
+    "percent": { "type": 3, "color": { "green": "cyan", "yellow": "bright_yellow", "red": "bright_red" } }
+  },
+  "modules": [
+    { "type": "custom", "format": "\u001b[1;96mCOPLAND OS ENTERPRISE\u001b[0m \u001b[90m· Tachibana General Laboratories\u001b[0m" },
+    { "type": "title", "format": "\u001b[90m{user-name}\u001b[34m@\u001b[90m{host-name}\u001b[0m \u001b[90m· Present day, present time\u001b[0m" },
+    { "type": "custom", "format": "\u001b[34m┌─────────────────────────────\u001b[0m" },
+    { "type": "host",     "key": "\u001b[34m│\u001b[0m ◆ NAVI",     "format": "{name}" },
+    { "type": "os",       "key": "\u001b[34m│\u001b[0m ◆ BASE",     "format": "{name} {version-id} ({codename})" },
+    { "type": "kernel",   "key": "\u001b[34m│\u001b[0m ◆ PROTOCOL", "format": "{release}" },
+    { "type": "uptime",   "key": "\u001b[34m│\u001b[0m ◆ ONLINE" },
+    { "type": "packages", "key": "\u001b[34m│\u001b[0m ◆ MODULES" },
+    { "type": "custom", "format": "\u001b[34m├─────────────────────────────\u001b[0m" },
+    { "type": "de",       "key": "\u001b[34m│\u001b[0m ◇ LAYER",    "format": "{pretty-name} {version}" },
+    { "type": "shell",    "key": "\u001b[34m│\u001b[0m ◇ SHELL",    "format": "{pretty-name} {version}" },
+    { "type": "terminal", "key": "\u001b[34m│\u001b[0m ◇ TERM",     "format": "{pretty-name}" },
+    { "type": "custom", "format": "\u001b[34m├─────────────────────────────\u001b[0m" },
+    { "type": "cpu",      "key": "\u001b[34m│\u001b[0m ▸ PSYCHE",   "format": "{name} ({cores-logical}) @ {freq-max}" },
+    { "type": "memory",   "key": "\u001b[34m│\u001b[0m ▸ MEMORY",   "format": "{used} / {total} {percentage-bar}" },
+    { "type": "disk",     "key": "\u001b[34m│\u001b[0m ▸ STORAGE",  "folders": "/", "format": "{size-used} / {size-total} {size-percentage-bar}" },
+    { "type": "localip",  "key": "\u001b[34m│\u001b[0m ▸ WIRED",    "showIpv4": true, "compact": true },
+    { "type": "custom", "format": "\u001b[34m└─────────────────────────────\u001b[0m" },
+    { "type": "custom", "format": "\u001b[3;90m  Close the world, Open the nExt.\u001b[0m" },
+    { "type": "colors", "symbol": "circle", "paddingLeft": 2 }
+  ]
+}
