@@ -61,7 +61,7 @@ example `curl -fsSL .../install.sh | COPLAND_REF=v1.0 bash`.
 | Id | Default | What you get |
 |---|---|---|
 | `packages` | on | installs the missing apt packages (sudo) |
-| `theme` | on | CoplandOS GTK 2/3 theme, xfwm4 window borders, notification style |
+| `theme` | on | CoplandOS GTK 2/3 theme, xfwm4 window borders, notification style, fonts (C059 for titles, Nimbus Sans for the interface) |
 | `icons` | on | Mac OS 9 icons (NineIcons from Platinum9). The show's Copland OS is drawn from Apple's Copland and Mac OS 8/9 |
 | `cursors` | on | classic Mac pixel-art cursors ([Retrosmart](https://github.com/useless-anvil/retrosmart-cursor), Mac-ish) |
 | `wallpaper` | on | the Copland OS Enterprise boot frame |

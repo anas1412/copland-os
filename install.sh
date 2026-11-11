@@ -279,14 +279,17 @@ step_theme() {
     xf xfwm4 /general/title_alignment string center
     xf xfwm4 /general/button_layout string "O|SHMC"
     xf xfce4-notifyd /theme string CoplandOS
+    # interface font: Nimbus Sans, a Helvetica clone from the same URW family as C059
+    xf xsettings /Gtk/FontName string "Nimbus Sans 10"
     if have gsettings; then
         run gsettings set org.gnome.desktop.interface gtk-theme CoplandOS || true
         run gsettings set org.gnome.desktop.interface color-scheme prefer-dark || true
+        run gsettings set org.gnome.desktop.interface font-name "Nimbus Sans 10" || true
     fi
     local fonts=""
     if have fc-list; then fonts="$(fc-list 2>/dev/null || true)"; fi
     if have fc-list && [[ "$fonts" != *C059* ]]; then
-        note "installed; font C059 (fonts-urw-base35) is missing, titles fall back to the default font"
+        note "installed; fonts-urw-base35 (C059, Nimbus Sans) is missing, so the default fonts are used"
     fi
 }
 
