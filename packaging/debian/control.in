@@ -7,7 +7,7 @@ Maintainer: Copland OS project <anas1412@users.noreply.github.com>
 Homepage: https://github.com/anas1412/copland-os
 Installed-Size: @SIZE@
 Depends: xfce4, xfce4-whiskermenu-plugin, xfce4-terminal, xfce4-notifyd, adwaita-icon-theme, fonts-urw-base35, fonts-dejavu-core, fonts-dejavu-mono, gtk2-engines-murrine, libgtk-3-bin, python3, devilspie2, fastfetch
-Recommends: xfce4-pulseaudio-plugin, lightdm, lightdm-gtk-greeter, plymouth, console-setup, grub-common
+Recommends: xfce4-pulseaudio-plugin, lightdm, lightdm-gtk-greeter, plymouth, console-setup, fonts-terminus, grub-common, btop
 Description: Copland OS look for Debian XFCE (Serial Experiments Lain)
  Applies the Copland OS Enterprise look system-wide: GTK and window theme, Mac OS 9
  icons, classic Mac cursors, wallpaper, top bar, terminal colours, fastfetch, four

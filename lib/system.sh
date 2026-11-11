@@ -332,7 +332,7 @@ set_issue() {
     fi
     install -d -m 755 "$TGT$SYS_STATE"
     [ -f "$TGT$SYS_STATE/issue.orig" ] || cp -a "$f" "$TGT$SYS_STATE/issue.orig"
-    printf '%s\n\n' 'Copland OS Enterprise (Debian \S{VERSION_ID}) \n \l' > "$f"
+    cat "$CONFIG/issue" > "$f"
     record "issue:/etc/issue"
 }
 

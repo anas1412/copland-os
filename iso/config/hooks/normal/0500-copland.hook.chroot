@@ -1,17 +1,16 @@
 #!/bin/sh
-# Copland OS: apply the look system-wide inside the image, with the same code as
-# "sudo ./install.sh --system" on a real machine. iso/build.sh staged the repo in
-# /usr/share/copland-os and the pinned boot animation next to it.
-# live-build rebuilds the initramfs after the hooks, and Calamares writes GRUB at
-# install time, so both are skipped here (--no-rebuild).
+# Copland OS is in the image as the copland-os-desktop package (iso/build.sh put it in
+# config/packages.chroot, and live-build installed it with apt), so dpkg owns its files
+# and installed systems update it with apt.
+#
+# Its install script runs once more here, after every package is in: plymouth and
+# console-setup are only Recommends, so apt may have set them up after it, and then the
+# boot animation and the console font would not be set. Every step in it is safe to
+# repeat. live-build rebuilds the initramfs after the hooks, and Calamares writes GRUB at
+# install time.
 set -e
 
-COPLAND_PLYMOUTH_SRC=/usr/share/copland-os/plymouth-src/copland
-export COPLAND_PLYMOUTH_SRC
-NO_COLOR=1
-export NO_COLOR
+/var/lib/dpkg/info/copland-os-desktop.postinst configure
 
-bash /usr/share/copland-os/install.sh --system --yes --no-packages --no-rebuild --root /
-
-# the boot animation source was only needed at build time
-rm -rf /usr/share/copland-os/plymouth-src
+# the boot animation must be the default, or the image boots with Debian's
+[ "$(/usr/sbin/plymouth-set-default-theme)" = copland ]

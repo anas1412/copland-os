@@ -13,7 +13,7 @@ set -Eeuo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/.." && pwd)"
-OUT="$HERE/out"
+OUT="${COPLAND_DEB_OUT:-$HERE/out}"
 PKG=copland-os-desktop
 
 say() { printf ' > %s\n' "$*"; }

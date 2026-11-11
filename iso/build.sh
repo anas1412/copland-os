@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 # Build CoplandOS.iso: upstream Debian (release set in iso/release.conf) + XFCE,
-# with Copland OS applied system-wide.
+# with Copland OS installed as the copland-os-desktop package, so installed systems
+# get Copland updates from its apt repository like any other package.
 #
 #   sudo ./iso/build.sh              build iso/out/CoplandOS-<version>-deb<debian>-amd64.iso (+ .sha256)
 #   sudo ./iso/build.sh --clean      remove the work folder, including its package cache
 #   ./iso/build.sh --check           only run the checks, no root needed
 #
-# Needs: root, live-build, debootstrap, wget, about 20 GB free and a network
-# connection. The work folder is /var/tmp/coplandos-build (override with
+# Needs: root, live-build, debootstrap, wget, dpkg-deb, gpgv, about 20 GB free, a
+# network connection, and the apt repository published (packaging/publish-repo.sh):
+# the image's apt source points at it. The work folder is /var/tmp/coplandos-build (override with
 # COPLAND_ISO_WORK=/path); it is reused, so a second build downloads much less.
 set -Eeuo pipefail
 
@@ -27,8 +29,8 @@ load_release() {
     [ -f "$HERE/release.conf" ] || die "iso/release.conf is missing."
     # shellcheck source=/dev/null
     . "$HERE/release.conf"
-    [ -n "${COPLAND_VERSION:-}" ] && [ -n "${DEBIAN_CODENAME:-}" ] && [ -n "${DEBIAN_VERSION:-}" ] \
-        || die "iso/release.conf must set COPLAND_VERSION, DEBIAN_CODENAME and DEBIAN_VERSION."
+    [ -n "${COPLAND_VERSION:-}" ] && [ -n "${DEBIAN_CODENAME:-}" ] && [ -n "${DEBIAN_VERSION:-}" ] && [ -n "${COPLAND_APT_URL:-}" ] \
+        || die "iso/release.conf must set COPLAND_VERSION, DEBIAN_CODENAME, DEBIAN_VERSION and COPLAND_APT_URL."
     case "$DEBIAN_CODENAME$DEBIAN_VERSION" in *[!a-z0-9]*) die "iso/release.conf: unexpected characters." ;; esac
     [[ "$COPLAND_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "iso/release.conf: COPLAND_VERSION must look like 0.1.0."
     if [ -d /usr/share/debootstrap/scripts ] && [ ! -e "/usr/share/debootstrap/scripts/$DEBIAN_CODENAME" ]; then
@@ -38,9 +40,9 @@ load_release() {
 
 checks() {
     local missing=() p
-    for p in lb debootstrap wget git tar; do have "$p" || missing+=("$p"); done
+    for p in lb debootstrap wget git tar dpkg-deb gpgv; do have "$p" || missing+=("$p"); done
     if [ "${#missing[@]}" -gt 0 ]; then
-        die "Missing tools: ${missing[*]}. Install them with:  sudo apt install live-build debootstrap wget git"
+        die "Missing tools: ${missing[*]}. Install them with:  sudo apt install live-build debootstrap wget git gpgv"
     fi
     [ -f "$REPO/install.sh" ] && [ -d "$REPO/core" ] && [ -d "$REPO/lib" ] || die "Run this from the copland-os repository."
     mkdir -p "$WORK" 2>/dev/null || true
@@ -61,7 +63,19 @@ checks() {
         export MKSQUASHFS_OPTIONS="${MKSQUASHFS_OPTIONS:-} -processors 2 -mem 768M"
         say "Low memory (${mem_mb} MB): image compression limited to 2 threads and 768 MB; close other apps while it runs"
     fi
-    say "Checks passed: Copland OS $COPLAND_VERSION on Debian $DEBIAN_VERSION ($DEBIAN_CODENAME), tools present, ${free_gb} GB free at $dir"
+    # the image's apt source must work from the first boot (and live-build runs apt
+    # update with it at the end): the repository has to be published and signed by the
+    # key the image trusts
+    local keyring="$REPO/packaging/copland-os-archive-keyring.gpg" rel
+    [ -f "$keyring" ] || die "packaging/copland-os-archive-keyring.gpg is missing."
+    rel="$(mktemp)"
+    if ! wget -q -O "$rel" "$COPLAND_APT_URL/dists/$DEBIAN_CODENAME/InRelease"; then
+        rm -f "$rel"
+        die "The apt repository is not published at $COPLAND_APT_URL ($DEBIAN_CODENAME). Publish it first: docs/BUILDING.md, 'apt repository'."
+    fi
+    gpgv --keyring "$keyring" "$rel" >/dev/null 2>&1 || { rm -f "$rel"; die "$COPLAND_APT_URL serves an InRelease that packaging/copland-os-archive-keyring.gpg does not verify."; }
+    rm -f "$rel"
+    say "Checks passed: Copland OS $COPLAND_VERSION on Debian $DEBIAN_VERSION ($DEBIAN_CODENAME), tools present, apt repository signed and served, ${free_gb} GB free at $dir"
 }
 
 # fill FILE: put the release values from iso/release.conf into a staged file
@@ -78,23 +92,34 @@ stage() {
     cp -a "$HERE/auto" "$HERE/config" "$HERE/release.conf" "$WORK"/
     fill "$WORK/config/hooks/normal/0510-copland-installer.hook.chroot"
 
-    say "Copying the Copland OS installer into the image (/usr/share/copland-os)"
-    mkdir -p "$inc/usr/share/copland-os"
-    tar -C "$REPO" --exclude=.git --exclude=iso --exclude=docs -cf - . | tar -C "$inc/usr/share/copland-os" -xf -
+    say "Fetching the boot animation (pinned commit ${PLYMOUTH_COMMIT:0:7})"
+    local ply="$WORK/plymouth-src"
+    git clone -q "$PLYMOUTH_REPO" "$ply"
+    git -C "$ply" -c advice.detachedHead=false checkout -q "$PLYMOUTH_COMMIT"
+    [ -f "$ply/copland/copland.plymouth" ] || die "Unexpected layout in $PLYMOUTH_REPO"
+
+    # the look goes in as the copland-os-desktop package: live-build installs every
+    # .deb in config/packages.chroot with apt, so dpkg owns the files and apt can
+    # update them later
+    say "Building the copland-os-desktop package"
+    mkdir -p "$WORK/config/packages.chroot"
+    COPLAND_DEB_OUT="$WORK/deb" COPLAND_PLYMOUTH_SRC="$ply/copland" "$REPO/packaging/build-deb.sh"
+    DEB="$(ls "$WORK"/deb/copland-os-desktop_*_all.deb)"
+    cp "$DEB" "$WORK/config/packages.chroot/"
+
+    say "Adding the Copland apt source, its key and the console login line"
+    install -D -m 644 "$REPO/packaging/copland-os-archive-keyring.gpg" "$inc/usr/share/keyrings/copland-os-archive-keyring.gpg"
+    mkdir -p "$inc/etc/apt/sources.list.d"
+    printf 'Types: deb\nURIs: %s\nSuites: %s\nComponents: main\nSigned-By: /usr/share/keyrings/copland-os-archive-keyring.gpg\n' \
+        "$COPLAND_APT_URL" "$DEBIAN_CODENAME" > "$inc/etc/apt/sources.list.d/copland-os.sources"
+    # /etc/issue belongs to base-files, so the package leaves it alone; the image sets it
+    install -D -m 644 "$REPO/core/config/issue" "$inc/etc/issue"
+
     # installer branding, used once by the 0510 hook and removed again
     mkdir -p "$inc/usr/share/copland-os/iso-branding"
     cp -a "$HERE/branding/." "$inc/usr/share/copland-os/iso-branding/"
     fill "$inc/usr/share/copland-os/iso-branding/branding.desc"
     if grep -rqE '@(COPLAND|DEBIAN)_VERSION@' "$WORK/config" "$inc/usr/share/copland-os/iso-branding"; then die "A release placeholder was left unfilled."; fi
-
-    say "Fetching the boot animation (pinned commit ${PLYMOUTH_COMMIT:0:7})"
-    local src="$inc/usr/share/copland-os/plymouth-src"
-    git clone -q "$PLYMOUTH_REPO" "$src.git"
-    git -C "$src.git" -c advice.detachedHead=false checkout -q "$PLYMOUTH_COMMIT"
-    [ -f "$src.git/copland/copland.plymouth" ] || die "Unexpected layout in $PLYMOUTH_REPO"
-    mkdir -p "$src"
-    cp -a "$src.git/copland" "$src/copland"
-    rm -rf "$src.git"
 }
 
 # record_build NAME: what went into the image, next to it, so a build can be traced and repeated
@@ -110,7 +135,8 @@ record_build() {
         echo "working copy:   ${dirty}"
         echo "live-build:     $(dpkg-query -W -f='${Version}' live-build 2>/dev/null || echo unknown)"
         echo "debootstrap:    $(dpkg-query -W -f='${Version}' debootstrap 2>/dev/null || echo unknown)"
-        echo "copland os:     $COPLAND_VERSION, from iso/release.conf"
+        echo "copland os:     $COPLAND_VERSION, from iso/release.conf ($(basename "$DEB"))"
+        echo "apt source:     $COPLAND_APT_URL $DEBIAN_CODENAME main"
         echo "debian release: $DEBIAN_VERSION ($DEBIAN_CODENAME), from iso/release.conf"
         echo "build host:     $(. /etc/os-release && echo "$PRETTY_NAME"), $(uname -m)"
         echo "boot animation: $PLYMOUTH_REPO @ $PLYMOUTH_COMMIT"

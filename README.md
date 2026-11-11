@@ -22,8 +22,10 @@ yourself (below); everything inside it is the same code the installer uses.
 
 What is in it: Debian 13 with a lean XFCE desktop
 (Firefox ESR, terminal, file manager, text editor, image and PDF viewers, no
-LibreOffice), Copland OS applied system-wide with the same `--system` code, and
-the Calamares installer branded as Copland OS. The image's own boot menu and the
+LibreOffice), Copland OS installed as the `copland-os-desktop` package (the same
+files as `--system`), and the Calamares installer branded as Copland OS. Installed
+systems get Debian's updates and Copland's with the same `sudo apt update && sudo apt
+upgrade`: the image includes Copland's signed apt source next to Debian's. The image's own boot menu and the
 installed system's boot menu both have the Copland look. The live user is `lain`
 (password `live`, live-config's default) and the hostname `coplandos`.
 
@@ -35,7 +37,8 @@ sudo ./iso/build.sh            # -> iso/out/CoplandOS-<version>-deb13-amd64.iso 
 ./iso/build.sh --check         # only the checks, no root
 ```
 
-The build needs root, about 20 GB free and a network connection; it works in
+The build needs root, about 20 GB free, a network connection, and the apt repository
+published (the image's apt source points at it, so the build checks it first); it works in
 `/var/tmp/coplandos-build` (set `COPLAND_ISO_WORK` to change it). Each image comes
 with a build record (repo commit, tool versions, every package with its version,
 the log). The whole method is in [docs/BUILDING.md](docs/BUILDING.md). So far the
@@ -194,7 +197,9 @@ and `--no-rebuild` skip apt and the initramfs/GRUB rebuild.
 ## Install with apt (not published yet)
 
 Once the repository is published, any Debian 13 XFCE system can get Copland OS as a
-normal package and keep it updated with `apt`:
+normal package and keep it updated with `apt`. It works like any third-party apt
+repository (Brave's, for example): Debian's own sources stay as they are, and one
+more source is added for this one package. CoplandOS.iso already includes it.
 
 ```bash
 sudo curl -fsSLo /usr/share/keyrings/copland-os-archive-keyring.gpg https://anas1412.github.io/copland-os/copland-os-archive-keyring.gpg
@@ -220,8 +225,8 @@ needed): the same files as `--system`, with Debian's package manager tracking th
 so the look can later be updated with `apt` and removed with
 `sudo apt purge copland-os-desktop` (`purge`, not `remove`: settings under `/etc` are
 kept on a plain remove). The version is `COPLAND_VERSION` plus the Debian release (both in `iso/release.conf`),
-for example `0.1.0+deb13`. Not yet published in an apt repository, and not yet tested
-by installing it (that needs a VM).
+for example `0.1.0+deb13`. CoplandOS.iso is built with it. Not yet published in an apt
+repository, and not yet tested by installing it (the ISO test in a VM is its first).
 
 ## Supported systems
 

@@ -43,15 +43,26 @@ Results in `iso/out/`, named from `iso/release.conf` (for example
 
 ## What the build does
 
-1. Checks the tools, free space and the work folder.
+1. Checks the tools, free space, the work folder, and that the apt repository is
+   published at `COPLAND_APT_URL` with an `InRelease` signed by
+   `packaging/copland-os-archive-keyring.gpg`. The image's apt source points there, so
+   an unpublished repository would break `apt update` (live-build itself runs it at the
+   end of the build).
 2. Copies `iso/auto` and `iso/config` into the work folder (keeping the package cache from an
    earlier build).
-3. Copies the repo (without `.git`, `iso/` and `docs/`) into the image at `/usr/share/copland-os`,
-   the installer branding next to it, and the boot animation from its pinned commit.
+3. Fetches the boot animation from its pinned commit and builds the `copland-os-desktop`
+   package with it (`packaging/build-deb.sh`) into `config/packages.chroot/`. Adds the
+   Copland apt source (`/etc/apt/sources.list.d/copland-os.sources`), its public key
+   (`/usr/share/keyrings/copland-os-archive-keyring.gpg`), the console login line
+   (`/etc/issue`, which belongs to base-files, so the package can't ship it) and the
+   installer branding.
 4. `lb config` (options in `iso/auto/config`), then `lb build`. Inside the image:
-   - `config/package-lists/copland.list.chroot` installs the desktop and tools;
-   - hook `0500-copland` runs `install.sh --system --no-packages --no-rebuild --root /`,
-     the same code as `sudo ./install.sh --system` on a real machine;
+   - `config/package-lists/copland.list.chroot` installs the desktop and tools, and
+     live-build installs `copland-os-desktop` from `config/packages.chroot` with apt, so
+     dpkg owns every Copland file and `apt upgrade` updates them on installed systems;
+   - hook `0500-copland` runs the package's install script once more, after every
+     package is in (plymouth and console-setup are only recommended, so apt may have
+     set them up after it), and checks the boot animation is the default;
    - hook `0510-copland-installer` brands Calamares (diverting Debian's settings and launcher);
    - `config/bootloaders/` gives the image's own boot menu the Copland look.
 5. Renames the image, writes the checksum and the build record.
@@ -113,15 +124,17 @@ up before release day.
    description, then merge and tag.
 
 Installed systems move to the new release with Debian's own upgrade procedure (its
-release notes). The Copland files survive the upgrade. They are updated by apt once
-the `copland-os-desktop` package is published in an apt repository (see
-`packaging/`; its version carries the Debian release, so a package is built per
-release); until then, run `sudo ./install.sh --system` again after upgrading.
+release notes). The Copland files belong to the `copland-os-desktop` package, whose
+version carries the Debian release (`+deb13`), so publish the package built for the new
+release before users upgrade; apt then replaces it like any other package. Machines
+set up with `install.sh --system` instead run it again after upgrading.
 
 ## apt repository
 
 The package is published as a signed apt repository on GitHub Pages (the `gh-pages`
-branch, served at `https://anas1412.github.io/copland-os/apt`). Publishing is done by
+branch, served at `COPLAND_APT_URL` from `iso/release.conf`). Every CoplandOS.iso
+carries this source and its key, so installed systems get Copland updates with
+`apt upgrade`; the ISO build refuses to start until the repository is published. Publishing is done by
 hand from the maintainer's machine, so the signing key never leaves it: anyone holding
 that key can ship code that runs as root on every machine using the repository.
 
@@ -139,16 +152,36 @@ example on a USB stick:
 gpg --armor --export-secret-keys "Copland OS archive signing key" > copland-os-signing-key.asc
 ```
 
+Put the public key in the repo, so the ISO build and `publish-repo.sh` use it:
+
+```bash
+gpg --export "Copland OS archive signing key" > packaging/copland-os-archive-keyring.gpg
+gpg --armor --export "Copland OS archive signing key" > packaging/copland-os-archive-keyring.asc
+```
+
 If the key is lost, every user has to trust a new one by hand. Before it expires,
 extend it with `gpg --quick-set-expire <fingerprint> 2y` and publish again.
+
+### Once: turn on GitHub Pages
+
+After the first push of `gh-pages`: repository Settings, Pages, source "Deploy from a
+branch", branch `gh-pages`, folder `/ (root)`. Or with the GitHub CLI:
+
+```bash
+gh api -X POST repos/anas1412/copland-os/pages -f 'source[branch]=gh-pages' -f 'source[path]=/'
+```
 
 ### Each release
 
 ```bash
 ./packaging/build-deb.sh
-./packaging/publish-repo.sh --key "Copland OS archive signing key"
+./packaging/publish-repo.sh
 git -C packaging/out/gh-pages push origin gh-pages
 ```
+
+`publish-repo.sh` signs with the key in `packaging/copland-os-archive-keyring.gpg`, so
+its secret half must be in your gpg keyring. Publish before building an ISO of the
+same version.
 
 `publish-repo.sh` adds every `.deb` in `packaging/out/` to the pool (older versions
 stay), rebuilds the indexes for the release in `iso/release.conf`, signs them (gpg asks
