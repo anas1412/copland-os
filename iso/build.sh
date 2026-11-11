@@ -28,7 +28,7 @@ checks() {
     if [ "${#missing[@]}" -gt 0 ]; then
         die "Missing tools: ${missing[*]}. Install them with:  sudo apt install live-build debootstrap wget git"
     fi
-    [ -f "$REPO/install.sh" ] && [ -d "$REPO/core" ] && [ -d "$REPO/lib" ] || die "Run this from the copland-os-dotfiles repository."
+    [ -f "$REPO/install.sh" ] && [ -d "$REPO/core" ] && [ -d "$REPO/lib" ] || die "Run this from the copland-os repository."
     mkdir -p "$WORK" 2>/dev/null || true
     local dir="$WORK"; [ -d "$dir" ] || dir="$(dirname "$WORK")"
     local free_gb
@@ -40,6 +40,13 @@ checks() {
     case "$(findmnt -n -o OPTIONS -T "$dir" 2>/dev/null || true)" in
         *noexec*|*nodev*) die "$dir is mounted noexec or nodev; live-build needs both allowed." ;;
     esac
+    # small machines: the squashfs compression is the step that needs the most memory
+    local mem_mb
+    mem_mb=$(( $(awk '/^MemTotal:/ {print $2}' /proc/meminfo) / 1024 ))
+    if [ "$mem_mb" -lt 6144 ]; then
+        export MKSQUASHFS_OPTIONS="${MKSQUASHFS_OPTIONS:-} -processors 2 -mem 768M"
+        say "Low memory (${mem_mb} MB): image compression limited to 2 threads and 768 MB; close other apps while it runs"
+    fi
     say "Checks passed: tools present, ${free_gb} GB free at $dir"
 }
 

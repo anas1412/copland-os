@@ -31,7 +31,7 @@ banner() {
 EOF
     printf '%s\n' "$R"
     printf '        %s%sC O P L A N D   O S   E N T E R P R I S E%s\n' "$B" "$TX" "$R"
-    printf '        %sTachibana General Laboratories %s·%s dotfiles installer v%s%s\n\n' "$DM" "$BL" "$DM" "$VERSION" "$R"
+    printf '        %sTachibana General Laboratories %s·%s installer v%s%s\n\n' "$DM" "$BL" "$DM" "$VERSION" "$R"
 }
 
 # --------------------------------------------------------------------- menu

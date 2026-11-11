@@ -15,10 +15,10 @@ strings:
     versionedName:       Copland OS Enterprise (Debian 13)
     shortVersionedName:  Copland OS 13
     bootloaderEntryName: Copland OS Enterprise
-    productUrl:          https://github.com/anas1412/copland-os-dotfiles
-    supportUrl:          https://github.com/anas1412/copland-os-dotfiles/issues
-    knownIssuesUrl:      https://github.com/anas1412/copland-os-dotfiles/issues
-    releaseNotesUrl:     https://github.com/anas1412/copland-os-dotfiles#readme
+    productUrl:          https://github.com/anas1412/copland-os
+    supportUrl:          https://github.com/anas1412/copland-os/issues
+    knownIssuesUrl:      https://github.com/anas1412/copland-os/issues
+    releaseNotesUrl:     https://github.com/anas1412/copland-os#readme
     donateUrl:           https://www.debian.org/donations
 sidebar: widget
 navigation: widget

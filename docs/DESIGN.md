@@ -3,7 +3,8 @@
 The look is the Copland OS Enterprise boot screen from *Serial Experiments Lain*:
 deep navy, a glowing cyan eye, a serif italic wordmark. Everything else is classic
 Mac (late-1990s) shapes on top of that palette. This page is the reference; when a
-value changes, change it here and in the files listed next to it.
+value changes, change it here and in the files listed next to it. Every choice here
+states its reason; a value without one is an open question, not a decision.
 
 ## Palette
 
@@ -82,7 +83,16 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
 - **Gaps:** 6/4 px margins around the menu button, 2 px between layer buttons, 4 px
   around the clock, spacers at both outer edges (`gtk.css` "panel spacing").
 - **Window titles:** centred, C059 Bold Italic 10, no app icon.
-- **Layers:** four workspaces named `Layer:01`–`Layer:04`, never more.
+- **Layers:** four workspaces named `Layer:01`–`Layer:04`. Why four:
+  - it is XFCE's own default (`workspace_count=4` in `/usr/share/xfwm4/defaults`), so
+    XFCE users keep the number they know;
+  - it maps to four common kinds of app: web, work or editor, terminal, chat and media;
+  - Super+1–4 sit under the left hand next to Super, on QWERTY and AZERTY; 5 and up
+    means stretching;
+  - the bar still has room: at 1366×768 the four labels and two open windows leave
+    about 300 px of the window list free (checked in a test session, 2026-11-11).
+  The count and names are one row in `core/settings.tsv`; the layer tools accept any
+  number, only Super+1–4 are bound.
 
 ## Voice and wording
 

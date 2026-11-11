@@ -13,11 +13,15 @@ Debian's own tool, live-build, from the files in `iso/`.
 
 `./iso/build.sh --check` runs the checks without root.
 
+With less than 6 GB of RAM the build limits the final image compression to 2 threads
+and 768 MB (`MKSQUASHFS_OPTIONS`); it is slower but fits a 4 GB machine. Close other
+apps while it runs. Set `MKSQUASHFS_OPTIONS` yourself to override.
+
 ## Build
 
 ```bash
-git clone https://github.com/anas1412/copland-os-dotfiles.git
-cd copland-os-dotfiles
+git clone https://github.com/anas1412/copland-os.git
+cd copland-os
 sudo ./iso/build.sh
 ```
 

@@ -1,7 +1,12 @@
 # Copland OS Enterprise for Debian XFCE
 
 A Serial Experiments Lain desktop for Debian XFCE: the Copland OS look from the
-show, with one installer that sets up the whole thing, not just config files.
+show, set up as a whole, not just config files. Three ways to get it:
+
+- **One line** on an existing Debian XFCE install, for your own account (below).
+- **System-wide** for every account on a machine: `sudo ./install.sh --system`.
+- **CoplandOS.iso**, a live and installable Debian 13 image with everything built in
+  (build it yourself for now; see [docs/BUILDING.md](docs/BUILDING.md)).
 
 ![Copland OS Enterprise on Debian XFCE](docs/screenshot.png)
 
@@ -10,24 +15,24 @@ show, with one installer that sets up the whole thing, not just config files.
 One line, from a terminal inside your XFCE session, as your own user:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os-dotfiles/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os/main/install.sh | bash
 ```
 
-It downloads the dotfiles to `~/.local/share/copland-os/src/` and opens the menu:
+It downloads the repository to `~/.local/share/copland-os/src/` and opens the menu:
 arrow keys to move, space to toggle a component, enter to install. Nothing is
 changed before you confirm.
 
 Pass options after `bash -s --`, for example a dry run:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os-dotfiles/main/install.sh | bash -s -- --dry-run
+curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os/main/install.sh | bash -s -- --dry-run
 ```
 
 Or from a clone:
 
 ```bash
-git clone https://github.com/anas1412/copland-os-dotfiles.git
-cd copland-os-dotfiles
+git clone https://github.com/anas1412/copland-os.git
+cd copland-os
 ./install.sh
 ```
 
@@ -46,8 +51,8 @@ Every component can be installed on its own. In the menu, press `n` to clear the
 selection and space to pick only what you want. Or name them with `--only`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os-dotfiles/main/install.sh | bash -s -- --only cursors
-curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os-dotfiles/main/install.sh | bash -s -- --only theme,icons,wallpaper
+curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os/main/install.sh | bash -s -- --only cursors
+curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os/main/install.sh | bash -s -- --only theme,icons,wallpaper
 ```
 
 `--list` prints the ids. Running a component again is safe: it backs up what it
@@ -123,8 +128,8 @@ Both are off by default and need sudo.
 yours. It needs sudo and a Debian-based system.
 
 ```bash
-git clone https://github.com/anas1412/copland-os-dotfiles.git
-cd copland-os-dotfiles
+git clone https://github.com/anas1412/copland-os.git
+cd copland-os
 sudo ./install.sh --system
 ```
 

@@ -96,7 +96,7 @@ preflight_system() {
     for f in assets/themes/CoplandOS/gtk-3.0/gtk.css assets/backgrounds/CoplandOS.png assets/icons/NineIcons/index.theme \
              "assets/cursors/$CURSOR_THEME/index.theme" settings.tsv config/fastfetch/config.jsonc \
              config/devilspie2/layers.lua bin/copland-goto bin/copland-send bin/copland-layers; do
-        [ -e "$CORE/$f" ] || die "The dotfiles folder is incomplete: core/$f is missing."
+        [ -e "$CORE/$f" ] || die "The Copland OS folder is incomplete: core/$f is missing."
     done
     [ -x "$SRC/tools/xfconf-xml.py" ] || die "tools/xfconf-xml.py is missing."
     have python3 || die "python3 is required to write the XFCE defaults."

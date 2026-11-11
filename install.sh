@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Copland OS Enterprise for Debian XFCE — dotfiles installer.
+# Copland OS Enterprise for Debian XFCE — installer.
 #
-#   curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os-dotfiles/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os/main/install.sh | bash
 #                             one-liner: downloads everything, then opens the menu
 #   ./install.sh              interactive menu (from a clone)
 #   ./install.sh --yes        install the default selection without asking
@@ -19,7 +19,7 @@
 set -Eeuo pipefail
 
 VERSION="1.0"
-REPO_SLUG="anas1412/copland-os-dotfiles"
+REPO_SLUG="anas1412/copland-os"
 # When run as a one-liner there is no script file, so this resolves to the current folder;
 # bootstrap() then downloads the rest.
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || pwd)"
@@ -82,7 +82,7 @@ fi
 
 usage() {
     cat <<USAGE
-Copland OS Enterprise for Debian XFCE — dotfiles installer.
+Copland OS Enterprise for Debian XFCE — installer.
 
   curl -fsSL https://raw.githubusercontent.com/$REPO_SLUG/main/install.sh | bash
                             one-liner: downloads everything, then opens the menu
@@ -109,8 +109,8 @@ USAGE
 bootstrap() {
     [ -d "$CORE" ] && return 0
     local ref="${COPLAND_REF:-main}" dest="$STATE/src" tmp
-    have curl || die "curl is required to download the dotfiles."
-    have tar  || die "tar is required to unpack the dotfiles."
+    have curl || die "curl is required to download Copland OS."
+    have tar  || die "tar is required to unpack Copland OS."
     printf ' %s%s%s Downloading %s (%s)...\n' "$CY" "$G_PTR" "$R" "$REPO_SLUG" "$ref"
     mkdir -p "$STATE"
     tmp="$(mktemp -d "$STATE/.download.XXXXXX")"
@@ -131,7 +131,7 @@ bootstrap() {
     tar -xzf "$tmp/src.tar.gz" -C "$tmp/src" --strip-components=1 --no-same-owner \
         || { rm -rf "$tmp"; die "The downloaded archive could not be unpacked."; }
     [ -f "$tmp/src/install.sh" ] && [ -d "$tmp/src/core" ] \
-        || { rm -rf "$tmp"; die "The download does not look like the Copland OS dotfiles."; }
+        || { rm -rf "$tmp"; die "The download does not look like the Copland OS repository."; }
     rm -rf "$dest"
     mv "$tmp/src" "$dest"
     rm -rf "$tmp"
