@@ -2056,7 +2056,6 @@ headerbar viewswitcher button stack box { padding-top: 0px; padding-bottom: 0px;
 .xfce4-panel.background {
   background-color: rgba(16, 24, 56, 0.90);
   color: #ccddff;
-  border-bottom: 1px solid #197aba;
 }
 .xfce4-panel.background button,
 .xfce4-panel.background .tasklist button {

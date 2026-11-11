@@ -41,12 +41,13 @@ PACKAGES=(xfce4-whiskermenu-plugin xfce4-pulseaudio-plugin xfce4-terminal xfce4-
           fonts-dejavu-mono gtk2-engines-murrine libgtk-3-bin python3 fastfetch devilspie2)
 
 # ---------------------------------------------------------------- components
-IDS=(packages theme icons icons95 cursors wallpaper panel terminal layers keys greeter boot)
+IDS=(packages theme icons iconsblue icons95 cursors wallpaper panel terminal layers keys greeter boot)
 declare -A TITLE DESC ON SUDO RESULT NOTE
 TITLE[packages]="Packages";        DESC[packages]="install the missing apt packages";              ON[packages]=1;  SUDO[packages]=1
 TITLE[theme]="Theme";              DESC[theme]="GTK, window borders, notifications";               ON[theme]=1;     SUDO[theme]=0
-TITLE[icons]="Icons";              DESC[icons]="blue duotone of Papirus, white panel icons";       ON[icons]=1;     SUDO[icons]=0
-TITLE[icons95]="Win95 icons";      DESC[icons95]="Chicago95 icons instead (downloads ~30 MB)";    ON[icons95]=0;   SUDO[icons95]=0
+TITLE[icons]="Icons";              DESC[icons]="Mac OS 9 icons (NineIcons), bundled";              ON[icons]=1;     SUDO[icons]=0
+TITLE[iconsblue]="Blue icons";     DESC[iconsblue]="instead: blue duotone built from Papirus";     ON[iconsblue]=0; SUDO[iconsblue]=0
+TITLE[icons95]="Win95 icons";      DESC[icons95]="instead: Chicago95 (downloads ~30 MB)"     ;    ON[icons95]=0;   SUDO[icons95]=0
 TITLE[cursors]="Cursors";          DESC[cursors]="Adwaita cursors tinted Copland cyan";            ON[cursors]=1;   SUDO[cursors]=0
 TITLE[wallpaper]="Wallpaper";      DESC[wallpaper]="Copland OS Enterprise boot frame";             ON[wallpaper]=1; SUDO[wallpaper]=0
 TITLE[panel]="Top bar";            DESC[panel]="replaces your panel layout (backed up)";           ON[panel]=1;     SUDO[panel]=0
@@ -145,7 +146,7 @@ preflight() {
     [ "${BASH_VERSINFO[0]}" -ge 4 ] || die "bash 4 or newer is required."
     [ "$EUID" -ne 0 ] || die "Do not run this as root. Run it as your own user; it asks for sudo only where needed."
     local f
-    for f in themes/CoplandOS/gtk-3.0/gtk.css themes/CoplandOS/xfwm4/themerc backgrounds/CoplandOS.png \
+    for f in themes/CoplandOS/gtk-3.0/gtk.css themes/CoplandOS/xfwm4/themerc backgrounds/CoplandOS.png icons/NineIcons/index.theme \
              fastfetch/config.jsonc devilspie2/layers.lua bin/copland-layers bin/copland-goto tools/copland_assets.py; do
         [ -e "$FILES/$f" ] || die "The dotfiles folder is incomplete: files/$f is missing."
     done
@@ -278,6 +279,16 @@ step_theme() {
 }
 
 step_icons() {
+    local dest="$HOME/.icons/NineIcons"
+    if [ -e "$dest" ] && [ "$DRY" -eq 0 ]; then mkdir -p "$BACKUP"; mv "$dest" "$BACKUP/icons-NineIcons"; fi
+    run mkdir -p "$HOME/.icons"
+    run cp -a "$FILES/icons/NineIcons" "$dest"
+    xf xsettings /Net/IconThemeName string NineIcons
+    if have gsettings; then run gsettings set org.gnome.desktop.interface icon-theme NineIcons || true; fi
+    [ -d /usr/share/icons/Adwaita ] || note "installed; adwaita-icon-theme is missing, so some icons will be blank"
+}
+
+step_iconsblue() {
     have python3 || skip "python3 is not installed"
     [ -d /usr/share/icons/Papirus ] && [ -d /usr/share/icons/Papirus-Dark ] || skip "papirus-icon-theme is not installed"
     local built=0
@@ -567,19 +578,29 @@ step_greeter() {
     [ -f "$GREETER" ] || skip "lightdm-gtk-greeter is not installed ($GREETER not found)"
     grep -q '^\[greeter\]' "$GREETER" || skip "no [greeter] section in $GREETER"
     local f
-    for f in "$THEME_DIR/gtk-3.0/gtk.css" "$ICON_DIR/index.theme" "$WALL"; do
+    local icons
+    icons="$(xfconf-query -c xsettings -p /Net/IconThemeName 2>/dev/null || echo NineIcons)"
+    for f in "$THEME_DIR/gtk-3.0/gtk.css" "$HOME/.icons/$icons/index.theme" "$WALL"; do
         [ -e "$f" ] || [ "$DRY" -eq 1 ] || skip "install Theme, Icons and Wallpaper first (missing $f)"
     done
     # the greeter runs as user 'lightdm' and cannot read your home folder
-    run sudo rm -rf /usr/share/themes/CoplandOS /usr/share/icons/CoplandOS
+    run sudo rm -rf /usr/share/themes/CoplandOS "/usr/share/icons/$icons"
     run sudo cp -a "$THEME_DIR" /usr/share/themes/CoplandOS
-    run sudo cp -a "$ICON_DIR" /usr/share/icons/CoplandOS
-    run sudo chown -R root:root /usr/share/themes/CoplandOS /usr/share/icons/CoplandOS
-    run sudo chmod -R go-w /usr/share/themes/CoplandOS /usr/share/icons/CoplandOS
+    run sudo cp -a "$HOME/.icons/$icons" "/usr/share/icons/$icons"
+    run sudo chown -R root:root /usr/share/themes/CoplandOS "/usr/share/icons/$icons"
+    run sudo chmod -R go-w /usr/share/themes/CoplandOS "/usr/share/icons/$icons"
+    # the cursors live in their own folder
+    if [ "$icons" != CoplandOS ] && [ -d "$ICON_DIR/cursors" ]; then
+        run sudo mkdir -p /usr/share/icons/CoplandOS
+        run sudo rm -rf /usr/share/icons/CoplandOS/cursors
+        run sudo cp -a "$ICON_DIR/cursors" /usr/share/icons/CoplandOS/cursors
+        run sudo chown -R root:root /usr/share/icons/CoplandOS
+        run sudo chmod -R go-w /usr/share/icons/CoplandOS
+    fi
     run sudo install -D -m 644 "$WALL" /usr/share/backgrounds/CoplandOS.png
     [ -f "$GREETER.copland-bak" ] || run sudo cp -a "$GREETER" "$GREETER.copland-bak"
     run sudo sed -i '/^# copland-begin$/,/^# copland-end$/d' "$GREETER"
-    run sudo sed -i '0,/^\[greeter\]/s//[greeter]\n# copland-begin\ntheme-name = CoplandOS\nicon-theme-name = CoplandOS\ncursor-theme-name = CoplandOS\ncursor-theme-size = 24\nbackground = \/usr\/share\/backgrounds\/CoplandOS.png\nuser-background = false\nfont-name = C059 Bold Italic 11\nclock-format = %H:%M\n# copland-end/' "$GREETER"
+    run sudo sed -i '0,/^\[greeter\]/s//[greeter]\n# copland-begin\ntheme-name = CoplandOS\nicon-theme-name = '"$icons"'\ncursor-theme-name = CoplandOS\ncursor-theme-size = 24\nbackground = \/usr\/share\/backgrounds\/CoplandOS.png\nuser-background = false\nfont-name = C059 Bold Italic 11\nclock-format = %H:%M\n# copland-end/' "$GREETER"
     [ "$DRY" -eq 1 ] || grep -q '^theme-name = CoplandOS$' "$GREETER" || { echo "greeter config was not updated"; exit 1; }
     note "installed; it is a snapshot, so run this component again after changing the theme or icons"
 }

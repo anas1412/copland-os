@@ -2227,7 +2227,6 @@ window.background.chromium button:not(.titlebutton) { border-color: #141c3a; }
 .xfce4-panel.background {
   background-color: rgba(16, 24, 56, 0.90);
   color: #ccddff;
-  border-bottom: 1px solid #197aba;
 }
 .xfce4-panel.background button,
 .xfce4-panel.background .tasklist button {
