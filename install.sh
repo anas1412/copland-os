@@ -9,7 +9,6 @@
 #   ./install.sh --only a,b   pick components by id (see --list)
 #   ./install.sh --list       list components
 #   ./install.sh --restore    put back the settings saved by the last run
-#   ./install.sh --force      rebuild things that already exist (icons, cursors)
 #
 # Safe by design: never runs as root, backs up before it changes anything,
 # runs every component on its own (one failure does not stop the rest),
@@ -27,35 +26,29 @@ STAMP="$(date +%Y%m%d-%H%M%S)"
 BACKUP="$STATE/backups/$STAMP"
 LOG="$STATE/install-$STAMP.log"
 REASON_FILE=""
-DRY=0; YES=0; FORCE=0; ONLY=""
+DRY=0; YES=0; ONLY=""
 
 THEME_DIR="$HOME/.themes/CoplandOS"
-ICON_DIR="$HOME/.icons/CoplandOS"
 WALL="$HOME/.local/share/backgrounds/CoplandOS.png"
 XML_DIR="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml"
 CHANNELS=(xsettings xfwm4 xfce4-panel xfce4-desktop xfce4-terminal xfce4-keyboard-shortcuts xfce4-notifyd)
 GREETER=/etc/lightdm/lightdm-gtk-greeter.conf
 GRUB=/etc/default/grub
 CURSOR_THEME="retrosmart-xcursor-mac-ish-classic"
-CHICAGO95_REPO="https://github.com/grassmunk/Chicago95.git"
-CHICAGO95_COMMIT="5da19b8b1e2a886ebf6628403023d5fac3acc3ee"   # pinned
 PLYMOUTH_REPO="https://github.com/faisalhsn/copland-plymouth-theme.git"
 PLYMOUTH_COMMIT="4e336d9e264723634ae1ed5dd38888cd2ab37c52"   # pinned: the repo is third-party
 
 PACKAGES=(xfce4-whiskermenu-plugin xfce4-pulseaudio-plugin xfce4-terminal xfce4-notifyd
-          papirus-icon-theme adwaita-icon-theme fonts-urw-base35 fonts-dejavu-core
+          adwaita-icon-theme fonts-urw-base35 fonts-dejavu-core
           fonts-dejavu-mono gtk2-engines-murrine libgtk-3-bin python3 fastfetch devilspie2)
 
 # ---------------------------------------------------------------- components
-IDS=(packages theme icons iconsblue icons95 cursors cursorscyan wallpaper panel terminal layers keys greeter boot)
+IDS=(packages theme icons cursors wallpaper panel terminal layers keys greeter boot)
 declare -A TITLE DESC ON SUDO RESULT NOTE
 TITLE[packages]="Packages";        DESC[packages]="install the missing apt packages";              ON[packages]=1;  SUDO[packages]=1
 TITLE[theme]="Theme";              DESC[theme]="GTK, window borders, notifications";               ON[theme]=1;     SUDO[theme]=0
-TITLE[icons]="Icons";              DESC[icons]="Mac OS 9 icons (NineIcons), bundled";              ON[icons]=1;     SUDO[icons]=0
-TITLE[iconsblue]="Blue icons";     DESC[iconsblue]="instead: blue duotone built from Papirus";     ON[iconsblue]=0; SUDO[iconsblue]=0
-TITLE[icons95]="Win95 icons";      DESC[icons95]="instead: Chicago95 (downloads ~30 MB)"     ;    ON[icons95]=0;   SUDO[icons95]=0
+TITLE[icons]="Icons";              DESC[icons]="Mac OS 9 icons (NineIcons)"         ;              ON[icons]=1;     SUDO[icons]=0
 TITLE[cursors]="Cursors";          DESC[cursors]="classic Mac pixel cursors (Retrosmart)";         ON[cursors]=1;   SUDO[cursors]=0
-TITLE[cursorscyan]="Cyan cursors"; DESC[cursorscyan]="instead: Adwaita cursors tinted cyan";       ON[cursorscyan]=0; SUDO[cursorscyan]=0
 TITLE[wallpaper]="Wallpaper";      DESC[wallpaper]="Copland OS Enterprise boot frame";             ON[wallpaper]=1; SUDO[wallpaper]=0
 TITLE[panel]="Top bar";            DESC[panel]="replaces your panel layout (backed up)";           ON[panel]=1;     SUDO[panel]=0
 TITLE[terminal]="Terminal";        DESC[terminal]="palette, font, fastfetch";                      ON[terminal]=1;  SUDO[terminal]=0
@@ -84,17 +77,29 @@ die()  { printf '\n %s%s %s%s\n' "$RD" "$G_FAIL" "$*" "$R" >&2; exit 1; }
 rule() { local i s=""; for ((i = 0; i < 62; i++)); do s+="$G_LINE"; done; printf ' %s%s%s\n' "$BL" "$s" "$R"; }
 
 banner() {
+    # the LainOS logo (Navi eye) from fastfetch, MIT licence
     printf '%s' "$CY"
     cat <<'EOF'
-
-                         .   ·   .
-                    .-==============-.
-          .:===:  .'    .--------.    '.  :===:.
-        (===:    /     (   (())   )     \    :===)
-          ':===:  '.    '--------'    .'  :===:'
-                    '-=====    =====-'
-             o           ||    ||           o
-                    ====='      '=====
+                    /==\
+                    \==/
+               · · · · · · ·
+            · · · · · · · · · ·
+           · · · .-======-.· · · ·
+        .::. ·.-============-.· .::.
+     .:==:· .:===:'. ·· .':===:. ·:==:.
+  .:===: · :===. ·  .--.  · .===: · :===:.
+ :===:· · :===. · .:====:. · .===: · ·:===:
+(===:· · :===- ·  :======:  · -===: · ·:===)
+ :===:· · :===. · ':====:' · .===: · ·:===:
+  ':===: · :===. ·  '--'  · .===: · :===:'
+     ':==:· ':===:.' ·· '.:===:' ·:==:'
+        '::' · '===-.  .-===' · '::'
+  /==\     · · · :===  ===: · · ·     /==\
+  \==/      · · ·:=== ·===:· · ·      \==/
+         .-.   · :===· ===: ·   .-.
+         .===.   .===  ===.   .===.
+           .========    ========.
+             '''''        '''''
 EOF
     printf '%s\n' "$R"
     printf '        %s%sC O P L A N D   O S   E N T E R P R I S E%s\n' "$B" "$TX" "$R"
@@ -154,7 +159,7 @@ preflight() {
     [ "$EUID" -ne 0 ] || die "Do not run this as root. Run it as your own user; it asks for sudo only where needed."
     local f
     for f in themes/CoplandOS/gtk-3.0/gtk.css themes/CoplandOS/xfwm4/themerc backgrounds/CoplandOS.png icons/NineIcons/index.theme "cursors/$CURSOR_THEME/index.theme" \
-             fastfetch/config.jsonc devilspie2/layers.lua bin/copland-layers bin/copland-goto bin/copland-send tools/copland_assets.py; do
+             fastfetch/config.jsonc devilspie2/layers.lua bin/copland-layers bin/copland-goto bin/copland-send; do
         [ -e "$FILES/$f" ] || die "The dotfiles folder is incomplete: files/$f is missing."
     done
     local like=""
@@ -295,67 +300,6 @@ step_icons() {
     [ -d /usr/share/icons/Adwaita ] || note "installed; adwaita-icon-theme is missing, so some icons will be blank"
 }
 
-step_iconsblue() {
-    have python3 || skip "python3 is not installed"
-    [ -d /usr/share/icons/Papirus ] && [ -d /usr/share/icons/Papirus-Dark ] || skip "papirus-icon-theme is not installed"
-    local built=0
-    if [ -f "$ICON_DIR/index.theme" ] && [ -d "$ICON_DIR/16x16" ] && [ "$FORCE" -eq 0 ]; then
-        echo "icon theme already built; keeping it (use --force to rebuild)"
-    else
-        local tmp="$ICON_DIR.new.$$"
-        run rm -rf "$tmp"
-        run mkdir -p "$HOME/.icons"
-        run python3 -I "$FILES/tools/copland_assets.py" icons /usr/share/icons/Papirus /usr/share/icons/Papirus-Dark "$tmp"
-        if [ "$DRY" -eq 0 ]; then
-            # keep cursors that are already there, then swap the new theme in
-            if [ -d "$ICON_DIR/cursors" ] && [ ! -e "$tmp/cursors" ]; then mv "$ICON_DIR/cursors" "$tmp/cursors"; fi
-            if [ -e "$ICON_DIR" ]; then mkdir -p "$BACKUP"; mv "$ICON_DIR" "$BACKUP/icons-CoplandOS"; fi
-            mv "$tmp" "$ICON_DIR"
-        fi
-        built=1
-    fi
-    # panel icons white instead of light blue, and a white power button
-    if [ "$DRY" -eq 0 ]; then
-        local s
-        for s in 16x16 22x22 24x24; do
-            [ -d "$ICON_DIR/$s/panel" ] || continue
-            find "$ICON_DIR/$s/panel" -type f -name '*.svg' -exec \
-                sed -i 's/\.ColorScheme-Text { color:#97d7f7; }/.ColorScheme-Text { color:#ffffff; }/' {} +
-            if [ -e "$ICON_DIR/$s/panel/system-shutdown-panel.svg" ] && [ -d "$ICON_DIR/$s/apps" ]; then
-                ln -sfn ../panel/system-shutdown-panel.svg "$ICON_DIR/$s/apps/xfsm-shutdown.svg"
-            fi
-        done
-        if have gtk-update-icon-cache; then gtk-update-icon-cache -f -q "$ICON_DIR" || true; fi
-    else
-        run sed -i "panel icons -> white" "$ICON_DIR/{16x16,22x22,24x24}/panel/*.svg"
-    fi
-    xf xsettings /Net/IconThemeName string CoplandOS
-    if have gsettings; then run gsettings set org.gnome.desktop.interface icon-theme CoplandOS || true; fi
-    [ "$built" -eq 1 ] || note "already built, kept (use --force to rebuild)"
-}
-
-step_icons95() {
-    have git || skip "git is not installed"
-    local dest="$HOME/.icons/Chicago95" tmp
-    if [ -f "$dest/index.theme" ] && [ "$FORCE" -eq 0 ]; then
-        note "already installed, kept (use --force to download again)"
-    else
-        tmp="$(mktemp -d)"
-        run git clone -q "$CHICAGO95_REPO" "$tmp/repo"
-        run git -C "$tmp/repo" -c advice.detachedHead=false checkout -q "$CHICAGO95_COMMIT"
-        if [ "$DRY" -eq 0 ]; then
-            [ -f "$tmp/repo/Icons/Chicago95/index.theme" ] || { rm -rf "$tmp"; echo "unexpected layout in the Chicago95 repo"; exit 1; }
-            mkdir -p "$HOME/.icons"
-            if [ -e "$dest" ]; then mkdir -p "$BACKUP"; mv "$dest" "$BACKUP/icons-Chicago95"; fi
-            cp -a "$tmp/repo/Icons/Chicago95" "$dest"
-            if have gtk-update-icon-cache; then gtk-update-icon-cache -f -q "$dest" || true; fi
-        fi
-        rm -rf "$tmp"
-    fi
-    xf xsettings /Net/IconThemeName string Chicago95
-    if have gsettings; then run gsettings set org.gnome.desktop.interface icon-theme Chicago95 || true; fi
-}
-
 step_cursors() {
     local dest="$HOME/.icons/$CURSOR_THEME"
     if [ -e "$dest" ] && [ "$DRY" -eq 0 ]; then mkdir -p "$BACKUP"; mv "$dest" "$BACKUP/cursors-$CURSOR_THEME"; fi
@@ -365,19 +309,6 @@ step_cursors() {
     xf xsettings /Gtk/CursorThemeSize int 24
     if have gsettings; then run gsettings set org.gnome.desktop.interface cursor-theme "$CURSOR_THEME" || true; fi
     note "apps that are already open keep the old cursor until restarted"
-}
-
-step_cursorscyan() {
-    have python3 || skip "python3 is not installed"
-    [ -d /usr/share/icons/Adwaita/cursors ] || skip "adwaita-icon-theme (cursors) is not installed"
-    if [ -d "$ICON_DIR/cursors" ] && [ "$FORCE" -eq 0 ]; then
-        note "already built, kept (use --force to rebuild)"
-    else
-        run mkdir -p "$ICON_DIR"
-        run python3 -I "$FILES/tools/copland_assets.py" cursors /usr/share/icons/Adwaita/cursors "$ICON_DIR/cursors"
-    fi
-    xf xsettings /Gtk/CursorThemeName string CoplandOS
-    xf xsettings /Gtk/CursorThemeSize int 24
 }
 
 step_wallpaper() {
@@ -768,7 +699,6 @@ Copland OS Enterprise — dotfiles installer for Debian + XFCE.
   ./install.sh --only a,b   pick components by id (see --list)
   ./install.sh --list       list components
   ./install.sh --restore    put back the settings saved by the last run
-  ./install.sh --force      rebuild things that already exist
 
 With the one-liner, pass options after 'bash -s --':
   curl -fsSL .../install.sh | bash -s -- --dry-run
@@ -819,7 +749,6 @@ main() {
         case "$1" in
             -y|--yes) YES=1 ;;
             -n|--dry-run) DRY=1 ;;
-            -f|--force) FORCE=1 ;;
             --only) shift; [ $# -gt 0 ] || die "--only needs a list, for example: --only theme,icons"; ONLY="$1" ;;
             --only=*) ONLY="${1#--only=}" ;;
             --list) list; exit 0 ;;

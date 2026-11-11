@@ -3,18 +3,7 @@
 A Serial Experiments Lain desktop for Debian + XFCE: the Copland OS look from the
 show, with one installer that sets up the whole thing, not just config files.
 
-```
-                         .   ·   .
-                    .-==============-.
-          .:===:  .'    .--------.    '.  :===:.
-        (===:    /     (   (())   )     \    :===)
-          ':===:  '.    '--------'    .'  :===:'
-                    '-=====    =====-'
-             o           ||    ||           o
-                    ====='      '=====
-
-        C O P L A N D   O S   E N T E R P R I S E
-```
+![Copland OS Enterprise on XFCE](docs/screenshot.png)
 
 ## Install
 
@@ -49,8 +38,20 @@ cd copland-os-dotfiles
 | `--dry-run` | print every command, change nothing |
 | `--only theme,icons` | install only the listed components |
 | `--list` | list component ids |
-| `--force` | re-download or rebuild things that already exist |
 | `--restore` | put back the settings saved by the last run |
+
+### Installing single components
+
+Every component can be installed on its own. In the menu, press `n` to clear the
+selection and space to pick only what you want. Or name them with `--only`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os-dotfiles/main/install.sh | bash -s -- --only cursors
+curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os-dotfiles/main/install.sh | bash -s -- --only theme,icons,wallpaper
+```
+
+`--list` prints the ids. Running a component again is safe: it backs up what it
+replaces first.
 
 To install a specific release instead of `main`, set `COPLAND_REF`, for
 example `curl -fsSL .../install.sh | COPLAND_REF=v1.0 bash`.
@@ -61,11 +62,8 @@ example `curl -fsSL .../install.sh | COPLAND_REF=v1.0 bash`.
 |---|---|---|
 | `packages` | on | installs the missing apt packages (sudo) |
 | `theme` | on | CoplandOS GTK 2/3 theme, xfwm4 window borders, notification style |
-| `icons` | on | Mac OS 9 icons (NineIcons from Platinum9), bundled. The show's Copland OS is drawn from Apple's Copland and Mac OS 8/9 |
-| `iconsblue` | off | instead: a blue duotone icon theme generated from Papirus, with white panel icons |
-| `icons95` | off | instead: Windows 95 icons from [Chicago95](https://github.com/grassmunk/Chicago95) instead, downloaded at a pinned commit |
-| `cursors` | on | classic Mac pixel-art cursors ([Retrosmart](https://github.com/useless-anvil/retrosmart-cursor), Mac-ish), bundled |
-| `cursorscyan` | off | instead: Adwaita cursors re-tinted Copland cyan |
+| `icons` | on | Mac OS 9 icons (NineIcons from Platinum9). The show's Copland OS is drawn from Apple's Copland and Mac OS 8/9 |
+| `cursors` | on | classic Mac pixel-art cursors ([Retrosmart](https://github.com/useless-anvil/retrosmart-cursor), Mac-ish) |
 | `wallpaper` | on | the Copland OS Enterprise boot frame |
 | `panel` | on | top bar: Copland menu (with the Copland logo as its profile picture), window list, Layer:01–04, tray, clock, power. **Replaces your current panel layout** |
 | `terminal` | on | xfce4-terminal palette and font, fastfetch config, `~/.bashrc` hook |
@@ -114,12 +112,11 @@ Both are off by default and need sudo.
 ## What was tested
 
 Tested on Debian 13 (trixie) with XFCE 4.20: the menu, `--dry-run`, and a real
-run of `theme`, `icons`, `iconsblue` (existing build kept), `cursors`,
+run of `theme`, `icons`, `cursors`,
 `wallpaper`, `panel`, `terminal`, `layers` and `keys`, and the `copland-layers`
 picker (navigation and loading; window placement from its config file).
 
-Not tested: a from-scratch icon and cursor build through the installer,
-`packages` on a system that is missing them, `greeter` and `boot` through this
+Not tested: `packages` on a system that is missing them, `greeter` and `boot` through this
 installer (the same steps were run from an earlier standalone script; how the
 login screen and boot animation look has not been checked), `--restore`, and any
 release other than Debian 13.
@@ -133,23 +130,21 @@ files/backgrounds/          wallpaper
 files/icons/NineIcons/      Mac OS 9 icon theme
 files/cursors/              classic Mac cursor theme and its licence
 files/fastfetch/            fastfetch config
+docs/screenshot.png         the screenshot above
 files/devilspie2/           per-app workspace rules (read layers.conf)
 files/bin/copland-layers    the layer picker
 files/bin/copland-goto      jump to a layer (Super+number)
 files/bin/copland-send      send the focused window to a layer (Super+Shift+number)
-files/tools/                generators: icon duotone, cursor tint, theme recolour
 ```
 
 ## Credits
 
 - GTK and xfwm4 theme: a recolour of [Greybird](https://github.com/shimmerproject/Greybird) (GPL-2.0-or-later / CC-BY-SA-3.0).
 - Icons: NineIcons from [Platinum9](https://github.com/grassmunk/Platinum9) by grassmunk (bundled; that repository declares no licence), plus a power glyph of our own.
-- Blue icons (optional): generated at install time from [Papirus](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme) (GPL-3.0).
 - Cursors: [Retrosmart Xcursor](https://github.com/useless-anvil/retrosmart-cursor) v2.0.3 by mdomlop and useless-anvil, GPL-3.0 (licence text in `files/cursors/`).
 - Menu logo: "Copland Os Enterprise Icon" by PsyBear,
   <https://www.deviantart.com/psybear/art/Copland-Os-Enterprise-Icon-65838629>. Copyright PsyBear.
 - Wallpaper: a frame from *Serial Experiments Lain*, via <https://lain.wiki/wiki/Copland_OS>.
   Copyright its owners; not covered by this repository's licence.
-- fastfetch logo: the built-in `LainOS` logo of [fastfetch](https://github.com/fastfetch-cli/fastfetch).
-- Win95 icons (optional): [Chicago95](https://github.com/grassmunk/Chicago95), GPL-3.0+/MIT per its README; downloaded, not bundled.
+- fastfetch logo and installer banner: the built-in `LainOS` logo of [fastfetch](https://github.com/fastfetch-cli/fastfetch).
 - Boot animation (optional): <https://github.com/faisalhsn/copland-plymouth-theme>.
