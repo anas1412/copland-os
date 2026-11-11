@@ -112,3 +112,40 @@ the `copland-os-desktop` package is published in an apt repository (see
 `packaging/`; its version carries the Debian release, so a package is built per
 release); until then, run `sudo ./install.sh --system` again after upgrading.
 
+## apt repository
+
+The package is published as a signed apt repository on GitHub Pages (the `gh-pages`
+branch, served at `https://anas1412.github.io/copland-os/apt`). Publishing is done by
+hand from the maintainer's machine, so the signing key never leaves it: anyone holding
+that key can ship code that runs as root on every machine using the repository.
+
+### Once: create the signing key
+
+```bash
+gpg --quick-generate-key "Copland OS archive signing key" ed25519 sign 2y
+```
+
+gpg asks for a passphrase; choose a strong one. Then back up the secret key and the
+revocation certificate gpg printed (under `~/.gnupg/openpgp-revocs.d/`) offline, for
+example on a USB stick:
+
+```bash
+gpg --armor --export-secret-keys "Copland OS archive signing key" > copland-os-signing-key.asc
+```
+
+If the key is lost, every user has to trust a new one by hand. Before it expires,
+extend it with `gpg --quick-set-expire <fingerprint> 2y` and publish again.
+
+### Each release
+
+```bash
+./packaging/build-deb.sh
+./packaging/publish-repo.sh --key "Copland OS archive signing key"
+git -C packaging/out/gh-pages push origin gh-pages
+```
+
+`publish-repo.sh` adds every `.deb` in `packaging/out/` to the pool (older versions
+stay), rebuilds the indexes for the release in `iso/release.conf`, signs them (gpg asks
+for the passphrase), checks the signature, exports the public key, and commits on the
+`gh-pages` branch in `packaging/out/gh-pages`. It never pushes by itself.
+

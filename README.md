@@ -186,6 +186,28 @@ sudo ./install.sh --system
 `--root DIR` writes under another folder (the ISO build uses it), `--no-packages`
 and `--no-rebuild` skip apt and the initramfs/GRUB rebuild.
 
+## Install with apt (not published yet)
+
+Once the repository is published, any Debian 13 XFCE system can get Copland OS as a
+normal package and keep it updated with `apt`:
+
+```bash
+sudo curl -fsSLo /usr/share/keyrings/copland-os-archive-keyring.gpg https://anas1412.github.io/copland-os/copland-os-archive-keyring.gpg
+```
+
+```bash
+printf 'Types: deb\nURIs: https://anas1412.github.io/copland-os/apt\nSuites: trixie\nComponents: main\nSigned-By: /usr/share/keyrings/copland-os-archive-keyring.gpg\n' | sudo tee /etc/apt/sources.list.d/copland-os.sources
+```
+
+```bash
+sudo apt update && sudo apt install copland-os-desktop
+```
+
+The signing key's fingerprint is `F629 F7AE EF0D D308 A4E3  7848 5881 81D7 36A2 68AC`;
+check it with `gpg --show-keys /usr/share/keyrings/copland-os-archive-keyring.gpg`.
+
+Remove it with `sudo apt purge copland-os-desktop`.
+
 ## Debian package (work in progress)
 
 `./packaging/build-deb.sh` builds `copland-os-desktop_<version>_all.deb` (no root
