@@ -1,0 +1,25 @@
+#!/bin/sh
+# Copland OS: brand the Calamares installer. Only the live image has Calamares (the
+# installer removes it from the installed system), so this lives in iso/, not --system.
+# Debian's settings and launcher are diverted, not edited, so the packages stay intact.
+set -e
+
+B=/etc/calamares/branding/copland
+S=/usr/share/copland-os/iso-branding
+install -d -m 755 "$B"
+install -m 644 "$S/branding.desc" "$S/show.qml" "$S/copland-logo.png" "$S/welcome.png" "$S/slide1.png" "$B/"
+
+# settings.conf: same as Debian's, with our branding folder
+dpkg-divert --local --rename --divert /etc/calamares/settings.conf.debian --add /etc/calamares/settings.conf
+sed 's/^branding: .*/branding: copland/' /etc/calamares/settings.conf.debian > /etc/calamares/settings.conf
+grep -q '^branding: copland$' /etc/calamares/settings.conf
+
+# the launcher (also copied to the live desktop by add-calamares-desktop-icon)
+L=/usr/share/applications/calamares-install-debian.desktop
+dpkg-divert --local --rename --divert "$L.debian" --add "$L"
+sed -e 's/^Name=.*/Name=Install Copland OS/' \
+    -e 's/^Comment=.*/Comment=Install Copland OS Enterprise (Debian 13) to this computer/' \
+    -e 's|^Icon=.*|Icon=/usr/share/themes/CoplandOS/assets/copland-logo-128.png|' \
+    "$L.debian" > "$L"
+
+rm -rf "$S"

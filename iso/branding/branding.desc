@@ -1,0 +1,35 @@
+# Copland OS branding for the Calamares installer on CoplandOS.iso.
+# Based on Debian's calamares-settings-debian branding; the system it installs is Debian 13.
+---
+componentName:   copland
+welcomeStyleCalamares: true
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 800px,580px
+windowPlacement: center
+strings:
+    productName:         Copland OS Enterprise
+    shortProductName:    Copland OS
+    version:             13
+    shortVersion:        13
+    versionedName:       Copland OS Enterprise (Debian 13)
+    shortVersionedName:  Copland OS 13
+    bootloaderEntryName: Copland OS Enterprise
+    productUrl:          https://github.com/anas1412/copland-os-dotfiles
+    supportUrl:          https://github.com/anas1412/copland-os-dotfiles/issues
+    knownIssuesUrl:      https://github.com/anas1412/copland-os-dotfiles/issues
+    releaseNotesUrl:     https://github.com/anas1412/copland-os-dotfiles#readme
+    donateUrl:           https://www.debian.org/donations
+sidebar: widget
+navigation: widget
+images:
+    productLogo:         "copland-logo.png"
+    productIcon:         "copland-logo.png"
+    productWelcome:      "welcome.png"
+slideshow:               "show.qml"
+style:
+   SidebarBackground:    "#101838"
+   SidebarText:          "#ccddff"
+   SidebarTextCurrent:   "#ffffff"
+   SidebarBackgroundCurrent: "#197aba"
+slideshowAPI: 2

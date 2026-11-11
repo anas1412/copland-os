@@ -20,7 +20,7 @@ PLYMOUTH_COMMIT="4e336d9e264723634ae1ed5dd38888cd2ab37c52"   # same pin as insta
 
 say()  { printf ' > %s\n' "$*"; }
 die()  { printf '\n x %s\n' "$*" >&2; exit 1; }
-have() { command -v "$1" >/dev/null 2>&1; }
+have() { command -v "$1" >/dev/null 2>&1 || [ -x "/usr/sbin/$1" ] || [ -x "/sbin/$1" ]; }
 
 checks() {
     local missing=() p
@@ -56,6 +56,9 @@ stage() {
     say "Copying the Copland OS installer into the image (/usr/share/copland-os)"
     mkdir -p "$inc/usr/share/copland-os"
     tar -C "$REPO" --exclude=.git --exclude=iso --exclude=docs -cf - . | tar -C "$inc/usr/share/copland-os" -xf -
+    # installer branding, used once by the 0510 hook and removed again
+    mkdir -p "$inc/usr/share/copland-os/iso-branding"
+    cp -a "$HERE/branding/." "$inc/usr/share/copland-os/iso-branding/"
 
     say "Fetching the boot animation (pinned commit ${PLYMOUTH_COMMIT:0:7})"
     local src="$inc/usr/share/copland-os/plymouth-src"
@@ -65,6 +68,30 @@ stage() {
     mkdir -p "$src"
     cp -a "$src.git/copland" "$src/copland"
     rm -rf "$src.git"
+}
+
+# record_build NAME: what went into the image, next to it, so a build can be traced and repeated
+record_build() {
+    local name=$1 info="$OUT/${1%.iso}.build-info.txt" commit dirty="no"
+    commit="$(git -c safe.directory="$REPO" -C "$REPO" rev-parse HEAD 2>/dev/null || echo unknown)"
+    [ -z "$(git -c safe.directory="$REPO" -C "$REPO" status --porcelain 2>/dev/null)" ] || dirty="yes (uncommitted changes were included)"
+    {
+        echo "CoplandOS.iso build record"
+        echo "image:          $name"
+        echo "built:          $(date -u +%Y-%m-%dT%H:%MZ)"
+        echo "repo commit:    $commit"
+        echo "working copy:   ${dirty}"
+        echo "live-build:     $(dpkg-query -W -f='${Version}' live-build 2>/dev/null || echo unknown)"
+        echo "debootstrap:    $(dpkg-query -W -f='${Version}' debootstrap 2>/dev/null || echo unknown)"
+        echo "build host:     $(. /etc/os-release && echo "$PRETTY_NAME"), $(uname -m)"
+        echo "boot animation: $PLYMOUTH_REPO @ $PLYMOUTH_COMMIT"
+        echo "sha256:         $(cut -d' ' -f1 "$OUT/$name.sha256")"
+        echo
+        echo "Installed packages (name, version) are in ${name%.iso}.packages; the full build log is ${name%.iso}.build.log."
+    } > "$info"
+    [ -f "$WORK/CoplandOS-amd64.packages" ] && cp "$WORK/CoplandOS-amd64.packages" "$OUT/${name%.iso}.packages"
+    [ -f "$WORK/build.log" ] && cp "$WORK/build.log" "$OUT/${name%.iso}.build.log"
+    say "Build record: $info"
 }
 
 build() {
@@ -80,6 +107,7 @@ build() {
     name="CoplandOS-$(date +%Y%m%d)-amd64.iso"
     mv "$iso" "$OUT/$name"
     (cd "$OUT" && sha256sum "$name" > "$name.sha256")
+    record_build "$name"
     # give the result to the user who ran sudo
     if [ -n "${SUDO_UID:-}" ]; then chown -R "$SUDO_UID:${SUDO_GID:-$SUDO_UID}" "$OUT"; fi
     local size

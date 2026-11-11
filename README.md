@@ -152,8 +152,9 @@ and `--no-rebuild` skip apt and the initramfs/GRUB rebuild.
 `iso/` builds a live and installable image: Debian 13 with a lean XFCE desktop
 (Firefox ESR, terminal, file manager, text editor, image and PDF viewers, no
 LibreOffice), Copland OS applied system-wide with the same `--system` code, and
-the Calamares installer. The live user is `lain` (password `live`, live-config's
-default) and the hostname `coplandos`.
+the Calamares installer branded as Copland OS. The image's own boot menu and the
+installed system's boot menu both have the Copland look. The live user is `lain`
+(password `live`, live-config's default) and the hostname `coplandos`.
 
 ```bash
 sudo apt install live-build debootstrap wget git
@@ -162,7 +163,9 @@ sudo ./iso/build.sh            # -> iso/out/CoplandOS-<date>-amd64.iso and .sha2
 ```
 
 The build needs root, about 20 GB free and a network connection; it works in
-`/var/tmp/coplandos-build` (set `COPLAND_ISO_WORK` to change it). So far the
+`/var/tmp/coplandos-build` (set `COPLAND_ISO_WORK` to change it). Each image comes
+with a build record (repo commit, tool versions, every package with its version,
+the log). The whole method is in [docs/BUILDING.md](docs/BUILDING.md). So far the
 configuration is checked (`lb config` accepts every option and every package is
 in trixie); no image has been built or booted yet.
 
@@ -200,8 +203,8 @@ core/bin/                     copland-layers, copland-goto, copland-send
 core/boot/                    full-screen boot script, GRUB theme, copland-boot.sh
 core/browsers/                browser colour policy and copland-browsers.sh
 tools/xfconf-xml.py           settings.tsv -> XFCE default files for --system
-iso/                          live-build config, chroot hook and build.sh for CoplandOS.iso
-docs/                         screenshot, WHAT-CHANGES.md
+iso/                          live-build config, hooks, boot menu, installer branding, build.sh
+docs/                         screenshot, DESIGN.md (palette, fonts, logo, wording), WHAT-CHANGES.md, BUILDING.md
 ```
 
 ## Fan project

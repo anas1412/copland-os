@@ -286,6 +286,7 @@ sys_boot() {
         echo "plymouth-set-default-theme not available here: set the theme with it after installing plymouth"
     fi
     write_grub_dropin
+    set_console_font
     if on_live_root && [ "$NO_REBUILD" -eq 0 ]; then
         have update-initramfs && run update-initramfs -u -k all
         have update-grub && run update-grub
@@ -293,6 +294,22 @@ sys_boot() {
     else
         note "installed; initramfs and GRUB are rebuilt later (--no-rebuild or --root)"
     fi
+}
+
+# text console (TTYs and the boot log) in Terminus 10x20; console-setup re-applies it at
+# boot because the file is newer than its cache, so no initramfs step is needed
+set_console_font() {
+    local f="$TGT/etc/default/console-setup"
+    [ -f "$f" ] || { echo "no /etc/default/console-setup: console font unchanged"; return 0; }
+    if [ "$DRY" -eq 1 ]; then
+        printf '      %s[dry-run]%s set FONTFACE=Terminus FONTSIZE=10x20 in %s\n' "$DM" "$R" "$f"; return 0
+    fi
+    install -d -m 755 "$TGT$SYS_STATE"
+    [ -f "$TGT$SYS_STATE/console-setup.orig" ] || cp -a "$f" "$TGT$SYS_STATE/console-setup.orig"
+    sed -i -E 's/^FONTFACE=.*/FONTFACE="Terminus"/; s/^FONTSIZE=.*/FONTSIZE="10x20"/' "$f"
+    grep -q '^FONTFACE=' "$f" || printf 'FONTFACE="Terminus"\n' >> "$f"
+    grep -q '^FONTSIZE=' "$f" || printf 'FONTSIZE="10x20"\n' >> "$f"
+    record "console:/etc/default/console-setup"
 }
 
 # /etc/default/grub.d/copland.cfg: splash, Copland name and theme, console colours
@@ -374,6 +391,9 @@ system_uninstall() {
                       if [ -n "$TGT" ]; then dpkg-divert --root "$TGT" --rename --remove "$p" >/dev/null || true
                       else dpkg-divert --rename --remove "$p" >/dev/null || true; fi ;;
             block:*)  p=${p#block:}; [ -f "$TGT$p" ] && sed -i '/^# >>> copland-os >>>$/,/^# <<< copland-os <<<$/d' "$TGT$p" ;;
+            console:*) p=${p#console:}
+                       [ -f "$TGT$SYS_STATE/console-setup.orig" ] && cp -a "$TGT$SYS_STATE/console-setup.orig" "$TGT$p" \
+                           && rm -f "$TGT$SYS_STATE/console-setup.orig" ;;
             plymouth:*) if on_live_root && [ -x /usr/sbin/plymouth-set-default-theme ]; then
                             /usr/sbin/plymouth-set-default-theme "$(cat "$SYS_STATE/previous-plymouth-theme" 2>/dev/null || echo text)" || true
                         fi ;;

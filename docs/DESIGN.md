@@ -1,0 +1,103 @@
+# Copland OS design system
+
+The look is the Copland OS Enterprise boot screen from *Serial Experiments Lain*:
+deep navy, a glowing cyan eye, a serif italic wordmark. Everything else is classic
+Mac (late-1990s) shapes on top of that palette. This page is the reference; when a
+value changes, change it here and in the files listed next to it.
+
+## Palette
+
+Sampled from the boot frame (`core/assets/backgrounds/CoplandOS.png`).
+
+| Token | Hex | Role | Used in |
+|---|---|---|---|
+| `navy` | `#25346a` | the wallpaper's background, the brand colour | browser policy (`core/browsers/copland-theme.json`), GTK theme base |
+| `navy-deep` | `#101838` | panels, terminal background, installer sidebar | panel (`rgba(16,24,56,0.90)`), whisker menu (`0.96`), notifications (`0.94`), terminal, Calamares sidebar |
+| `navy-ink` | `#141c3a` | darkest surface, terminal colour 0 | terminal palette, notifications, live boot menu progress bar |
+| `navy-raised` | `#1c2852` | raised surfaces | GRUB menu, notifications |
+| `cyan` | `#46baef` | the eye's glow: accents, focus, active items, borders | panel active/underline, menu border, tooltips, cursor in terminal, GRUB selection, live boot menu title |
+| `blue` | `#197aba` | the eye's darker ring: selection, buttons, borders | panel checked buttons (`rgba(25,122,186,0.35)`), selection, Calamares current step |
+| `text` | `#ccddff` | body text on navy | panel labels, terminal foreground, notifications, GRUB items |
+| `text-dim` | `#738dc1` | secondary text | GRUB help line, disabled labels |
+| `white` | `#ffffff` | panel icons, emphasis | panel glyphs (power, tray), selected text |
+
+Hover on navy: `rgba(70,186,239,0.18)` (cyan at 18 %).
+
+### Terminal and console (16 colours)
+
+`#141c3a #e0507a #5fd7a7 #e6d28a #197aba #9a7cf0 #46baef #c5cfee`
+`#4a5c9a #ff7096 #8af0c8 #f5e6a8 #5aa8e8 #b8a0ff #8fd6fa #ffffff`
+
+Same order as ANSI 0–15. Source: `core/settings.tsv` (`terminal`), and the text
+console's `vt.default_red/grn/blu` in `lib/system.sh` (background `#101838` first).
+Red, green and yellow keep their meaning (errors, success, warnings) in a cooler,
+softer form.
+
+## Typography
+
+| Use | Font | Size | Where set |
+|---|---|---|---|
+| Brand: menu button, window titles, clock, login screen | C059 Bold Italic (URW, `fonts-urw-base35`) | 10–11 (titles 10, clock and greeter 11) | `settings.tsv`, `gtk.css`, greeter drop-in |
+| Interface: menus, labels, layer names, file manager | Nimbus Sans (URW Helvetica clone, same package) | 10 | `settings.tsv` (`/Gtk/FontName`) |
+| Terminal | DejaVu Sans Mono | 9 | `settings.tsv` (`terminal`) |
+| Boot menu (installed system) | C059 Bold Italic 26 / DejaVu Sans Mono 14 | built with `grub-mkfont` | `core/boot/grub/copland/theme.txt` |
+| Text console | Terminus | 10x20 | `/etc/default/console-setup` (`--system`) |
+
+Rule: **serif italic for identity, sans for controls.** The two ends of the bar
+(Copland OS button, clock) are C059 italic; everything you click in between is Nimbus
+Sans. Do not set small body text in italic serif.
+
+Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
+
+## Logo and wallpaper
+
+- **Logo:** the Navi eye, "Copland Os Enterprise Icon" by PsyBear (credit required).
+  Files: `core/assets/themes/CoplandOS/assets/copland-logo-{24,48,128}.png`, transparent.
+  Used for the menu button (48), the user picture (`~/.face`, 128), the installer and
+  launchers (128). Keep it on navy; don't recolour it or put it on light backgrounds.
+- **Wallpaper:** the boot frame, 996×625, scaled to fill. Its eye and wordmark sit in
+  the centre.
+- **Login screen:** the login box stays centred over the eye (decided 2026-11-11 after
+  comparing centre, left, right and bottom placements); the wordmark below it stays visible.
+- **Derived images:** live boot menu splashes 800×600 and 640×480
+  (`iso/config/bootloaders/*/splash.png`), installer welcome and slide 467×293
+  (`iso/branding/`). They are generated from the wallpaper by covering and cropping;
+  regenerate them if the wallpaper changes.
+- **fastfetch / installer banner:** fastfetch's built-in `LainOS` eye, in `blue`/`cyan`.
+
+## Icons and cursor
+
+- Icons: NineIcons (Mac OS 9, from Platinum9), unmodified colours. Apps it doesn't
+  cover keep their own icons.
+- Panel glyphs: white, flat (`xfsm-shutdown` glyph drawn for the theme, tray icons
+  follow their apps).
+- Cursor: Retrosmart Mac-ish classic (black with white outline, pixel art), 24 px.
+
+## Layout
+
+- **Top bar:** 30 px, full width, `navy-deep` at 90 %. Left to right: Copland OS menu
+  (logo + C059 label), window list (current layer only), spacer, Layer:01–04, spacer,
+  tray, volume, clock (`Wed 11 Nov  13:08`), power. No borders; active items get a
+  2 px `cyan` underline.
+- **Gaps:** 6/4 px margins around the menu button, 2 px between layer buttons, 4 px
+  around the clock, spacers at both outer edges (`gtk.css` "panel spacing").
+- **Window titles:** centred, C059 Bold Italic 10, no app icon.
+- **Layers:** four workspaces named `Layer:01`–`Layer:04`, never more.
+
+## Voice and wording
+
+| String | Where |
+|---|---|
+| Copland OS Enterprise | product name: wallpaper, installer, boot menus, GRUB entries |
+| Copland OS | short name: menu button, launcher ("Install Copland OS") |
+| Produced By Tachibana Lab / Tachibana General Laboratories | credits line (wallpaper, fastfetch, installer banner) |
+| Layer:01 … Layer:04 | workspaces (the show's episodes are "Layers") |
+| Present day, present time | fastfetch title line, installer slide |
+| Close the world, Open the nExt | sign-off (fastfetch, end of the installer output) |
+| NAVI, PROTOCOL, PSYCHE, WIRED, LAYER | fastfetch keys: machine, kernel, CPU, network, desktop |
+
+Tone: short, calm, a little cryptic; English UI text stays plain and functional.
+
+## Open issues
+
+- **Wallpaper resolution:** 996×625 is soft on large screens; kept by choice for now.
