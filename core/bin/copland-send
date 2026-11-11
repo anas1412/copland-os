@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""copland-send N — send the focused window to Layer N (workspace N, counted from 1).
+"""copland-send N: send the focused window to Layer N (workspace N, counted from 1).
 
 You stay on the layer you are on. Uses EWMH (_NET_ACTIVE_WINDOW, _NET_WM_DESKTOP)
 through libX11 only, so it needs no wmctrl or xdotool.

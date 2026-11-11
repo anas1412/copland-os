@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""copland-goto N — switch to Layer N (workspace N, counted from 1).
+"""copland-goto N: switch to Layer N (workspace N, counted from 1).
 
 Asks the window manager directly (EWMH _NET_CURRENT_DESKTOP), using only the
 Python standard library and libX11, so it needs no wmctrl or xdotool.

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copland OS Enterprise for Debian XFCE — installer.
+# Copland OS installer for Debian XFCE.
 #
 #   curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os/main/install.sh | bash
 #                             one-liner: downloads everything, then opens the menu
@@ -82,7 +82,7 @@ fi
 
 usage() {
     cat <<USAGE
-Copland OS Enterprise for Debian XFCE — installer.
+Copland OS installer for Debian XFCE.
 
   curl -fsSL https://raw.githubusercontent.com/$REPO_SLUG/main/install.sh | bash
                             one-liner: downloads everything, then opens the menu

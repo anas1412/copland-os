@@ -1,4 +1,4 @@
-# Copland OS Enterprise for Debian XFCE
+# Copland OS
 
 A Serial Experiments Lain desktop for Debian XFCE: the Copland OS look from the
 show, set up as a whole, not just config files. Three ways to get it:
@@ -8,7 +8,7 @@ show, set up as a whole, not just config files. Three ways to get it:
 - **CoplandOS.iso**, a live and installable Debian 13 image with everything built in
   (build it yourself for now; see [docs/BUILDING.md](docs/BUILDING.md)).
 
-![Copland OS Enterprise on Debian XFCE](docs/screenshot.png)
+![Copland OS on Debian XFCE](docs/screenshot.png)
 
 ## Install
 
@@ -214,7 +214,7 @@ docs/                         screenshot, DESIGN.md (palette, fonts, logo, wordi
 
 ## Fan project
 
-Copland OS Enterprise for Debian XFCE is a non-commercial fan project inspired by
+Copland OS is a non-commercial fan project inspired by
 *Serial Experiments Lain*. It is not affiliated with the show's owners, Apple,
 Debian or any of the artists credited below. The wallpaper, logo, icons and
 boot animation belong to their owners; if you own one of them and want it

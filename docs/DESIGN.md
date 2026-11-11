@@ -38,15 +38,18 @@ softer form.
 
 | Use | Font | Size | Where set |
 |---|---|---|---|
-| Brand: menu button, window titles, clock, login screen | C059 Bold Italic (URW, `fonts-urw-base35`) | 10–11 (titles 10, clock and greeter 11) | `settings.tsv`, `gtk.css`, greeter drop-in |
-| Interface: menus, labels, layer names, file manager | Nimbus Sans (URW Helvetica clone, same package) | 10 | `settings.tsv` (`/Gtk/FontName`) |
+| Brand: menu button, layer names, window titles, clock, login screen | C059 Bold Italic (URW, `fonts-urw-base35`) | 10–11 (titles 10, clock and greeter 11) | `settings.tsv`, `gtk.css`, greeter drop-in |
+| Interface: menus, labels, window list, file manager | Nimbus Sans (URW Helvetica clone, same package) | 10 | `settings.tsv` (`/Gtk/FontName`) |
 | Terminal | DejaVu Sans Mono | 9 | `settings.tsv` (`terminal`) |
 | Boot menu (installed system) | C059 Bold Italic 26 / DejaVu Sans Mono 14 | built with `grub-mkfont` | `core/boot/grub/copland/theme.txt` |
 | Text console | Terminus | 10x20 | `/etc/default/console-setup` (`--system`) |
 
-Rule: **serif italic for identity, sans for controls.** The two ends of the bar
-(Copland OS button, clock) are C059 italic; everything you click in between is Nimbus
-Sans. Do not set small body text in italic serif.
+Rule: **serif italic for identity, sans for everything you read at length.** On the
+bar, the Copland OS button, the layer names and the clock are C059 italic: they are
+short, fixed words that carry the brand ("Layer" is the show's own word for its
+episodes). The window list, menus and app text are Nimbus Sans, because they hold
+changing, longer text that has to be read quickly. Do not set body text in italic
+serif. (Decided 2026-11-11 after trying the layer names in both fonts.)
 
 Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
 
@@ -83,6 +86,10 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
 - **Gaps:** 6/4 px margins around the menu button, 2 px between layer buttons, 4 px
   around the clock, spacers at both outer edges (`gtk.css` "panel spacing").
 - **Window titles:** centred, C059 Bold Italic 10, no app icon.
+- **Layers shown as text, not icons:** the workspace switcher has no icon option, and
+  icons would claim a purpose the neutral layers don't have; "Layer:01" is the show's
+  own wording and pairs with Super+1. Symbols in the names would depend on font
+  coverage that C059 and Nimbus Sans lack.
 - **Layers:** four workspaces named `Layer:01`–`Layer:04`. Why four:
   - it is XFCE's own default (`workspace_count=4` in `/usr/share/xfwm4/defaults`), so
     XFCE users keep the number they know;
@@ -99,7 +106,7 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
 | String | Where |
 |---|---|
 | Copland OS Enterprise | product name: wallpaper, installer, boot menus, GRUB entries |
-| Copland OS | short name: menu button, launcher ("Install Copland OS") |
+| Copland OS | the project's name (repo, README title, GitHub description) and the short name on screen: menu button, launcher ("Install Copland OS") |
 | Produced By Tachibana Lab / Tachibana General Laboratories | credits line (wallpaper, fastfetch, installer banner) |
 | Layer:01 … Layer:04 | workspaces (the show's episodes are "Layers") |
 | Present day, present time | fastfetch title line, installer slide |
@@ -107,6 +114,8 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
 | NAVI, PROTOCOL, PSYCHE, WIRED, LAYER | fastfetch keys: machine, kernel, CPU, network, desktop |
 
 Tone: short, calm, a little cryptic; English UI text stays plain and functional.
+No em dashes anywhere (docs, UI strings, descriptions): use a colon, a comma or a
+full stop instead.
 
 ## Open issues
 

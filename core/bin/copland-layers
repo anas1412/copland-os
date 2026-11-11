@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# copland-layers — choose which apps open on which Layer (workspace).
+# copland-layers: choose which apps open on which Layer (workspace).
 # Writes ~/.config/copland-os/layers.conf, which the devilspie2 rules read.
 set -euo pipefail
 

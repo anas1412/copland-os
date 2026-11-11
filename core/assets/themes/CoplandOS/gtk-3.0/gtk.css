@@ -2245,7 +2245,8 @@ window.background.chromium button:not(.titlebutton) { border-color: #141c3a; }
   color: #ffffff;
 }
 #whiskermenu-button label,
-#clock-button label {
+#clock-button label,
+.xfce4-panel.background grid > button label {
   font-family: "C059";
   font-style: italic;
   font-weight: bold;
