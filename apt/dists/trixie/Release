@@ -1,7 +1,7 @@
 Architectures: amd64 all
 Codename: trixie
 Components: main
-Date: Wed, 11 Nov 2026 23:33:20 +0000
+Date: Wed, 11 Nov 2026 23:52:12 +0000
 Description: Copland OS packages for Debian 13 (trixie)
 Label: Copland OS
 Origin: Copland OS
