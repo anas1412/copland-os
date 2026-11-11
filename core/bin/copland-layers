@@ -80,7 +80,10 @@ load_windows() {
 }
 
 load_conf() {
-    [ -r "$CONF" ] || return 0
+    local src="$CONF"
+    # start from the system default (installed with --system) until the user saves their own
+    [ -r "$src" ] || src=/etc/copland-os/layers.conf
+    [ -r "$src" ] || return 0
     local line k v
     while IFS= read -r line; do
         case "$line" in ''|'#'*) continue ;; esac
@@ -95,7 +98,7 @@ load_conf() {
                 [ -n "${SEEN[$k]:-}" ] || add "$k (custom rule)" "$k"
                 LAYER[${SEEN[$k]}]=$v ;;
         esac
-    done < "$CONF"
+    done < "$src"
 }
 
 lname() {  # layer number -> label

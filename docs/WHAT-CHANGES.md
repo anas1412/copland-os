@@ -129,7 +129,7 @@ You get the login screen in the same theme.
 |---|---|
 | `/usr/share/themes/CoplandOS`, `/usr/share/icons/<icons>`, the cursor theme | copies; they are snapshots, so run `greeter` again after changing the theme |
 | `/usr/share/backgrounds/CoplandOS.png` | the wallpaper |
-| `/etc/lightdm/lightdm-gtk-greeter.conf` | a `# copland-begin` / `# copland-end` block under `[greeter]`. A `.copland-bak` copy is made first |
+| `/etc/lightdm/lightdm-gtk-greeter.conf.d/50-copland.conf` | a drop-in with the theme, icons, cursor, wallpaper, font and clock. Debian's `/etc/lightdm/lightdm-gtk-greeter.conf` is not edited; if an older version of this installer left a `# copland-begin` block there, it is removed (a `.copland-bak` copy is made first) |
 
 ### `boot` (off)
 
@@ -142,11 +142,22 @@ You get the Copland boot animation (a third-party Plymouth theme, pinned to one 
 | `/etc/default/grub` | `splash` added to the kernel command line. A `.copland-bak` copy is made first |
 | initramfs | rebuilt for every installed kernel |
 
-## In the repo, not yet run by `install.sh`
+## System-wide install (`--system`)
+
+`sudo ./install.sh --system` puts the same look in shared places for every
+account; the README's "System-wide install" section lists them. Every file it
+writes is recorded in `/var/lib/copland-os/manifest`, and
+`sudo ./install.sh --system --uninstall` removes them, undoes the two
+`dpkg-divert`s (`/usr/share/backgrounds/xfce/xfce-x.svg`,
+`/usr/share/wayland-sessions/xfce-wayland.desktop`) and the marked block in
+`/etc/skel/.bashrc`. It includes what `core/boot/copland-boot.sh` does, written as
+`/etc/default/grub.d/copland.cfg` instead of editing `/etc/default/grub`.
+
+## In the repo, not yet run by the per-user `install.sh`
 
 These are finished and were run on one machine. The installer does not run them yet.
 
-### `files/boot/copland-boot.sh` (sudo, needs `boot` first)
+### `core/boot/copland-boot.sh` (sudo, needs `boot` first)
 
 You get:
 
@@ -165,9 +176,9 @@ You get:
 GRUB writes the menu entry as "Copland OS Enterprise GNU/Linux": its own
 script appends "GNU/Linux" to any name that doesn't end in it.
 
-Undo with `files/boot/copland-boot.sh --undo`.
+Undo with `core/boot/copland-boot.sh --undo`.
 
-### `files/browsers/copland-browsers.sh` (sudo)
+### `core/browsers/copland-browsers.sh` (sudo; also the `browsers` component, off by default)
 
 You get Copland navy in every Chromium-based browser (Brave, Chromium, Google
 Chrome, Microsoft Edge), for every profile, from the first launch, with no
@@ -180,7 +191,7 @@ clicks. The browser builds its whole palette from one colour.
 It is a managed policy: while it is set, users cannot pick another browser
 theme. `brave://policy` or `chrome://policy` shows whether it is active.
 
-Undo with `files/browsers/copland-browsers.sh --undo`.
+Undo with `core/browsers/copland-browsers.sh --undo`.
 
 ### Firefox
 
@@ -189,7 +200,7 @@ default, so it follows CoplandOS once `theme` is installed (checked with Firefox
 ESR 153 on a fresh profile). A profile that already uses another Firefox theme
 keeps it.
 
-### Font smoothing
+### Font smoothing (now part of `theme`)
 
 `xsettings /Xft/Antialias` `1`, `/Xft/Hinting` `1`, `/Xft/HintStyle`
 `hintslight`, `/Xft/RGBA` `rgb`. These make text crisper on most LCD screens.

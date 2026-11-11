@@ -71,6 +71,7 @@ Every file and setting each component touches, and how to undo it: [docs/WHAT-CH
 | `terminal` | on | xfce4-terminal palette and font, fastfetch config, `~/.bashrc` hook |
 | `layers` | on | 4 workspaces named Layer:01–04, plus `copland-layers`, a small picker to choose which app opens on which layer. Nothing is assigned until you choose |
 | `keys` | on | the Super (Windows) key opens the Copland menu; Super+1–4 (number row or numpad) jump to Layer:01–04; Super+Shift+1–4 send the focused window there |
+| `browsers` | off | Copland colour for Chromium-family browsers (Brave, Chromium, Chrome, Edge) by managed policy; Firefox follows the GTK theme on its own (sudo) |
 | `greeter` | off | LightDM login screen in the same theme (sudo) |
 | `boot` | off | Plymouth boot animation from a third-party repo (sudo, experimental) |
 
@@ -101,15 +102,76 @@ send an app to a layer, `0` to leave it wherever you are.
 Both are off by default and need sudo.
 
 - **Login screen** copies the theme, icons and wallpaper to `/usr/share` because
-  the greeter cannot read your home folder. That copy is a snapshot: after you
-  change the theme or icons, run `./install.sh --only greeter` again.
+  the greeter cannot read your home folder, and writes its settings to a drop-in,
+  `/etc/lightdm/lightdm-gtk-greeter.conf.d/50-copland.conf`; Debian's own file is
+  left alone (an older Copland block in it is removed). The copy is a snapshot:
+  after you change the theme or icons, run `./install.sh --only greeter` again.
 - **Boot animation** clones a third-party Plymouth theme at a pinned commit (it
   has no licence file, so it is not bundled here), adds `splash` to the kernel
   command line and rebuilds the initramfs of every installed kernel. Its frames
   are 1336x768 and are centred, not scaled. If boot misbehaves, press `Esc` for
   the text log, or remove `splash` from the GRUB entry for one boot.
-- Both keep a `.copland-bak` copy of the file they edit; `--restore` offers to
+- Both keep a `.copland-bak` copy of any file they edit; `--restore` offers to
   put them back.
+- `core/boot/copland-boot.sh` (optional, sudo) goes further on an existing
+  install: full-screen animation, a Copland GRUB menu and Copland colours in the
+  text console. `--system` and the ISO include all of that.
+
+## System-wide install
+
+`--system` sets Copland OS up for every account on the machine instead of only
+yours. It needs sudo and a Debian-based system.
+
+```bash
+git clone https://github.com/anas1412/copland-os-dotfiles.git
+cd copland-os-dotfiles
+sudo ./install.sh --system
+```
+
+- Themes, icons, cursors and the wallpaper go to `/usr/share`, the helper
+  commands to `/usr/local/bin`.
+- The XFCE settings go to `/etc/xdg/copland-os` as defaults, and
+  `/etc/X11/Xsession.d/55copland-os` puts that folder first in XFCE's search path.
+  Anyone's own changes still win over these defaults.
+- New accounts get the menu picture, fastfetch and the layer rules from `/etc/skel`.
+  The top bar appears for users logging in to XFCE for the first time; existing
+  users keep theirs (run `./install.sh` as that user to switch them).
+- The login screen, the X11 session as the default (XFCE's Wayland session entry
+  is hidden: it needs a compositor Debian does not install), the boot animation,
+  the GRUB menu and the console colours are included.
+- Nothing owned by a Debian package is edited except `/etc/skel/.bashrc` (a
+  marked block); two packaged files are moved aside with `dpkg-divert`.
+- Everything written is listed in `/var/lib/copland-os/manifest`;
+  `sudo ./install.sh --system --uninstall` removes it again.
+
+`--root DIR` writes under another folder (the ISO build uses it), `--no-packages`
+and `--no-rebuild` skip apt and the initramfs/GRUB rebuild.
+
+## CoplandOS.iso (not built yet)
+
+`iso/` builds a live and installable image: Debian 13 with a lean XFCE desktop
+(Firefox ESR, terminal, file manager, text editor, image and PDF viewers, no
+LibreOffice), Copland OS applied system-wide with the same `--system` code, and
+the Calamares installer. The live user is `lain` (password `live`, live-config's
+default) and the hostname `coplandos`.
+
+```bash
+sudo apt install live-build debootstrap wget git
+sudo ./iso/build.sh            # -> iso/out/CoplandOS-<date>-amd64.iso and .sha256
+./iso/build.sh --check         # only the checks, no root
+```
+
+The build needs root, about 20 GB free and a network connection; it works in
+`/var/tmp/coplandos-build` (set `COPLAND_ISO_WORK` to change it). So far the
+configuration is checked (`lb config` accepts every option and every package is
+in trixie); no image has been built or booted yet.
+
+## Supported systems
+
+Debian 13 (trixie) with XFCE 4.20 is what this is built and tested on; Ubuntu and
+other Debian-based systems with XFCE should work. Arch-based and Fedora-based
+systems are not supported yet: the per-user look may work there, but package
+installation, the login screen, the boot animation and `--system` will not.
 
 ## What was tested
 
@@ -118,7 +180,10 @@ run of `theme`, `icons`, `cursors`,
 `wallpaper`, `panel`, `terminal`, `layers` and `keys`, and the `copland-layers`
 picker (navigation and loading; window placement from its config file).
 
-Not tested: `packages` on a system that is missing them, `greeter` and `boot` through this
+Also tested: `--system` into a scratch folder (`--root`), every file it writes,
+and `--system --uninstall` putting that folder back as it was.
+
+Not tested: `--system` on a real machine (`/`), `browsers`, `packages` on a system that is missing them, `greeter` and `boot` through this
 installer (the same steps were run from an earlier standalone script; how the
 login screen and boot animation look has not been checked), `--restore`, and any
 release other than Debian 13.
@@ -126,24 +191,32 @@ release other than Debian 13.
 ## Layout
 
 ```
-install.sh                  the installer
-files/themes/CoplandOS/     GTK theme, xfwm4 borders, notification style, logo
-files/backgrounds/          wallpaper
-files/icons/NineIcons/      Mac OS 9 icon theme
-files/cursors/              classic Mac cursor theme and its licence
-files/fastfetch/            fastfetch config
-docs/screenshot.png         the screenshot above
-files/devilspie2/           per-app workspace rules (read layers.conf)
-files/bin/copland-layers    the layer picker
-files/bin/copland-goto      jump to a layer (Super+number)
-files/bin/copland-send      send the focused window to a layer (Super+Shift+number)
+install.sh                    the installer: per-user (default) or --system
+lib/                          the installer's parts: ui, common, components (per-user), system
+core/settings.tsv             every XFCE setting, once (used by both modes)
+core/assets/                  theme (with logo), icons, cursors, wallpaper
+core/config/                  fastfetch config, devilspie2 layer rules
+core/bin/                     copland-layers, copland-goto, copland-send
+core/boot/                    full-screen boot script, GRUB theme, copland-boot.sh
+core/browsers/                browser colour policy and copland-browsers.sh
+tools/xfconf-xml.py           settings.tsv -> XFCE default files for --system
+iso/                          live-build config, chroot hook and build.sh for CoplandOS.iso
+docs/                         screenshot, WHAT-CHANGES.md
 ```
+
+## Fan project
+
+Copland OS Enterprise for Debian XFCE is a non-commercial fan project inspired by
+*Serial Experiments Lain*. It is not affiliated with the show's owners, Apple,
+Debian or any of the artists credited below. The wallpaper, logo, icons and
+boot animation belong to their owners; if you own one of them and want it
+removed, open an issue and it will be taken out.
 
 ## Credits
 
 - GTK and xfwm4 theme: a recolour of [Greybird](https://github.com/shimmerproject/Greybird) (GPL-2.0-or-later / CC-BY-SA-3.0).
 - Icons: NineIcons from [Platinum9](https://github.com/grassmunk/Platinum9) by grassmunk (bundled; that repository declares no licence), plus a power glyph of our own.
-- Cursors: [Retrosmart Xcursor](https://github.com/useless-anvil/retrosmart-cursor) v2.0.3 by mdomlop and useless-anvil, GPL-3.0 (licence text in `files/cursors/`).
+- Cursors: [Retrosmart Xcursor](https://github.com/useless-anvil/retrosmart-cursor) v2.0.3 by mdomlop and useless-anvil, GPL-3.0 (licence text in `core/assets/cursors/`).
 - Menu logo: "Copland Os Enterprise Icon" by PsyBear,
   <https://www.deviantart.com/psybear/art/Copland-Os-Enterprise-Icon-65838629>. Copyright PsyBear.
 - Wallpaper: a frame from *Serial Experiments Lain*, via <https://lain.wiki/wiki/Copland_OS>.

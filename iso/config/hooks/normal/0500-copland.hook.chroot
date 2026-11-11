@@ -1,0 +1,17 @@
+#!/bin/sh
+# Copland OS: apply the look system-wide inside the image, with the same code as
+# "sudo ./install.sh --system" on a real machine. iso/build.sh staged the repo in
+# /usr/share/copland-os and the pinned boot animation next to it.
+# live-build rebuilds the initramfs after the hooks, and Calamares writes GRUB at
+# install time, so both are skipped here (--no-rebuild).
+set -e
+
+COPLAND_PLYMOUTH_SRC=/usr/share/copland-os/plymouth-src/copland
+export COPLAND_PLYMOUTH_SRC
+NO_COLOR=1
+export NO_COLOR
+
+bash /usr/share/copland-os/install.sh --system --yes --no-packages --no-rebuild --root /
+
+# the boot animation source was only needed at build time
+rm -rf /usr/share/copland-os/plymouth-src

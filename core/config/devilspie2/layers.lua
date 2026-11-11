@@ -15,6 +15,7 @@ end
 
 local follow, default, rules = true, 0, {}
 local conf = io.open((os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/copland-os/layers.conf", "r")
+  or io.open("/etc/copland-os/layers.conf", "r")   -- system default (installed with --system)
 if conf then
   for line in conf:lines() do
     local k, v = line:match("^%s*([^#=]-)%s*=%s*(.-)%s*$")

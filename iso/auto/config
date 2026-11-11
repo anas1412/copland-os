@@ -1,0 +1,24 @@
+#!/bin/sh
+# CoplandOS.iso: live-build configuration (live-build 1:20250505, Debian 13 trixie).
+# Called by "lb config"; iso/build.sh runs it inside its work folder.
+set -e
+
+lb config noauto \
+    --mode debian \
+    --distribution trixie \
+    --architecture amd64 \
+    --archive-areas "main contrib non-free-firmware" \
+    --security true \
+    --updates true \
+    --binary-image iso-hybrid \
+    --bootloaders "syslinux,grub-efi" \
+    --debian-installer none \
+    --firmware-chroot true \
+    --firmware-binary false \
+    --apt-recommends true \
+    --image-name CoplandOS \
+    --iso-volume "COPLANDOS" \
+    --iso-application "Copland OS Enterprise" \
+    --iso-publisher "Copland OS fan project" \
+    --bootappend-live "boot=live components quiet splash username=lain hostname=coplandos" \
+    "${@}"

@@ -1,0 +1,32 @@
+# CoplandOS.iso: a lean XFCE desktop (no LibreOffice, no extra language packs).
+# live-build adds live-boot, live-config, live-config-systemd and systemd-sysv itself.
+
+# live session: user-setup creates the live user (live-config only recommends it)
+user-setup sudo libnss-myhostname locales keyboard-configuration console-setup
+
+# desktop
+xfce4 xfce4-terminal xfce4-whiskermenu-plugin xfce4-pulseaudio-plugin xfce4-notifyd
+xfce4-power-manager xfce4-screenshooter thunar-archive-plugin xarchiver
+mousepad ristretto atril
+lightdm lightdm-gtk-greeter desktop-base
+
+# network and sound
+network-manager network-manager-applet nm-connection-editor
+pipewire-audio wireplumber pavucontrol
+
+# web
+firefox-esr
+
+# Copland OS look and tools (same as the installer's package list)
+fonts-urw-base35 fonts-dejavu-core fonts-dejavu-mono fonts-terminus
+adwaita-icon-theme gtk2-engines-murrine libgtk-3-bin python3
+fastfetch devilspie2 curl git
+
+# boot: animation, and grub-mkfont for the boot menu theme
+plymouth plymouth-themes grub-common
+
+# installer
+calamares calamares-settings-debian
+
+# virtual machines (clipboard and screen resize under QEMU/SPICE)
+spice-vdagent

@@ -1,0 +1,100 @@
+# Copland OS: every XFCE setting, once. Used per-user (xfconf-query) and system-wide (XML).
+# component<TAB>channel<TAB>property<TAB>type<TAB>value
+# type: string|int|uint|bool|double, or array:<type> with values separated by |
+# placeholders: @THEME@ = CoplandOS theme folder, @BIN@ = folder holding copland-goto/send
+theme	xsettings	/Net/ThemeName	string	CoplandOS
+theme	xfwm4	/general/theme	string	CoplandOS
+theme	xfwm4	/general/title_font	string	C059 Bold Italic 10
+theme	xfwm4	/general/title_alignment	string	center
+theme	xfwm4	/general/button_layout	string	O|SHMC
+theme	xfce4-notifyd	/theme	string	CoplandOS
+theme	xsettings	/Gtk/FontName	string	Nimbus Sans 10
+theme	xsettings	/Xft/Antialias	int	1
+theme	xsettings	/Xft/Hinting	int	1
+theme	xsettings	/Xft/HintStyle	string	hintslight
+theme	xsettings	/Xft/RGBA	string	rgb
+icons	xsettings	/Net/IconThemeName	string	NineIcons
+cursors	xsettings	/Gtk/CursorThemeName	string	retrosmart-xcursor-mac-ish-classic
+cursors	xsettings	/Gtk/CursorThemeSize	int	24
+panel	xfce4-panel	/panels	array:int	1
+panel	xfce4-panel	/panels/dark-mode	bool	true
+panel	xfce4-panel	/panels/panel-1/position	string	p=6;x=0;y=0
+panel	xfce4-panel	/panels/panel-1/position-locked	bool	true
+panel	xfce4-panel	/panels/panel-1/length	double	100
+panel	xfce4-panel	/panels/panel-1/size	uint	30
+panel	xfce4-panel	/panels/panel-1/icon-size	uint	18
+panel	xfce4-panel	/panels/panel-1/mode	uint	0
+panel	xfce4-panel	/panels/panel-1/enable-struts	bool	true
+panel	xfce4-panel	/panels/panel-1/background-style	uint	0
+panel	xfce4-panel	/panels/panel-1/plugin-ids	array:int	1|2|3|4|5|6|7|8|9|10
+panel	xfce4-panel	/plugins/plugin-1	string	whiskermenu
+panel	xfce4-panel	/plugins/plugin-1/button-title	string	Copland OS
+panel	xfce4-panel	/plugins/plugin-1/button-icon	string	@THEME@/assets/copland-logo-48.png
+panel	xfce4-panel	/plugins/plugin-1/show-button-title	bool	true
+panel	xfce4-panel	/plugins/plugin-1/show-button-icon	bool	true
+panel	xfce4-panel	/plugins/plugin-1/menu-width	int	520
+panel	xfce4-panel	/plugins/plugin-1/menu-height	int	560
+panel	xfce4-panel	/plugins/plugin-1/menu-opacity	int	94
+panel	xfce4-panel	/plugins/plugin-2	string	tasklist
+panel	xfce4-panel	/plugins/plugin-2/flat-buttons	bool	true
+panel	xfce4-panel	/plugins/plugin-2/show-handle	bool	false
+panel	xfce4-panel	/plugins/plugin-2/show-labels	bool	true
+panel	xfce4-panel	/plugins/plugin-2/grouping	uint	0
+panel	xfce4-panel	/plugins/plugin-2/include-all-workspaces	bool	false
+panel	xfce4-panel	/plugins/plugin-3	string	separator
+panel	xfce4-panel	/plugins/plugin-3/expand	bool	true
+panel	xfce4-panel	/plugins/plugin-3/style	uint	0
+panel	xfce4-panel	/plugins/plugin-4	string	pager
+panel	xfce4-panel	/plugins/plugin-4/miniature-view	bool	false
+panel	xfce4-panel	/plugins/plugin-4/rows	uint	1
+panel	xfce4-panel	/plugins/plugin-5	string	separator
+panel	xfce4-panel	/plugins/plugin-5/style	uint	0
+panel	xfce4-panel	/plugins/plugin-6	string	systray
+panel	xfce4-panel	/plugins/plugin-6/square-icons	bool	true
+panel	xfce4-panel	/plugins/plugin-7	string	pulseaudio
+panel	xfce4-panel	/plugins/plugin-7/enable-keyboard-shortcuts	bool	true
+panel	xfce4-panel	/plugins/plugin-8	string	clock
+panel	xfce4-panel	/plugins/plugin-8/mode	uint	2
+panel	xfce4-panel	/plugins/plugin-8/digital-layout	uint	3
+panel	xfce4-panel	/plugins/plugin-8/digital-time-format	string	%a %d %b  %H:%M
+panel	xfce4-panel	/plugins/plugin-8/digital-time-font	string	C059 Bold Italic 11
+panel	xfce4-panel	/plugins/plugin-8/digital-date-format	string	%d %b %Y
+panel	xfce4-panel	/plugins/plugin-9	string	actions
+panel	xfce4-panel	/plugins/plugin-9/appearance	uint	0
+panel	xfce4-panel	/plugins/plugin-9/button-title	uint	3
+panel	xfce4-panel	/plugins/plugin-9/items	array:string	-lock-screen|-switch-user|-separator|-suspend|-hibernate|-hybrid-sleep|-separator|+shutdown|-restart|+separator|-logout|-logout-dialog
+panel	xfce4-panel	/plugins/plugin-10	string	separator
+panel	xfce4-panel	/plugins/plugin-10/style	uint	0
+terminal	xfce4-terminal	/color-background	string	#101838
+terminal	xfce4-terminal	/color-foreground	string	#ccddff
+terminal	xfce4-terminal	/color-cursor	string	#46baef
+terminal	xfce4-terminal	/color-palette	string	#141c3a;#e0507a;#5fd7a7;#e6d28a;#197aba;#9a7cf0;#46baef;#c5cfee;#4a5c9a;#ff7096;#8af0c8;#f5e6a8;#5aa8e8;#b8a0ff;#8fd6fa;#ffffff
+terminal	xfce4-terminal	/background-mode	string	TERMINAL_BACKGROUND_TRANSPARENT
+terminal	xfce4-terminal	/background-darkness	double	0.92
+terminal	xfce4-terminal	/font-use-system	bool	false
+terminal	xfce4-terminal	/font-name	string	DejaVu Sans Mono 9
+terminal	xfce4-terminal	/misc-default-geometry	string	120x34
+layers	xfwm4	/general/workspace_count	int	4
+layers	xfwm4	/general/workspace_names	array:string	Layer:01|Layer:02|Layer:03|Layer:04
+layers	xfwm4	/general/activate_action	string	switch
+keys	xfce4-keyboard-shortcuts	/commands/custom/Super_L	string	xfce4-popup-whiskermenu
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Super>1	string	@BIN@/copland-goto 1
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Super>KP_1	string	@BIN@/copland-goto 1
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Super>ampersand	string	@BIN@/copland-goto 1
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Super>2	string	@BIN@/copland-goto 2
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Super>KP_2	string	@BIN@/copland-goto 2
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Super>eacute	string	@BIN@/copland-goto 2
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Super>3	string	@BIN@/copland-goto 3
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Super>KP_3	string	@BIN@/copland-goto 3
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Super>quotedbl	string	@BIN@/copland-goto 3
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Super>4	string	@BIN@/copland-goto 4
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Super>KP_4	string	@BIN@/copland-goto 4
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Super>apostrophe	string	@BIN@/copland-goto 4
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Shift><Super>exclam	string	@BIN@/copland-send 1
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Shift><Super>1	string	@BIN@/copland-send 1
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Shift><Super>at	string	@BIN@/copland-send 2
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Shift><Super>2	string	@BIN@/copland-send 2
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Shift><Super>numbersign	string	@BIN@/copland-send 3
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Shift><Super>3	string	@BIN@/copland-send 3
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Shift><Super>dollar	string	@BIN@/copland-send 4
+keys	xfce4-keyboard-shortcuts	/commands/custom/<Shift><Super>4	string	@BIN@/copland-send 4
