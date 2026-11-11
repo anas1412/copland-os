@@ -428,6 +428,12 @@ step_panel() {
     xf $P /plugins/plugin-1/menu-height int 560
     xf $P /plugins/plugin-1/menu-opacity int 94
 
+    # the menu shows your profile picture (~/.face): use the Copland logo
+    if [ -f "$THEME_DIR/assets/copland-logo-128.png" ] || [ "$DRY" -eq 1 ]; then
+        if [ -e "$HOME/.face" ] && [ "$DRY" -eq 0 ]; then mkdir -p "$BACKUP"; cp -a "$HOME/.face" "$BACKUP/face"; fi
+        run cp "$THEME_DIR/assets/copland-logo-128.png" "$HOME/.face"
+    fi
+
     xf $P /plugins/plugin-2 string tasklist
     xf $P /plugins/plugin-2/flat-buttons bool true
     xf $P /plugins/plugin-2/show-handle bool false
@@ -730,6 +736,7 @@ restore() {
         [ -f "$src/xfconf/$ch.xml" ] && cp -a "$src/xfconf/$ch.xml" "$XML_DIR/$ch.xml"
     done
     [ -f "$HOME/.bashrc" ] && sed -i '/^# >>> copland-os fastfetch >>>$/,/^# <<< copland-os fastfetch <<<$/d' "$HOME/.bashrc"
+    [ -f "$src/face" ] && cp -a "$src/face" "$HOME/.face"
     [ -f "$src/fastfetch-config.jsonc" ] && cp -a "$src/fastfetch-config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
     rm -f "$HOME/.config/autostart/devilspie2.desktop" "$HOME/.local/share/applications/copland-layers.desktop"
     pkill -u "$EUID" -x devilspie2 2>/dev/null || true

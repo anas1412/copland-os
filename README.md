@@ -49,7 +49,7 @@ you pick components with the arrow keys and space; enter installs.
 | `cursors` | on | classic Mac pixel-art cursors ([Retrosmart](https://github.com/useless-anvil/retrosmart-cursor), Mac-ish), bundled |
 | `cursorscyan` | off | instead: Adwaita cursors re-tinted Copland cyan |
 | `wallpaper` | on | the Copland OS Enterprise boot frame |
-| `panel` | on | top bar: Copland menu, window list, Layer:01–04, tray, clock, power. **Replaces your current panel layout** |
+| `panel` | on | top bar: Copland menu (with the Copland logo as its profile picture), window list, Layer:01–04, tray, clock, power. **Replaces your current panel layout** |
 | `terminal` | on | xfce4-terminal palette and font, fastfetch config, `~/.bashrc` hook |
 | `layers` | on | 4 workspaces named Layer:01–04, plus `copland-layers`, a small picker to choose which app opens on which layer. Nothing is assigned until you choose |
 | `keys` | on | the Super (Windows) key opens the Copland menu; Super+1–4 (number row or numpad) jump to Layer:01–04; Super+Shift+1–4 send the focused window there |
