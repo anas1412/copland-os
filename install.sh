@@ -402,7 +402,7 @@ step_panel() {
     xf $P /plugins/plugin-8 string clock
     xf $P /plugins/plugin-8/mode uint 2
     xf $P /plugins/plugin-8/digital-layout uint 3
-    xf $P /plugins/plugin-8/digital-time-format string "%H:%M"
+    xf $P /plugins/plugin-8/digital-time-format string "%a %d %b  %H:%M"
     xf $P /plugins/plugin-8/digital-time-font string "C059 Bold Italic 11"
     xf $P /plugins/plugin-8/digital-date-format string "%d %b %Y"
 
