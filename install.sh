@@ -32,6 +32,7 @@ CHANNELS=(xsettings xfwm4 xfce4-panel xfce4-desktop xfce4-terminal xfce4-keyboar
 GREETER=/etc/lightdm/lightdm-gtk-greeter.conf
 GRUB=/etc/default/grub
 PLYMOUTH_REPO="https://github.com/faisalhsn/copland-plymouth-theme.git"
+PLYMOUTH_COMMIT="4e336d9e264723634ae1ed5dd38888cd2ab37c52"   # pinned: the repo is third-party
 
 PACKAGES=(xfce4-whiskermenu-plugin xfce4-pulseaudio-plugin xfce4-terminal xfce4-notifyd
           papirus-icon-theme adwaita-icon-theme fonts-urw-base35 fonts-dejavu-core
@@ -47,7 +48,7 @@ TITLE[cursors]="Cursors";          DESC[cursors]="Adwaita cursors tinted Copland
 TITLE[wallpaper]="Wallpaper";      DESC[wallpaper]="Copland OS Enterprise boot frame";             ON[wallpaper]=1; SUDO[wallpaper]=0
 TITLE[panel]="Top bar";            DESC[panel]="replaces your panel layout (backed up)";           ON[panel]=1;     SUDO[panel]=0
 TITLE[terminal]="Terminal";        DESC[terminal]="palette, font, fastfetch";                      ON[terminal]=1;  SUDO[terminal]=0
-TITLE[layers]="Layers";            DESC[layers]="4 workspaces, one per kind of app";               ON[layers]=1;    SUDO[layers]=0
+TITLE[layers]="Layers";            DESC[layers]="4 workspaces; you choose which apps go where";               ON[layers]=1;    SUDO[layers]=0
 TITLE[keys]="Super key";           DESC[keys]="Windows key opens the Copland menu";                ON[keys]=1;      SUDO[keys]=0
 TITLE[greeter]="Login screen";     DESC[greeter]="LightDM greeter in the same theme";              ON[greeter]=0;   SUDO[greeter]=1
 TITLE[boot]="Boot animation";      DESC[boot]="Plymouth theme, third-party, experimental";         ON[boot]=0;      SUDO[boot]=1
@@ -142,7 +143,7 @@ preflight() {
     [ "$EUID" -ne 0 ] || die "Do not run this as root. Run it as your own user; it asks for sudo only where needed."
     local f
     for f in themes/CoplandOS/gtk-3.0/gtk.css themes/CoplandOS/xfwm4/themerc backgrounds/CoplandOS.png \
-             fastfetch/config.jsonc devilspie2/layers.lua tools/copland_assets.py; do
+             fastfetch/config.jsonc devilspie2/layers.lua bin/copland-layers tools/copland_assets.py; do
         [ -e "$FILES/$f" ] || die "The dotfiles folder is incomplete: files/$f is missing."
     done
     local like=""
@@ -469,7 +470,35 @@ EOF
 step_layers() {
     xf xfwm4 /general/workspace_count int 4
     xf_arr xfwm4 /general/workspace_names string "Layer:01" "Layer:02" "Layer:03" "Layer:04"
+    # when an app asks for attention, go to its layer instead of dragging its window to yours
+    xf xfwm4 /general/activate_action string switch
     run install -D -m 644 "$FILES/devilspie2/layers.lua" "$HOME/.config/devilspie2/layers.lua"
+    run install -D -m 755 "$FILES/bin/copland-layers" "$HOME/.local/bin/copland-layers"
+    # a neutral starting point: no app is assigned until you choose
+    local conf="${XDG_CONFIG_HOME:-$HOME/.config}/copland-os/layers.conf"
+    if [ -f "$conf" ]; then
+        echo "keeping your existing layer choices: $conf"
+    elif [ "$DRY" -eq 0 ]; then
+        mkdir -p "$(dirname "$conf")"
+        printf '# Copland OS layers. Edit with: copland-layers\nfollow = true\ndefault = 0\n' > "$conf"
+    else
+        run write "$conf"
+    fi
+    if [ "$DRY" -eq 0 ]; then
+        mkdir -p "$HOME/.local/share/applications"
+        cat > "$HOME/.local/share/applications/copland-layers.desktop" <<LAUNCHER
+[Desktop Entry]
+Type=Application
+Name=Copland Layers
+Comment=Choose which apps open on which layer
+Exec=xfce4-terminal --title="Copland Layers" --geometry=84x34 -x $HOME/.local/bin/copland-layers
+Icon=$THEME_DIR/assets/copland-logo-128.png
+Categories=Settings;DesktopSettings;
+Terminal=false
+LAUNCHER
+    else
+        run write "$HOME/.local/share/applications/copland-layers.desktop"
+    fi
     if [ "$DRY" -eq 0 ]; then
         mkdir -p "$HOME/.config/autostart"
         cat > "$HOME/.config/autostart/devilspie2.desktop" <<'EOF'
@@ -485,9 +514,11 @@ EOF
         run write "$HOME/.config/autostart/devilspie2.desktop"
     fi
     have devilspie2 || { note "names set; devilspie2 is missing, so apps are not sorted into layers"; return 0; }
-    if ! pgrep -u "$EUID" -x devilspie2 >/dev/null && [ "$DRY" -eq 0 ]; then
+    if [ "$DRY" -eq 0 ]; then
+        pkill -u "$EUID" -x devilspie2 2>/dev/null || true
         spawn devilspie2
     fi
+    note "run 'copland-layers' (or Copland Layers in the menu) to choose your apps"
 }
 
 step_keys() {
@@ -507,11 +538,13 @@ step_greeter() {
     run sudo cp -a "$THEME_DIR" /usr/share/themes/CoplandOS
     run sudo cp -a "$ICON_DIR" /usr/share/icons/CoplandOS
     run sudo chown -R root:root /usr/share/themes/CoplandOS /usr/share/icons/CoplandOS
+    run sudo chmod -R go-w /usr/share/themes/CoplandOS /usr/share/icons/CoplandOS
     run sudo install -D -m 644 "$WALL" /usr/share/backgrounds/CoplandOS.png
     [ -f "$GREETER.copland-bak" ] || run sudo cp -a "$GREETER" "$GREETER.copland-bak"
     run sudo sed -i '/^# copland-begin$/,/^# copland-end$/d' "$GREETER"
     run sudo sed -i '0,/^\[greeter\]/s//[greeter]\n# copland-begin\ntheme-name = CoplandOS\nicon-theme-name = CoplandOS\ncursor-theme-name = CoplandOS\ncursor-theme-size = 24\nbackground = \/usr\/share\/backgrounds\/CoplandOS.png\nuser-background = false\nfont-name = C059 Bold Italic 11\nclock-format = %H:%M\n# copland-end/' "$GREETER"
     [ "$DRY" -eq 1 ] || grep -q '^theme-name = CoplandOS$' "$GREETER" || { echo "greeter config was not updated"; exit 1; }
+    note "installed; it is a snapshot, so run this component again after changing the theme or icons"
 }
 
 step_boot() {
@@ -521,13 +554,15 @@ step_boot() {
     [ -f "$GRUB" ] || skip "$GRUB not found"
     local tmp
     tmp="$(mktemp -d)"
-    run git clone --depth=1 "$PLYMOUTH_REPO" "$tmp/repo"
+    run git clone -q "$PLYMOUTH_REPO" "$tmp/repo"
+    run git -C "$tmp/repo" -c advice.detachedHead=false checkout -q "$PLYMOUTH_COMMIT"
     if [ "$DRY" -eq 0 ]; then
         [ -f "$tmp/repo/copland/copland.plymouth" ] || { rm -rf "$tmp"; echo "unexpected layout in the Plymouth theme repo"; exit 1; }
     fi
     run sudo rm -rf /usr/share/plymouth/themes/copland
     run sudo cp -a "$tmp/repo/copland" /usr/share/plymouth/themes/copland
     run sudo chown -R root:root /usr/share/plymouth/themes/copland
+    run sudo chmod -R go-w /usr/share/plymouth/themes/copland
     rm -rf "$tmp"
     if [ ! -f /etc/copland-prev-plymouth ] && [ "$DRY" -eq 0 ]; then
         /usr/sbin/plymouth-set-default-theme | sudo tee /etc/copland-prev-plymouth >/dev/null
@@ -538,7 +573,7 @@ step_boot() {
     fi
     run sudo /usr/sbin/plymouth-set-default-theme -R copland     # -R rebuilds the initramfs
     run sudo /usr/sbin/update-grub
-    note "installed; it shows on the next reboot"
+    note "installed; it shows on the next reboot (the initramfs of every kernel was rebuilt)"
 }
 
 # ------------------------------------------------------------------- runner
@@ -611,7 +646,7 @@ restore() {
     done
     [ -f "$HOME/.bashrc" ] && sed -i '/^# >>> copland-os fastfetch >>>$/,/^# <<< copland-os fastfetch <<<$/d' "$HOME/.bashrc"
     [ -f "$src/fastfetch-config.jsonc" ] && cp -a "$src/fastfetch-config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
-    rm -f "$HOME/.config/autostart/devilspie2.desktop"
+    rm -f "$HOME/.config/autostart/devilspie2.desktop" "$HOME/.local/share/applications/copland-layers.desktop"
     pkill -u "$EUID" -x devilspie2 2>/dev/null || true
     if [ -f "$GREETER.copland-bak" ] && confirm "Also restore the login screen config (sudo)?"; then
         sudo cp -a "$GREETER.copland-bak" "$GREETER" && info "Login screen restored."
@@ -695,7 +730,14 @@ main() {
         idx=$((idx + 1))
         run_step "$id" "$idx" "$total"
     done
-    summary || exit 1
+    local rc=0
+    summary || rc=1
+    # offer the app picker right away when Layers was just installed interactively
+    if [ "$DRY" -eq 0 ] && [ "$YES" -eq 0 ] && [ -z "$ONLY" ] && [ "${RESULT[layers]:-}" = ok ] \
+        && [ -t 0 ] && [ -x "$HOME/.local/bin/copland-layers" ]; then
+        if confirm "Choose which apps open on which layer now?"; then "$HOME/.local/bin/copland-layers" || true; fi
+    fi
+    exit "$rc"
 }
 
 main "$@"

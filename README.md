@@ -48,10 +48,21 @@ you pick components with the arrow keys and space; enter installs.
 | `wallpaper` | on | the Copland OS Enterprise boot frame |
 | `panel` | on | top bar: Copland menu, window list, Layer:01–04, tray, clock, power. **Replaces your current panel layout** |
 | `terminal` | on | xfce4-terminal palette and font, fastfetch config, `~/.bashrc` hook |
-| `layers` | on | 4 workspaces named Layer:01–04 and devilspie2 rules: Claude, browser, terminals, everything else |
+| `layers` | on | 4 workspaces named Layer:01–04, plus `copland-layers`, a small picker to choose which app opens on which layer. Nothing is assigned until you choose |
 | `keys` | on | the Super (Windows) key opens the Copland menu |
 | `greeter` | off | LightDM login screen in the same theme (sudo) |
 | `boot` | off | Plymouth boot animation from a third-party repo (sudo, experimental) |
+
+## Choosing your layers
+
+The installer does not assume which apps you use. After installing `layers`, run
+`copland-layers` (or open **Copland Layers** from the menu). It lists your
+installed apps and open windows; move with the arrow keys and press `1`–`4` to
+send an app to a layer, `0` to leave it wherever you are.
+
+- `d` sets where every other app goes (default: anywhere).
+- `f` sets whether opening an app switches you to its layer.
+- `s` saves to `~/.config/copland-os/layers.conf` and applies at once.
 
 ## Safety
 
@@ -64,15 +75,33 @@ you pick components with the arrow keys and space; enter installs.
   others still run. The full output is in `~/.local/share/copland-os/install-<timestamp>.log`.
 - Packages that your release does not have are skipped and named, not fatal.
 
+## Login screen and boot animation
+
+Both are off by default and need sudo.
+
+- **Login screen** copies the theme, icons and wallpaper to `/usr/share` because
+  the greeter cannot read your home folder. That copy is a snapshot: after you
+  change the theme or icons, run `./install.sh --only greeter` again.
+- **Boot animation** clones a third-party Plymouth theme at a pinned commit (it
+  has no licence file, so it is not bundled here), adds `splash` to the kernel
+  command line and rebuilds the initramfs of every installed kernel. Its frames
+  are 1336x768 and are centred, not scaled. If boot misbehaves, press `Esc` for
+  the text log, or remove `splash` from the GRUB entry for one boot.
+- Both keep a `.copland-bak` copy of the file they edit; `--restore` offers to
+  put them back.
+
 ## What was tested
 
 Tested on Debian 13 (trixie) with XFCE 4.20: the menu, `--dry-run`, and a real
 run of `theme`, `icons` (existing build kept), `cursors` (existing build kept),
-`wallpaper`, `panel`, `terminal`, `layers` and `keys`.
+`wallpaper`, `panel`, `terminal`, `layers` and `keys`, and the `copland-layers`
+picker (navigation and loading; window placement from its config file).
 
 Not tested: a from-scratch icon and cursor build through the installer,
-`packages` on a system that is missing them, `greeter` and `boot` through the
-installer, `--restore`, and any release other than Debian 13.
+`packages` on a system that is missing them, `greeter` and `boot` through this
+installer (the same steps were run from an earlier standalone script; how the
+login screen and boot animation look has not been checked), `--restore`, and any
+release other than Debian 13.
 
 ## Layout
 
@@ -81,7 +110,8 @@ install.sh                  the installer
 files/themes/CoplandOS/     GTK theme, xfwm4 borders, notification style, logo
 files/backgrounds/          wallpaper
 files/fastfetch/            fastfetch config
-files/devilspie2/           per-app workspace rules
+files/devilspie2/           per-app workspace rules (read layers.conf)
+files/bin/copland-layers    the layer picker
 files/tools/                generators: icon duotone, cursor tint, theme recolour
 ```
 
