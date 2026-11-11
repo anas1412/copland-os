@@ -18,24 +18,42 @@ show, with one installer that sets up the whole thing, not just config files.
 
 ## Install
 
+One line, from a terminal inside your XFCE session, as your own user:
+
 ```bash
-git clone git@github.com:anas1412/copland-os-dotfiles.git
+curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os-dotfiles/main/install.sh | bash
+```
+
+It downloads the dotfiles to `~/.local/share/copland-os/src/` and opens the menu:
+arrow keys to move, space to toggle a component, enter to install. Nothing is
+changed before you confirm.
+
+Pass options after `bash -s --`, for example a dry run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os-dotfiles/main/install.sh | bash -s -- --dry-run
+```
+
+Or from a clone:
+
+```bash
+git clone https://github.com/anas1412/copland-os-dotfiles.git
 cd copland-os-dotfiles
 ./install.sh
 ```
 
-Run it from a terminal inside your XFCE session, as your own user. The menu lets
-you pick components with the arrow keys and space; enter installs.
-
 | Option | What it does |
 |---|---|
-| `./install.sh` | interactive menu |
-| `./install.sh --yes` | install the default selection without asking |
-| `./install.sh --dry-run` | print every command, change nothing |
-| `./install.sh --only theme,icons` | install only the listed components |
-| `./install.sh --list` | list component ids |
-| `./install.sh --force` | rebuild icons and cursors even if they exist |
-| `./install.sh --restore` | put back the settings saved by the last run |
+| *(none)* | interactive menu |
+| `--yes` | install the default selection without asking |
+| `--dry-run` | print every command, change nothing |
+| `--only theme,icons` | install only the listed components |
+| `--list` | list component ids |
+| `--force` | re-download or rebuild things that already exist |
+| `--restore` | put back the settings saved by the last run |
+
+To install a specific release instead of `main`, set `COPLAND_REF`, for
+example `curl -fsSL .../install.sh | COPLAND_REF=v1.0 bash`.
 
 ## Components
 

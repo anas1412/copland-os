@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Copland OS Enterprise — dotfiles installer for Debian + XFCE.
 #
-#   ./install.sh              interactive menu
+#   curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os-dotfiles/main/install.sh | bash
+#                             one-liner: downloads everything, then opens the menu
+#   ./install.sh              interactive menu (from a clone)
 #   ./install.sh --yes        install the default selection without asking
 #   ./install.sh --dry-run    show every change, make none
 #   ./install.sh --only a,b   pick components by id (see --list)
@@ -15,7 +17,10 @@
 set -Eeuo pipefail
 
 VERSION="1.0"
-SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_SLUG="anas1412/copland-os-dotfiles"
+# When run as a one-liner there is no script file, so this resolves to the current folder;
+# bootstrap() then downloads the rest.
+SRC="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || pwd)"
 FILES="$SRC/files"
 STATE="${XDG_DATA_HOME:-$HOME/.local/share}/copland-os"
 STAMP="$(date +%Y%m%d-%H%M%S)"
@@ -751,11 +756,64 @@ restore() {
     say; info "Done. Log out and back in to load the restored settings."
 }
 
-usage() { sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() {
+    cat <<USAGE
+Copland OS Enterprise — dotfiles installer for Debian + XFCE.
+
+  curl -fsSL https://raw.githubusercontent.com/$REPO_SLUG/main/install.sh | bash
+                            one-liner: downloads everything, then opens the menu
+  ./install.sh              interactive menu (from a clone)
+  ./install.sh --yes        install the default selection without asking
+  ./install.sh --dry-run    show every change, make none
+  ./install.sh --only a,b   pick components by id (see --list)
+  ./install.sh --list       list components
+  ./install.sh --restore    put back the settings saved by the last run
+  ./install.sh --force      rebuild things that already exist
+
+With the one-liner, pass options after 'bash -s --':
+  curl -fsSL .../install.sh | bash -s -- --dry-run
+Set COPLAND_REF to install a tag or commit instead of main.
+USAGE
+}
+
+# bootstrap: when started without the rest of the repo next to it (the curl one-liner),
+# download the repository tarball and run the real copy from there.
+bootstrap() {
+    [ -d "$FILES" ] && return 0
+    local ref="${COPLAND_REF:-main}" dest="$STATE/src" tmp
+    have curl || die "curl is required to download the dotfiles."
+    have tar  || die "tar is required to unpack the dotfiles."
+    printf ' %s%s%s Downloading %s (%s)...\n' "$CY" "$G_PTR" "$R" "$REPO_SLUG" "$ref"
+    mkdir -p "$STATE"
+    tmp="$(mktemp -d "$STATE/.download.XXXXXX")"
+    if ! curl -fsSL --retry 2 -o "$tmp/src.tar.gz" "https://codeload.github.com/$REPO_SLUG/tar.gz/$ref" 2>/dev/null; then
+        # a private repository needs your GitHub login
+        if have gh && gh auth status >/dev/null 2>&1 \
+            && gh api "repos/$REPO_SLUG/tarball/$ref" > "$tmp/src.tar.gz" 2>/dev/null; then
+            :
+        else
+            rm -rf "$tmp"
+            die "Could not download $REPO_SLUG ($ref). Check your connection; a private repository also needs 'gh auth login'."
+        fi
+    fi
+    mkdir -p "$tmp/src"
+    tar -xzf "$tmp/src.tar.gz" -C "$tmp/src" --strip-components=1 --no-same-owner \
+        || { rm -rf "$tmp"; die "The downloaded archive could not be unpacked."; }
+    [ -f "$tmp/src/install.sh" ] && [ -d "$tmp/src/files" ] \
+        || { rm -rf "$tmp"; die "The download does not look like the Copland OS dotfiles."; }
+    rm -rf "$dest"
+    mv "$tmp/src" "$dest"
+    rm -rf "$tmp"
+    printf ' %s%s%s Saved to %s\n' "$GN" "$G_OK" "$R" "$dest"
+    exec bash "$dest/install.sh" "$@"
+}
 list()  { local id; for id in "${IDS[@]}"; do printf '  %-10s %-15s %s\n' "$id" "${TITLE[$id]}" "${DESC[$id]}"; done; }
 
 # --------------------------------------------------------------------- main
 main() {
+    # 'curl ... | bash' leaves the script on stdin; the menu needs the keyboard
+    if [ ! -t 0 ] && (: </dev/tty) 2>/dev/null; then exec </dev/tty; fi
+    case " $* " in *" -h "*|*" --help "*|*" --list "*) ;; *) bootstrap "$@" ;; esac
     local id sel=() total idx=0 need_sudo=0
     while [ $# -gt 0 ]; do
         case "$1" in
