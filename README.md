@@ -58,6 +58,8 @@ example `curl -fsSL .../install.sh | COPLAND_REF=v1.0 bash`.
 
 ## Components
 
+Every file and setting each component touches, and how to undo it: [docs/WHAT-CHANGES.md](docs/WHAT-CHANGES.md).
+
 | Id | Default | What you get |
 |---|---|---|
 | `packages` | on | installs the missing apt packages (sudo) |

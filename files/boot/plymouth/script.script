@@ -1,0 +1,38 @@
+# Copland OS boot animation (frames from faisalhsn/copland-plymouth-theme).
+# Scales every frame to cover the whole screen, keeping its shape, so there
+# are no black bars on any resolution. Frames are loaded one at a time, so
+# only the frame on screen is held in memory.
+
+# frame edge colour (#171a31), shown if a screen shape ever leaves a gap
+Window.SetBackgroundTopColor(0.090, 0.102, 0.192);
+Window.SetBackgroundBottomColor(0.090, 0.102, 0.192);
+
+global.nframes = 25;
+global.nseconds = 8.333333;
+
+first = Image("progress-1.png");
+scale_w = Window.GetWidth() / first.GetWidth();
+scale_h = Window.GetHeight() / first.GetHeight();
+if (scale_w > scale_h) scale = scale_w; else scale = scale_h;
+global.w = Math.Int(first.GetWidth() * scale + 0.5);
+global.h = Math.Int(first.GetHeight() * scale + 0.5);
+
+global.video = Sprite();
+global.video.SetX(Window.GetX() + Window.GetWidth() / 2 - global.w / 2);
+global.video.SetY(Window.GetY() + Window.GetHeight() / 2 - global.h / 2);
+global.video.SetImage(first.Scale(global.w, global.h));
+
+global.shown = 1;
+global.progress = 1;
+
+fun refresh_callback () {
+    if (Math.Int(global.progress) <= global.nframes) {
+        n = Math.Int(global.progress);
+        if (n != global.shown) {
+            global.video.SetImage(Image("progress-" + n + ".png").Scale(global.w, global.h));
+            global.shown = n;
+        }
+        global.progress = global.progress + ((global.nframes / global.nseconds) / 50);
+    }
+}
+Plymouth.SetRefreshFunction(refresh_callback);

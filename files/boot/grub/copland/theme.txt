@@ -1,0 +1,55 @@
+# Copland OS Enterprise - GRUB theme
+# Background: first frame of the boot animation, so GRUB hands over to
+# Plymouth without a visible jump. Layout is in % so it fits any resolution.
+
+title-text: ""
+desktop-image: "background.png"
+desktop-image-scale-method: "crop"
+desktop-color: "#171a31"
+terminal-font: "DejaVu Sans Mono Regular 14"
+terminal-left: "10%"
+terminal-top: "10%"
+terminal-width: "80%"
+terminal-height: "80%"
+terminal-border: "0"
+
++ boot_menu {
+    left = 24%
+    top = 77%
+    width = 52%
+    height = 15%
+    item_font = "C059 Bold Italic 26"
+    selected_item_font = "C059 Bold Italic 26"
+    item_color = "#ccddff"
+    selected_item_color = "#ffffff"
+    selected_item_pixmap_style = "select_*.png"
+    item_height = 38
+    item_padding = 10
+    item_spacing = 4
+    icon_width = 0
+    icon_height = 0
+    item_icon_space = 0
+    scrollbar = false
+}
+
++ progress_bar {
+    id = "__timeout__"
+    left = 24%
+    top = 93%
+    width = 52%
+    height = 2
+    fg_color = "#46baef"
+    bg_color = "#1c2852"
+    border_color = "#1c2852"
+}
+
++ label {
+    left = 0
+    top = 96%
+    width = 100%
+    height = 20
+    align = "center"
+    color = "#738dc1"
+    font = "DejaVu Sans Mono Regular 14"
+    text = "up/down select    enter boot    e edit    c console"
+}
