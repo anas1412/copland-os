@@ -144,7 +144,7 @@ You get the Copland boot animation (a third-party Plymouth theme, pinned to one 
 
 ## In the repo, not yet run by `install.sh`
 
-These are finished and tested on one machine. The installer does not run them yet.
+These are finished and were run on one machine. The installer does not run them yet.
 
 ### `files/boot/copland-boot.sh` (sudo, needs `boot` first)
 
@@ -167,17 +167,27 @@ script appends "GNU/Linux" to any name that doesn't end in it.
 
 Undo with `files/boot/copland-boot.sh --undo`.
 
-### `files/brave/` (Brave, or any Chromium browser)
+### `files/browsers/copland-browsers.sh` (sudo)
 
-You get navy and cyan tabs and toolbar.
+You get Copland navy in every Chromium-based browser (Brave, Chromium, Google
+Chrome, Microsoft Edge), for every profile, from the first launch, with no
+clicks. The browser builds its whole palette from one colour.
 
-To load it:
+| Changes | Value |
+|---|---|
+| `copland-theme.json` in `/etc/brave/policies/managed/`, `/etc/chromium/policies/managed/`, `/etc/chromium-browser/policies/managed/`, `/etc/opt/chrome/policies/managed/`, `/etc/opt/edge/policies/managed/` | `BrowserThemeColor` = `#25346a`. The folders are created if missing, so a browser installed later is covered too |
 
-1. Open `brave://extensions`.
-2. Turn on Developer mode.
-3. Click "Load unpacked" and choose this folder.
+It is a managed policy: while it is set, users cannot pick another browser
+theme. `brave://policy` or `chrome://policy` shows whether it is active.
 
-To remove it, open Settings → Appearance → Reset to default.
+Undo with `files/browsers/copland-browsers.sh --undo`.
+
+### Firefox
+
+Nothing to install. Firefox draws its tabs and toolbar from the GTK theme by
+default, so it follows CoplandOS once `theme` is installed (checked with Firefox
+ESR 153 on a fresh profile). A profile that already uses another Firefox theme
+keeps it.
 
 ### Font smoothing
 
