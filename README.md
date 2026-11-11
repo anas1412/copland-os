@@ -186,6 +186,16 @@ sudo ./install.sh --system
 `--root DIR` writes under another folder (the ISO build uses it), `--no-packages`
 and `--no-rebuild` skip apt and the initramfs/GRUB rebuild.
 
+## Debian package (work in progress)
+
+`./packaging/build-deb.sh` builds `copland-os-desktop_<version>_all.deb` (no root
+needed): the same files as `--system`, with Debian's package manager tracking them,
+so the look can later be updated with `apt` and removed with
+`sudo apt purge copland-os-desktop` (`purge`, not `remove`: settings under `/etc` are
+kept on a plain remove). The version is `packaging/VERSION` plus the Debian release,
+for example `0.1.0+deb13`. Not yet published in an apt repository, and not yet tested
+by installing it (that needs a VM).
+
 ## Supported systems
 
 Debian 13 (trixie) with XFCE 4.20 is what this is built and tested on; Ubuntu and
@@ -220,7 +230,9 @@ core/bin/                     copland-layers, copland-goto, copland-send
 core/boot/                    full-screen boot script, GRUB theme, copland-boot.sh
 core/browsers/                browser colour policy and copland-browsers.sh
 tools/xfconf-xml.py           settings.tsv -> XFCE default files for --system
-iso/                          live-build config, hooks, boot menu, installer branding, build.sh
+iso/                          live-build config, hooks, boot menu, installer branding, build.sh;
+                              release.conf names the Debian release
+packaging/                    builds the copland-os-desktop .deb (build-deb.sh, install scripts)
 docs/                         screenshot, DESIGN.md (palette, fonts, logo, wording), WHAT-CHANGES.md, BUILDING.md
 ```
 

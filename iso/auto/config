@@ -1,11 +1,14 @@
 #!/bin/sh
-# CoplandOS.iso: live-build configuration (live-build 1:20250505, Debian 13 trixie).
-# Called by "lb config"; iso/build.sh runs it inside its work folder.
+# CoplandOS.iso: live-build configuration (written for live-build 1:20250505).
+# Called by "lb config"; iso/build.sh runs it inside its work folder, next to a copy of
+# iso/release.conf, which names the Debian release.
 set -e
+
+. ./release.conf
 
 lb config noauto \
     --mode debian \
-    --distribution trixie \
+    --distribution "$DEBIAN_CODENAME" \
     --architecture amd64 \
     --archive-areas "main contrib non-free-firmware" \
     --security true \

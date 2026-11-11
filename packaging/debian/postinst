@@ -1,0 +1,53 @@
+#!/bin/sh
+# copland-os-desktop: the parts that act on the installed system
+set -e
+PKG=copland-os-desktop
+STATE=/var/lib/copland-os
+
+case "$1" in
+    configure)
+        mkdir -p "$STATE"
+
+        # XFCE's Wayland session needs a compositor Debian does not install: hide it
+        if [ -e /usr/share/wayland-sessions/xfce-wayland.desktop ] || \
+           dpkg-divert --list /usr/share/wayland-sessions/xfce-wayland.desktop | grep -q .; then
+            dpkg-divert --package "$PKG" --rename \
+                --divert /usr/share/wayland-sessions/xfce-wayland.desktop.copland-hidden \
+                --add /usr/share/wayland-sessions/xfce-wayland.desktop
+        fi
+
+        # new accounts: fastfetch in interactive terminals
+        if [ -f /etc/skel/.bashrc ] && ! grep -q '^# >>> copland-os >>>$' /etc/skel/.bashrc; then
+            printf '# >>> copland-os >>>\n[ -r /etc/copland-os/bashrc ] && . /etc/copland-os/bashrc\n# <<< copland-os <<<\n' >> /etc/skel/.bashrc
+        fi
+
+        # text console font (console-setup re-applies it at boot)
+        if [ -f /etc/default/console-setup ]; then
+            [ -f "$STATE/console-setup.orig" ] || cp -a /etc/default/console-setup "$STATE/console-setup.orig"
+            sed -i -E 's/^FONTFACE=.*/FONTFACE="Terminus"/; s/^FONTSIZE=.*/FONTSIZE="10x20"/' /etc/default/console-setup
+        fi
+
+        # boot menu theme (GRUB reads it from /boot)
+        if [ -d /usr/share/copland-os/grub-theme ]; then
+            rm -rf /boot/grub/themes/copland
+            mkdir -p /boot/grub/themes
+            cp -a /usr/share/copland-os/grub-theme /boot/grub/themes/copland
+        fi
+
+        if [ -x /usr/bin/gtk-update-icon-cache ]; then
+            gtk-update-icon-cache -f -q /usr/share/icons/NineIcons || true
+        fi
+
+        # boot animation
+        if [ -x /usr/sbin/plymouth-set-default-theme ]; then
+            if [ ! -f "$STATE/previous-plymouth-theme" ]; then
+                prev="$(/usr/sbin/plymouth-set-default-theme 2>/dev/null || true)"
+                [ -n "$prev" ] && [ "$prev" != copland ] && echo "$prev" > "$STATE/previous-plymouth-theme"
+            fi
+            /usr/sbin/plymouth-set-default-theme copland || true
+        fi
+        if [ -x /usr/sbin/update-initramfs ]; then update-initramfs -u -k all || true; fi
+        if [ -x /usr/sbin/update-grub ] && [ -f /boot/grub/grub.cfg ]; then update-grub || true; fi
+        ;;
+esac
+exit 0

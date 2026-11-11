@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Build CoplandOS.iso: Debian 13 (trixie) + XFCE, with Copland OS applied system-wide.
+# Build CoplandOS.iso: upstream Debian (release set in iso/release.conf) + XFCE,
+# with Copland OS applied system-wide.
 #
 #   sudo ./iso/build.sh              build iso/out/CoplandOS-<date>-amd64.iso (+ .sha256)
 #   sudo ./iso/build.sh --clean      remove the work folder, including its package cache
@@ -21,6 +22,17 @@ PLYMOUTH_COMMIT="4e336d9e264723634ae1ed5dd38888cd2ab37c52"   # same pin as insta
 say()  { printf ' > %s\n' "$*"; }
 die()  { printf '\n x %s\n' "$*" >&2; exit 1; }
 have() { command -v "$1" >/dev/null 2>&1 || [ -x "/usr/sbin/$1" ] || [ -x "/sbin/$1" ]; }
+
+load_release() {
+    [ -f "$HERE/release.conf" ] || die "iso/release.conf is missing."
+    # shellcheck source=/dev/null
+    . "$HERE/release.conf"
+    [ -n "${DEBIAN_CODENAME:-}" ] && [ -n "${DEBIAN_VERSION:-}" ] || die "iso/release.conf must set DEBIAN_CODENAME and DEBIAN_VERSION."
+    case "$DEBIAN_CODENAME$DEBIAN_VERSION" in *[!a-z0-9]*) die "iso/release.conf: unexpected characters." ;; esac
+    if [ -d /usr/share/debootstrap/scripts ] && [ ! -e "/usr/share/debootstrap/scripts/$DEBIAN_CODENAME" ]; then
+        die "debootstrap does not know Debian '$DEBIAN_CODENAME'; update debootstrap or fix iso/release.conf."
+    fi
+}
 
 checks() {
     local missing=() p
@@ -47,7 +59,7 @@ checks() {
         export MKSQUASHFS_OPTIONS="${MKSQUASHFS_OPTIONS:-} -processors 2 -mem 768M"
         say "Low memory (${mem_mb} MB): image compression limited to 2 threads and 768 MB; close other apps while it runs"
     fi
-    say "Checks passed: tools present, ${free_gb} GB free at $dir"
+    say "Checks passed: Debian $DEBIAN_VERSION ($DEBIAN_CODENAME), tools present, ${free_gb} GB free at $dir"
 }
 
 stage() {
@@ -58,7 +70,8 @@ stage() {
     rm -rf "$WORK"
     mkdir -p "$WORK"
     if [ -d "$WORK.cache" ]; then mv "$WORK.cache" "$WORK/cache"; fi
-    cp -a "$HERE/auto" "$HERE/config" "$WORK"/
+    cp -a "$HERE/auto" "$HERE/config" "$HERE/release.conf" "$WORK"/
+    sed -i "s/@DEBIAN_VERSION@/$DEBIAN_VERSION/g" "$WORK/config/hooks/normal/0510-copland-installer.hook.chroot"
 
     say "Copying the Copland OS installer into the image (/usr/share/copland-os)"
     mkdir -p "$inc/usr/share/copland-os"
@@ -66,6 +79,8 @@ stage() {
     # installer branding, used once by the 0510 hook and removed again
     mkdir -p "$inc/usr/share/copland-os/iso-branding"
     cp -a "$HERE/branding/." "$inc/usr/share/copland-os/iso-branding/"
+    sed -i "s/@DEBIAN_VERSION@/$DEBIAN_VERSION/g" "$inc/usr/share/copland-os/iso-branding/branding.desc"
+    if grep -rq '@DEBIAN_VERSION@' "$WORK/config" "$inc/usr/share/copland-os/iso-branding"; then die "A release placeholder was left unfilled."; fi
 
     say "Fetching the boot animation (pinned commit ${PLYMOUTH_COMMIT:0:7})"
     local src="$inc/usr/share/copland-os/plymouth-src"
@@ -90,6 +105,7 @@ record_build() {
         echo "working copy:   ${dirty}"
         echo "live-build:     $(dpkg-query -W -f='${Version}' live-build 2>/dev/null || echo unknown)"
         echo "debootstrap:    $(dpkg-query -W -f='${Version}' debootstrap 2>/dev/null || echo unknown)"
+        echo "debian release: $DEBIAN_VERSION ($DEBIAN_CODENAME), from iso/release.conf"
         echo "build host:     $(. /etc/os-release && echo "$PRETTY_NAME"), $(uname -m)"
         echo "boot animation: $PLYMOUTH_REPO @ $PLYMOUTH_COMMIT"
         echo "sha256:         $(cut -d' ' -f1 "$OUT/$name.sha256")"
@@ -129,7 +145,7 @@ build() {
 }
 
 case "${1:-}" in
-    --check) checks; exit 0 ;;
+    --check) load_release; checks; exit 0 ;;
     --clean)
         [ "$EUID" -eq 0 ] || die "Run with sudo."
         if [ -d "$WORK" ]; then (cd "$WORK" && lb clean --purge >/dev/null 2>&1 || true); rm -rf "$WORK"; fi
@@ -140,6 +156,7 @@ case "${1:-}" in
 esac
 
 [ "$EUID" -eq 0 ] || die "Building an image needs root:  sudo ./iso/build.sh"
+load_release
 checks
 stage
 build

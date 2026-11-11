@@ -1,0 +1,33 @@
+#!/bin/sh
+# copland-os-desktop: undo what postinst and preinst did
+set -e
+PKG=copland-os-desktop
+STATE=/var/lib/copland-os
+
+case "$1" in
+    remove|purge|abort-install|abort-upgrade)
+        rm -rf /boot/grub/themes/copland
+        if [ -f /etc/skel/.bashrc ]; then
+            sed -i '/^# >>> copland-os >>>$/,/^# <<< copland-os <<<$/d' /etc/skel/.bashrc
+        fi
+        if [ -f "$STATE/console-setup.orig" ]; then
+            cp -a "$STATE/console-setup.orig" /etc/default/console-setup
+            rm -f "$STATE/console-setup.orig"
+        fi
+        if [ -x /usr/sbin/plymouth-set-default-theme ]; then
+            /usr/sbin/plymouth-set-default-theme "$(cat "$STATE/previous-plymouth-theme" 2>/dev/null || echo text)" || true
+        fi
+        rm -f "$STATE/previous-plymouth-theme"
+        rmdir "$STATE" 2>/dev/null || true
+        for f in /usr/share/backgrounds/xfce/xfce-x.svg /usr/share/wayland-sessions/xfce-wayland.desktop; do
+            if dpkg-divert --list "$f" | grep -q "$PKG"; then
+                dpkg-divert --package "$PKG" --rename --remove "$f"
+            fi
+        done
+        if [ "$1" = remove ] || [ "$1" = purge ]; then
+            if [ -x /usr/sbin/update-initramfs ]; then update-initramfs -u -k all || true; fi
+            if [ -x /usr/sbin/update-grub ] && [ -f /boot/grub/grub.cfg ]; then update-grub || true; fi
+        fi
+        ;;
+esac
+exit 0

@@ -1,0 +1,12 @@
+#!/bin/sh
+# copland-os-desktop: set Debian's fallback wallpaper aside before ours is unpacked
+set -e
+PKG=copland-os-desktop
+case "$1" in
+    install|upgrade)
+        dpkg-divert --package "$PKG" --rename \
+            --divert /usr/share/backgrounds/xfce/xfce-x.svg.debian \
+            --add /usr/share/backgrounds/xfce/xfce-x.svg
+        ;;
+esac
+exit 0

@@ -1,12 +1,15 @@
 # Building CoplandOS.iso
 
-CoplandOS.iso is Debian 13 (trixie) with a lean XFCE desktop, Copland OS applied
+CoplandOS.iso is upstream Debian (the release named in `iso/release.conf`, currently
+13 "trixie") with a lean XFCE desktop, Copland OS applied
 system-wide, and the Calamares installer branded as Copland OS. It is built with
 Debian's own tool, live-build, from the files in `iso/`.
 
 ## Requirements
 
-- A Debian 13 machine (or VM) with root access and a network connection.
+- A Debian machine (or VM) with root access and a network connection. The builds so
+  far were prepared on Debian 13; building a newer release may need a newer
+  `live-build` and `debootstrap` (the build checks that debootstrap knows the release).
 - About 20 GB free on the disk holding the work folder (default `/var/tmp/coplandos-build`;
   set `COPLAND_ISO_WORK=/path` to change it; it must not be a tmpfs).
 - The tools: `sudo apt install live-build debootstrap wget git`
@@ -55,7 +58,7 @@ Results in `iso/out/`:
 ## Repeating a build
 
 The same commit of this repo always runs the same steps, and the boot animation is
-pinned. Debian packages are not: a later build picks up trixie's point releases and
+pinned. Debian packages are not: a later build picks up the release's point releases and
 security updates, so two builds a month apart differ in package versions. The
 `.packages` file next to each image lists exactly what went in.
 
@@ -64,3 +67,48 @@ security updates, so two builds a month apart differ in package versions. The
 User `lain`, password `live` (live-config's default), hostname `coplandos`, X11 XFCE
 session, US keyboard and English locale unless changed at the boot menu (press Tab /
 `e` and add for example `locales=fr_FR.UTF-8 keyboard-layouts=fr`).
+
+## Moving to a new Debian release
+
+The release is set in one place, `iso/release.conf` (`DEBIAN_CODENAME`,
+`DEBIAN_VERSION`). `build.sh` passes it to live-build and fills it into the
+installer's branding and launcher. A new release is a deliberate, tested change, never
+a floating "stable": a build should not change Debian versions on its own.
+
+Start while the new release is still Debian's *testing* distribution, so breakage shows
+up before release day.
+
+1. **Branch and switch.** On a new branch, set both lines in `iso/release.conf`.
+   `./iso/build.sh --check` confirms debootstrap knows the codename.
+2. **Packages.** For every name in `iso/config/package-lists/copland.list.chroot` and
+   `PACKAGES` in `install.sh`, check it still exists in the new release
+   (`apt-cache policy` against its sources, or packages.debian.org). Replace renamed or
+   dropped ones.
+3. **live-build.** Read the new `live-build` changelog; run `lb config` with
+   `iso/auto/config` in a scratch folder and confirm every option is still accepted.
+4. **XFCE.** If XFCE's version changed, check:
+   - panel plugin names and library paths (`plugin_exists` in `lib/common.sh`);
+   - the GTK theme's panel and window selectors (`core/assets/themes/CoplandOS`);
+   - that xfdesktop still falls back to `/usr/share/backgrounds/xfce/xfce-x.svg`
+     (`lib/system.sh`, `sys_wallpaper`);
+   - xfconf property names in `core/settings.tsv` (`xfconf-query -c <channel> -l`);
+   - the Wayland session entry and LightDM greeter option names.
+5. **Installer and boot.** Compare Debian's new `calamares-settings-debian`
+   (`settings.conf`, the launcher) with what hook `0510-copland-installer` diverts, and
+   live-build's boot menu templates with `iso/config/bootloaders/`.
+6. **Tests, in this order:**
+   - `./install.sh --dry-run --yes` on a machine running the new release;
+   - `--system --root` into a scratch folder, then `--uninstall`;
+   - the first-login test in a Xephyr window (fresh home, system defaults first);
+   - the login screen in `lightdm --test-mode`;
+   - build the ISO, then boot it in a VM (BIOS and UEFI): live session, install,
+     second user.
+7. **Text.** Update the release named in README.md, docs/DESIGN.md and the GitHub
+   description, then merge and tag.
+
+Installed systems move to the new release with Debian's own upgrade procedure (its
+release notes). The Copland files survive the upgrade. They are updated by apt once
+the `copland-os-desktop` package is published in an apt repository (see
+`packaging/`; its version carries the Debian release, so a package is built per
+release); until then, run `sudo ./install.sh --system` again after upgrading.
+

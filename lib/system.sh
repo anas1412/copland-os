@@ -18,7 +18,9 @@
 
 SYS_XDG=/etc/xdg/copland-os
 SYS_THEME=/usr/share/themes/CoplandOS
-SYS_BIN=/usr/local/bin
+# helpers go to /usr/local/bin for a local install; the Debian package sets
+# COPLAND_SYS_BIN=/usr/bin (packages may not install into /usr/local)
+SYS_BIN="${COPLAND_SYS_BIN:-/usr/local/bin}"
 SYS_WALL=/usr/share/backgrounds/CoplandOS.png
 SYS_STATE=/var/lib/copland-os
 GRUB_THEME_DIR=/boot/grub/themes/copland
@@ -343,8 +345,12 @@ build_grub_theme() {
     local tmp; tmp="$(mktemp -d)"
     cp "$g"/* "$tmp"/
     cp "$frame" "$tmp/background.png"
-    grub-mkfont -s 26 -o "$tmp/c059-26.pf2" "$TGT/usr/share/fonts/opentype/urw-base35/C059-BdIta.otf" 2>/dev/null || fonts=0
-    grub-mkfont -s 14 -o "$tmp/mono-14.pf2" "$TGT/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf" 2>/dev/null || fonts=0
+    # fonts from the target, or from this machine when building into a staging folder
+    local c059=/usr/share/fonts/opentype/urw-base35/C059-BdIta.otf mono=/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf
+    [ -f "$TGT$c059" ] && c059="$TGT$c059"
+    [ -f "$TGT$mono" ] && mono="$TGT$mono"
+    grub-mkfont -s 26 -o "$tmp/c059-26.pf2" "$c059" 2>/dev/null || fonts=0
+    grub-mkfont -s 14 -o "$tmp/mono-14.pf2" "$mono" 2>/dev/null || fonts=0
     [ "$fonts" -eq 1 ] || echo "a GRUB font could not be built; the theme falls back to GRUB's font"
     rm -rf "$TGT$GRUB_THEME_DIR"
     install -d -m 755 "$TGT$GRUB_THEME_DIR"

@@ -1,5 +1,6 @@
 # Copland OS branding for the Calamares installer on CoplandOS.iso.
-# Based on Debian's calamares-settings-debian branding; the system it installs is Debian 13.
+# Based on Debian's calamares-settings-debian branding. @DEBIAN_VERSION@ is filled in by
+# iso/build.sh from iso/release.conf.
 ---
 componentName:   copland
 welcomeStyleCalamares: true
@@ -10,10 +11,10 @@ windowPlacement: center
 strings:
     productName:         Copland OS Enterprise
     shortProductName:    Copland OS
-    version:             13
-    shortVersion:        13
-    versionedName:       Copland OS Enterprise (Debian 13)
-    shortVersionedName:  Copland OS 13
+    version:             @DEBIAN_VERSION@
+    shortVersion:        @DEBIAN_VERSION@
+    versionedName:       Copland OS Enterprise (Debian @DEBIAN_VERSION@)
+    shortVersionedName:  Copland OS @DEBIAN_VERSION@
     bootloaderEntryName: Copland OS Enterprise
     productUrl:          https://github.com/anas1412/copland-os
     supportUrl:          https://github.com/anas1412/copland-os/issues
