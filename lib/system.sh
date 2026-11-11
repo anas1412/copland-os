@@ -261,6 +261,11 @@ remove_old_greeter_block() {
     echo "removed the old copland block from $GREETER"
 }
 
+# automatic login belongs to one account: not part of a system-wide install
+sys_autologin() {
+    skip "per account: run ./install.sh --only autologin as the user who should log in"
+}
+
 sys_boot() {
     local src="${COPLAND_PLYMOUTH_SRC:-}" tmp=""
     if [ -z "$src" ]; then
@@ -349,6 +354,12 @@ GRUB_BACKGROUND=$GRUB_THEME_DIR/background.png"
     put_text 644 /etc/default/grub.d/copland.cfg <<EOF
 # Copland OS boot menu and boot screen (Debian's /etc/default/grub stays untouched)
 GRUB_DISTRIBUTOR="Copland OS Enterprise"
+# One resolution from the menu to the desktop: "auto" is the screen's own preferred
+# mode (from its EDID; 800x600 if the firmware gives none), and "keep" hands that same
+# mode to Linux instead of setting it again, so the boot animation starts without a
+# mode change
+GRUB_GFXMODE=auto
+GRUB_GFXPAYLOAD_LINUX=keep
 GRUB_CMDLINE_LINUX_DEFAULT="\$GRUB_CMDLINE_LINUX_DEFAULT splash $vt"
 $theme_line
 EOF

@@ -184,6 +184,9 @@ restore() {
     if [ -f "$GREETER.copland-bak" ] && confirm "Also restore the login screen config (sudo)?"; then
         sudo cp -a "$GREETER.copland-bak" "$GREETER" && info "Login screen restored."
     fi
+    if [ -f "$AUTOLOGIN_DROPIN" ] && confirm "Also turn off automatic login (sudo)?"; then
+        sudo rm -f "$AUTOLOGIN_DROPIN" && info "Automatic login off from the next startup."
+    fi
     if [ -f "$GRUB.copland-bak" ] && confirm "Also restore the boot settings (sudo, rebuilds the initramfs)?"; then
         sudo cp -a "$GRUB.copland-bak" "$GRUB"
         sudo /usr/sbin/plymouth-set-default-theme -R "$(cat /etc/copland-prev-plymouth 2>/dev/null || echo text)"

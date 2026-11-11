@@ -145,6 +145,26 @@ You get the Copland boot animation (a third-party Plymouth theme, pinned to one 
 | `/etc/default/grub` | `splash` added to the kernel command line. A `.copland-bak` copy is made first |
 | initramfs | rebuilt for every installed kernel |
 
+### `autologin` (off)
+
+You are logged in to XFCE at startup, as the account that ran the installer, without
+typing a password.
+
+| Changes | Value |
+|---|---|
+| `/etc/lightdm/lightdm.conf.d/60-copland-autologin.conf` | `autologin-user=<you>`, `autologin-user-timeout=0`, `autologin-session=xfce`. Debian's `/etc/lightdm/lightdm.conf` is not edited |
+
+Two consequences, which is why it is off by default:
+
+- anyone who can switch the machine on gets your desktop;
+- your login keyring (passwords saved by browsers and other apps) is normally unlocked
+  by the password you type at login. With automatic login nothing unlocks it, so the
+  first app that needs it asks for its password once per session.
+
+`./install.sh --restore` offers to turn it off (it deletes the drop-in). `--system`
+skips it: automatic login belongs to one account. On CoplandOS.iso the place for it is
+the installer's own "Log in automatically" option (not yet checked: part of the VM test).
+
 ## System-wide install (`--system`)
 
 `sudo ./install.sh --system` puts the same look in shared places for every
@@ -177,7 +197,7 @@ You get:
 |---|---|
 | `/usr/share/plymouth/themes/copland/script.script` | replaced; the original is kept as `script.script.orig` |
 | `/boot/grub/themes/copland/` | the GRUB theme. Its fonts and background are built on your machine from installed files |
-| `/etc/default/grub` | a `# copland-boot-begin` / `# copland-boot-end` block at the end of the file. A `.copland-boot-bak` copy is made first. The block sets `GRUB_DISTRIBUTOR`, `GRUB_THEME`, `GRUB_BACKGROUND`, and adds the console colours (`vt.default_red/grn/blu`) to the kernel command line |
+| `/etc/default/grub` | a `# copland-boot-begin` / `# copland-boot-end` block at the end of the file. A `.copland-boot-bak` copy is made first. The block sets `GRUB_DISTRIBUTOR`, `GRUB_GFXMODE=auto` and `GRUB_GFXPAYLOAD_LINUX=keep` (the screen's own resolution, kept from the menu to the boot animation), `GRUB_THEME`, `GRUB_BACKGROUND`, and adds the console colours (`vt.default_red/grn/blu`) to the kernel command line |
 | `/etc/default/console-setup` | `FONTFACE="Terminus"`, `FONTSIZE="10x20"`. A `.copland-bak` copy is made first |
 | initramfs and GRUB config | rebuilt |
 

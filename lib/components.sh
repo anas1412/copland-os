@@ -3,7 +3,7 @@
 # Sourced by install.sh; not meant to be run on its own.
 
 # ---------------------------------------------------------------- components
-IDS=(packages theme icons cursors wallpaper panel terminal layers keys browsers greeter boot)
+IDS=(packages theme icons cursors wallpaper panel terminal layers keys browsers greeter boot autologin)
 declare -A TITLE DESC ON SUDO RESULT NOTE
 TITLE[packages]="Packages";        DESC[packages]="install the missing apt packages";              ON[packages]=1;  SUDO[packages]=1
 TITLE[theme]="Theme";              DESC[theme]="GTK, window borders, notifications";               ON[theme]=1;     SUDO[theme]=0
@@ -17,6 +17,7 @@ TITLE[keys]="Shortcuts";           DESC[keys]="Super menu, Super+1-4 go, +Shift 
 TITLE[browsers]="Browsers";       DESC[browsers]="Copland colour for Chromium-family browsers";  ON[browsers]=0;  SUDO[browsers]=1
 TITLE[greeter]="Login screen";     DESC[greeter]="LightDM greeter in the same theme";              ON[greeter]=0;   SUDO[greeter]=1
 TITLE[boot]="Boot animation";      DESC[boot]="Plymouth theme, third-party, experimental";         ON[boot]=0;      SUDO[boot]=1
+TITLE[autologin]="Auto login";     DESC[autologin]="log you in at startup, no password (LightDM)";  ON[autologin]=0; SUDO[autologin]=1
 
 # --------------------------------------------------------------- components
 step_packages() {
@@ -302,6 +303,35 @@ step_greeter() {
     fi
     [ "$DRY" -eq 1 ] || grep -q '^theme-name = CoplandOS$' "$dropin" || { echo "greeter drop-in was not written"; exit 1; }
     note "installed; it is a snapshot, so run this component again after changing the theme or icons"
+}
+
+# automatic login for the account running the installer. Off by default: anyone who
+# can switch the machine on gets your desktop, and the login keyring is not unlocked.
+AUTOLOGIN_DROPIN=/etc/lightdm/lightdm.conf.d/60-copland-autologin.conf
+step_autologin() {
+    [ -x /usr/sbin/lightdm ] || skip "LightDM is not installed (automatic login is set up for LightDM only)"
+    local user
+    user="$(id -un)"
+    [ "$user" != root ] || skip "run it as the account that should log in, not as root"
+    local session=""
+    [ -f /usr/share/xsessions/xfce.desktop ] && session="autologin-session=xfce"
+    # a drop-in, read before the main lightdm.conf; the packaged file is not edited
+    if [ "$DRY" -eq 1 ]; then
+        run sudo tee "$AUTOLOGIN_DROPIN"
+    else
+        sudo install -d -m 755 "$(dirname "$AUTOLOGIN_DROPIN")"
+        printf '%s\n' '# Copland OS: log in automatically at startup (./install.sh --restore turns it off)' \
+            '[Seat:*]' "autologin-user=$user" 'autologin-user-timeout=0' $session \
+            | sudo tee "$AUTOLOGIN_DROPIN" >/dev/null
+        # lightdm prints its merged config on stderr
+        /usr/sbin/lightdm --show-config 2>&1 | grep -q "autologin-user=$user" \
+            || { echo "LightDM does not show autologin-user=$user after writing $AUTOLOGIN_DROPIN"; exit 1; }
+    fi
+    if [ -f "$HOME/.local/share/keyrings/login.keyring" ]; then
+        note "on for $user from the next startup; your login keyring now asks for its password once per session"
+    else
+        note "on for $user from the next startup"
+    fi
 }
 
 step_boot() {

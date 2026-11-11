@@ -64,6 +64,8 @@ install() {
     sudo sed -i '/^# copland-boot-begin$/,/^# copland-boot-end$/d' "$GRUB"
     printf '%s\n' '# copland-boot-begin' \
         'GRUB_DISTRIBUTOR="Copland OS Enterprise"' \
+        'GRUB_GFXMODE=auto' \
+        'GRUB_GFXPAYLOAD_LINUX=keep' \
         "GRUB_THEME=$THEME_DIR/theme.txt" \
         "GRUB_BACKGROUND=$THEME_DIR/background.png" \
         "GRUB_CMDLINE_LINUX_DEFAULT=\"\$GRUB_CMDLINE_LINUX_DEFAULT vt.default_red=$VT_RED vt.default_grn=$VT_GRN vt.default_blu=$VT_BLU\"" \

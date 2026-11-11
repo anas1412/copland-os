@@ -87,10 +87,21 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
   the centre.
 - **Login screen:** the login box stays centred over the eye (decided 2026-11-11 after
   comparing centre, left, right and bottom placements); the wordmark below it stays visible.
-- **Derived images:** live boot menu splashes 800×600 and 640×480
-  (`iso/config/bootloaders/*/splash.png`), installer welcome and slide 467×293
-  (`iso/branding/`). They are generated from the wallpaper by covering and cropping;
-  regenerate them if the wallpaper changes.
+- **Derived images:** live boot menu splash for BIOS 640×480
+  (`iso/config/bootloaders/syslinux_common/splash.png`), installer welcome and slide
+  467×293 (`iso/branding/`). They are generated from the wallpaper by covering and
+  cropping; regenerate them if the wallpaper changes. The UEFI live boot menu uses the
+  wallpaper itself (`iso/config/bootloaders/grub-pc/splash.png`), cropped to the screen
+  by GRUB, because it runs at the screen's own resolution.
+- **One resolution from boot menu to desktop:** GRUB runs at the screen's preferred
+  mode (`GRUB_GFXMODE=auto`, from the screen's EDID) and hands that mode to Linux
+  (`GRUB_GFXPAYLOAD_LINUX=keep`); the live image's menu does the same
+  (`iso/config/bootloaders/grub-pc/config.cfg`, where live-build's default is 800×600).
+  Why: every mode change blanks the screen, and between the menu and the boot
+  animation that reads as a glitch. Backgrounds use `crop` scaling, so any resolution
+  keeps their proportions. Limit: firmware that reports no EDID gets 800×600 in GRUB,
+  and the graphics driver then switches to the native mode once. The BIOS live menu
+  (syslinux) stays 640×480.
 - **fastfetch / installer banner:** fastfetch's built-in `LainOS` eye, in `blue`/`cyan`.
 
 ## Icons and cursor

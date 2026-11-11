@@ -1,5 +1,7 @@
 # Copland OS: live ISO boot menu (UEFI). Based on live-build's live-theme.
 desktop-image: "../splash.png"
+# any screen size: scale to cover, keep the proportions, crop the edges
+desktop-image-scale-method: "crop"
 title-color: "#46baef"
 title-font: "Unifont Regular 16"
 title-text: "Copland OS Enterprise"

@@ -116,6 +116,7 @@ Every file and setting each component touches, and how to undo it: [docs/WHAT-CH
 | `browsers` | off | Copland colour for Chromium-family browsers (Brave, Chromium, Chrome, Edge) by managed policy; Firefox follows the GTK theme on its own (sudo) |
 | `greeter` | off | LightDM login screen in the same theme (sudo) |
 | `boot` | off | Plymouth boot animation from a third-party repo (sudo, experimental) |
+| `autologin` | off | log in automatically at startup as you, no password (LightDM, sudo) |
 
 ## Choosing your layers
 
