@@ -7,7 +7,7 @@
 # --root into a staging folder. The steps that must act on the target system
 # (diversions, the .bashrc line, the console font, the boot theme) are in
 # packaging/debian/{preinst,postinst,postrm}.
-# Version: packaging/VERSION plus the Debian release from iso/release.conf,
+# Version: COPLAND_VERSION plus the Debian release, both from iso/release.conf,
 # for example 0.1.0+deb13.
 set -Eeuo pipefail
 
@@ -20,10 +20,10 @@ say() { printf ' > %s\n' "$*"; }
 die() { printf '\n x %s\n' "$*" >&2; exit 1; }
 
 command -v dpkg-deb >/dev/null || die "dpkg-deb is required."
-[ -f "$HERE/VERSION" ] || die "packaging/VERSION is missing."
 # shellcheck source=/dev/null
 . "$REPO/iso/release.conf"
-VERSION="$(tr -d ' \n' < "$HERE/VERSION")+deb${DEBIAN_VERSION}"
+[ -n "${COPLAND_VERSION:-}" ] || die "iso/release.conf must set COPLAND_VERSION."
+VERSION="${COPLAND_VERSION}+deb${DEBIAN_VERSION}"
 case "$VERSION" in *[!0-9A-Za-z.+~-]*) die "Bad version: $VERSION" ;; esac
 
 STAGE="$(mktemp -d "${TMPDIR:-/tmp}/copland-deb.XXXXXX")"

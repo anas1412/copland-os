@@ -151,7 +151,12 @@ writes is recorded in `/var/lib/copland-os/manifest`, and
 `dpkg-divert`s (`/usr/share/backgrounds/xfce/xfce-x.svg`,
 `/usr/share/wayland-sessions/xfce-wayland.desktop`) and the marked block in
 `/etc/skel/.bashrc`. It includes what `core/boot/copland-boot.sh` does, written as
-`/etc/default/grub.d/copland.cfg` instead of editing `/etc/default/grub`, and sets the Terminus console font in `/etc/default/console-setup` (the original is kept in `/var/lib/copland-os/console-setup.orig` and put back by `--uninstall`).
+`/etc/default/grub.d/copland.cfg` instead of editing `/etc/default/grub`, and sets the Terminus console font in `/etc/default/console-setup` (the original is kept in `/var/lib/copland-os/console-setup.orig` and put back by `--uninstall`). It also replaces the text console's login line, `/etc/issue`, with
+`Copland OS Enterprise (Debian 13) <host> tty1` (the Debian number is read from
+`/etc/os-release` at each login). The original is kept in
+`/var/lib/copland-os/issue.orig` and put back by `--uninstall`. `/etc/issue` belongs to
+Debian's `base-files`, so dpkg asks about it when a new Debian release ships its own;
+the `copland-os-desktop` package does not change it.
 
 ## In the repo, not yet run by the per-user `install.sh`
 

@@ -31,7 +31,7 @@ installed system's boot menu both have the Copland look. The live user is `lain`
 
 ```bash
 sudo apt install live-build debootstrap wget git
-sudo ./iso/build.sh            # -> iso/out/CoplandOS-<date>-amd64.iso and .sha256
+sudo ./iso/build.sh            # -> iso/out/CoplandOS-<version>-deb13-amd64.iso and .sha256
 ./iso/build.sh --check         # only the checks, no root
 ```
 
@@ -178,8 +178,11 @@ sudo ./install.sh --system
 - The login screen, the X11 session as the default (XFCE's Wayland session entry
   is hidden: it needs a compositor Debian does not install), the boot animation,
   the GRUB menu and the console colours are included.
-- Nothing owned by a Debian package is edited except `/etc/skel/.bashrc` (a
-  marked block); two packaged files are moved aside with `dpkg-divert`.
+- The text console's login line (`/etc/issue`) reads
+  `Copland OS Enterprise (Debian 13)`. `/etc/os-release` stays Debian's.
+- Only two files owned by a Debian package are edited: `/etc/skel/.bashrc` (a
+  marked block) and `/etc/issue` (original kept); two packaged files are moved aside
+  with `dpkg-divert`.
 - Everything written is listed in `/var/lib/copland-os/manifest`;
   `sudo ./install.sh --system --uninstall` removes it again.
 
@@ -214,7 +217,7 @@ Remove it with `sudo apt purge copland-os-desktop`.
 needed): the same files as `--system`, with Debian's package manager tracking them,
 so the look can later be updated with `apt` and removed with
 `sudo apt purge copland-os-desktop` (`purge`, not `remove`: settings under `/etc` are
-kept on a plain remove). The version is `packaging/VERSION` plus the Debian release,
+kept on a plain remove). The version is `COPLAND_VERSION` plus the Debian release (both in `iso/release.conf`),
 for example `0.1.0+deb13`. Not yet published in an apt repository, and not yet tested
 by installing it (that needs a VM).
 
@@ -253,7 +256,7 @@ core/boot/                    full-screen boot script, GRUB theme, copland-boot.
 core/browsers/                browser colour policy and copland-browsers.sh
 tools/xfconf-xml.py           settings.tsv -> XFCE default files for --system
 iso/                          live-build config, hooks, boot menu, installer branding, build.sh;
-                              release.conf names the Debian release
+                              release.conf sets the Copland OS version and the Debian release
 packaging/                    builds the copland-os-desktop .deb (build-deb.sh, install scripts)
 docs/                         screenshot, DESIGN.md (palette, fonts, logo, wording), WHAT-CHANGES.md, BUILDING.md
 ```

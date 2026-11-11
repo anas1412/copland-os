@@ -2,7 +2,7 @@
 # Build CoplandOS.iso: upstream Debian (release set in iso/release.conf) + XFCE,
 # with Copland OS applied system-wide.
 #
-#   sudo ./iso/build.sh              build iso/out/CoplandOS-<date>-amd64.iso (+ .sha256)
+#   sudo ./iso/build.sh              build iso/out/CoplandOS-<version>-deb<debian>-amd64.iso (+ .sha256)
 #   sudo ./iso/build.sh --clean      remove the work folder, including its package cache
 #   ./iso/build.sh --check           only run the checks, no root needed
 #
@@ -27,8 +27,10 @@ load_release() {
     [ -f "$HERE/release.conf" ] || die "iso/release.conf is missing."
     # shellcheck source=/dev/null
     . "$HERE/release.conf"
-    [ -n "${DEBIAN_CODENAME:-}" ] && [ -n "${DEBIAN_VERSION:-}" ] || die "iso/release.conf must set DEBIAN_CODENAME and DEBIAN_VERSION."
+    [ -n "${COPLAND_VERSION:-}" ] && [ -n "${DEBIAN_CODENAME:-}" ] && [ -n "${DEBIAN_VERSION:-}" ] \
+        || die "iso/release.conf must set COPLAND_VERSION, DEBIAN_CODENAME and DEBIAN_VERSION."
     case "$DEBIAN_CODENAME$DEBIAN_VERSION" in *[!a-z0-9]*) die "iso/release.conf: unexpected characters." ;; esac
+    [[ "$COPLAND_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "iso/release.conf: COPLAND_VERSION must look like 0.1.0."
     if [ -d /usr/share/debootstrap/scripts ] && [ ! -e "/usr/share/debootstrap/scripts/$DEBIAN_CODENAME" ]; then
         die "debootstrap does not know Debian '$DEBIAN_CODENAME'; update debootstrap or fix iso/release.conf."
     fi
@@ -59,8 +61,11 @@ checks() {
         export MKSQUASHFS_OPTIONS="${MKSQUASHFS_OPTIONS:-} -processors 2 -mem 768M"
         say "Low memory (${mem_mb} MB): image compression limited to 2 threads and 768 MB; close other apps while it runs"
     fi
-    say "Checks passed: Debian $DEBIAN_VERSION ($DEBIAN_CODENAME), tools present, ${free_gb} GB free at $dir"
+    say "Checks passed: Copland OS $COPLAND_VERSION on Debian $DEBIAN_VERSION ($DEBIAN_CODENAME), tools present, ${free_gb} GB free at $dir"
 }
+
+# fill FILE: put the release values from iso/release.conf into a staged file
+fill() { sed -i -e "s/@COPLAND_VERSION@/$COPLAND_VERSION/g" -e "s/@DEBIAN_VERSION@/$DEBIAN_VERSION/g" "$1"; }
 
 stage() {
     local inc="$WORK/config/includes.chroot_after_packages"
@@ -71,7 +76,7 @@ stage() {
     mkdir -p "$WORK"
     if [ -d "$WORK.cache" ]; then mv "$WORK.cache" "$WORK/cache"; fi
     cp -a "$HERE/auto" "$HERE/config" "$HERE/release.conf" "$WORK"/
-    sed -i "s/@DEBIAN_VERSION@/$DEBIAN_VERSION/g" "$WORK/config/hooks/normal/0510-copland-installer.hook.chroot"
+    fill "$WORK/config/hooks/normal/0510-copland-installer.hook.chroot"
 
     say "Copying the Copland OS installer into the image (/usr/share/copland-os)"
     mkdir -p "$inc/usr/share/copland-os"
@@ -79,8 +84,8 @@ stage() {
     # installer branding, used once by the 0510 hook and removed again
     mkdir -p "$inc/usr/share/copland-os/iso-branding"
     cp -a "$HERE/branding/." "$inc/usr/share/copland-os/iso-branding/"
-    sed -i "s/@DEBIAN_VERSION@/$DEBIAN_VERSION/g" "$inc/usr/share/copland-os/iso-branding/branding.desc"
-    if grep -rq '@DEBIAN_VERSION@' "$WORK/config" "$inc/usr/share/copland-os/iso-branding"; then die "A release placeholder was left unfilled."; fi
+    fill "$inc/usr/share/copland-os/iso-branding/branding.desc"
+    if grep -rqE '@(COPLAND|DEBIAN)_VERSION@' "$WORK/config" "$inc/usr/share/copland-os/iso-branding"; then die "A release placeholder was left unfilled."; fi
 
     say "Fetching the boot animation (pinned commit ${PLYMOUTH_COMMIT:0:7})"
     local src="$inc/usr/share/copland-os/plymouth-src"
@@ -105,6 +110,7 @@ record_build() {
         echo "working copy:   ${dirty}"
         echo "live-build:     $(dpkg-query -W -f='${Version}' live-build 2>/dev/null || echo unknown)"
         echo "debootstrap:    $(dpkg-query -W -f='${Version}' debootstrap 2>/dev/null || echo unknown)"
+        echo "copland os:     $COPLAND_VERSION, from iso/release.conf"
         echo "debian release: $DEBIAN_VERSION ($DEBIAN_CODENAME), from iso/release.conf"
         echo "build host:     $(. /etc/os-release && echo "$PRETTY_NAME"), $(uname -m)"
         echo "boot animation: $PLYMOUTH_REPO @ $PLYMOUTH_COMMIT"
@@ -127,7 +133,7 @@ build() {
     [ -f "$iso" ] || die "The build finished without an ISO. Read $WORK/build.log."
     mkdir -p "$OUT"
     local name
-    name="CoplandOS-$(date +%Y%m%d)-amd64.iso"
+    name="CoplandOS-${COPLAND_VERSION}-deb${DEBIAN_VERSION}-amd64.iso"
     mv "$iso" "$OUT/$name"
     (cd "$OUT" && sha256sum "$name" > "$name.sha256")
     record_build "$name"

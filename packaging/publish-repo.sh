@@ -5,8 +5,8 @@
 #   ./packaging/publish-repo.sh --key <KEYID> --dir DIR   build into DIR only (no git; for tests)
 #
 # Takes every .deb in packaging/out/, adds it to the repository's pool (older versions
-# stay), regenerates the indexes, and signs them with your key: gpg asks for your
-# passphrase. It never pushes: it prints the push command for you to run.
+# stay), regenerates the indexes, and signs them with your key (gpg asks for its
+# passphrase, if it has one). It never pushes: it prints the push command for you to run.
 #
 # Layout served by GitHub Pages (https://anas1412.github.io/copland-os/):
 #   copland-os-archive-keyring.gpg      public key (binary), for Signed-By
@@ -89,7 +89,7 @@ done
     release . ) > "$DISTS/Release.tmp"
 mv "$DISTS/Release.tmp" "$DISTS/Release"
 
-say "Signing with key $KEY (gpg asks for your passphrase)"
+say "Signing with key $KEY"
 gpg --yes --local-user "$KEY" --clearsign -o "$DISTS/InRelease" "$DISTS/Release"
 gpg --yes --local-user "$KEY" --armor --detach-sign -o "$DISTS/Release.gpg" "$DISTS/Release"
 gpg --export "$KEY" > "$DIR/copland-os-archive-keyring.gpg"

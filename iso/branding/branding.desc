@@ -1,5 +1,5 @@
 # Copland OS branding for the Calamares installer on CoplandOS.iso.
-# Based on Debian's calamares-settings-debian branding. @DEBIAN_VERSION@ is filled in by
+# Based on Debian's calamares-settings-debian branding. @COPLAND_VERSION@ and @DEBIAN_VERSION@ are filled in by
 # iso/build.sh from iso/release.conf.
 ---
 componentName:   copland
@@ -11,10 +11,10 @@ windowPlacement: center
 strings:
     productName:         Copland OS Enterprise
     shortProductName:    Copland OS
-    version:             @DEBIAN_VERSION@
-    shortVersion:        @DEBIAN_VERSION@
-    versionedName:       Copland OS Enterprise (Debian @DEBIAN_VERSION@)
-    shortVersionedName:  Copland OS @DEBIAN_VERSION@
+    version:             @COPLAND_VERSION@
+    shortVersion:        @COPLAND_VERSION@
+    versionedName:       Copland OS Enterprise @COPLAND_VERSION@ (Debian @DEBIAN_VERSION@)
+    shortVersionedName:  Copland OS @COPLAND_VERSION@
     bootloaderEntryName: Copland OS Enterprise
     productUrl:          https://github.com/anas1412/copland-os
     supportUrl:          https://github.com/anas1412/copland-os/issues

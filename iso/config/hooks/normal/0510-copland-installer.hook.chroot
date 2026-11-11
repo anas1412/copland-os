@@ -18,7 +18,7 @@ grep -q '^branding: copland$' /etc/calamares/settings.conf
 L=/usr/share/applications/calamares-install-debian.desktop
 dpkg-divert --local --rename --divert "$L.debian" --add "$L"
 sed -e 's/^Name=.*/Name=Install Copland OS/' \
-    -e 's/^Comment=.*/Comment=Install Copland OS Enterprise (Debian @DEBIAN_VERSION@) to this computer/' \
+    -e 's/^Comment=.*/Comment=Install Copland OS Enterprise @COPLAND_VERSION@ (Debian @DEBIAN_VERSION@) to this computer/' \
     -e 's|^Icon=.*|Icon=/usr/share/themes/CoplandOS/assets/copland-logo-128.png|' \
     "$L.debian" > "$L"
 

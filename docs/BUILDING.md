@@ -28,15 +28,16 @@ cd copland-os
 sudo ./iso/build.sh
 ```
 
-Results in `iso/out/`:
+Results in `iso/out/`, named from `iso/release.conf` (for example
+`CoplandOS-0.1.0-deb13-amd64.iso`):
 
 | File | What it is |
 |---|---|
-| `CoplandOS-<date>-amd64.iso` | the image (BIOS and UEFI, USB or DVD) |
-| `CoplandOS-<date>-amd64.iso.sha256` | its checksum |
-| `CoplandOS-<date>-amd64.build-info.txt` | repo commit, whether the working copy had changes, tool versions, boot animation pin |
-| `CoplandOS-<date>-amd64.packages` | every package in the image, with its version |
-| `CoplandOS-<date>-amd64.build.log` | the full live-build log |
+| `CoplandOS-<version>-deb<debian>-amd64.iso` | the image (BIOS and UEFI, USB or DVD) |
+| `CoplandOS-<version>-deb<debian>-amd64.iso.sha256` | its checksum |
+| `CoplandOS-<version>-deb<debian>-amd64.build-info.txt` | repo commit, whether the working copy had changes, tool versions, boot animation pin |
+| `CoplandOS-<version>-deb<debian>-amd64.packages` | every package in the image, with its version |
+| `CoplandOS-<version>-deb<debian>-amd64.build.log` | the full live-build log |
 
 `sudo ./iso/build.sh --clean` removes the work folder, including the package cache.
 
@@ -62,6 +63,11 @@ pinned. Debian packages are not: a later build picks up the release's point rele
 security updates, so two builds a month apart differ in package versions. The
 `.packages` file next to each image lists exactly what went in.
 
+The file name carries the Copland OS version and the Debian release, not the date, so
+a published name always says what it is. Rebuilding the same version replaces the
+earlier image in `iso/out/`; the build date is in its `.build-info.txt`. For a new
+release, raise `COPLAND_VERSION` in `iso/release.conf` first.
+
 ## Live session
 
 User `lain`, password `live` (live-config's default), hostname `coplandos`, X11 XFCE
@@ -71,7 +77,7 @@ session, US keyboard and English locale unless changed at the boot menu (press T
 ## Moving to a new Debian release
 
 The release is set in one place, `iso/release.conf` (`DEBIAN_CODENAME`,
-`DEBIAN_VERSION`). `build.sh` passes it to live-build and fills it into the
+`DEBIAN_VERSION`, next to Copland's own `COPLAND_VERSION`). `build.sh` passes it to live-build and fills it into the
 installer's branding and launcher. A new release is a deliberate, tested change, never
 a floating "stable": a build should not change Debian versions on its own.
 
@@ -146,6 +152,6 @@ git -C packaging/out/gh-pages push origin gh-pages
 
 `publish-repo.sh` adds every `.deb` in `packaging/out/` to the pool (older versions
 stay), rebuilds the indexes for the release in `iso/release.conf`, signs them (gpg asks
-for the passphrase), checks the signature, exports the public key, and commits on the
+for the passphrase if the key has one), checks the signature, exports the public key, and commits on the
 `gh-pages` branch in `packaging/out/gh-pages`. It never pushes by itself.
 

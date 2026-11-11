@@ -289,6 +289,7 @@ sys_boot() {
     fi
     write_grub_dropin
     set_console_font
+    set_issue
     if on_live_root && [ "$NO_REBUILD" -eq 0 ]; then
         have update-initramfs && run update-initramfs -u -k all
         have update-grub && run update-grub
@@ -312,6 +313,23 @@ set_console_font() {
     grep -q '^FONTFACE=' "$f" || printf 'FONTFACE="Terminus"\n' >> "$f"
     grep -q '^FONTSIZE=' "$f" || printf 'FONTSIZE="10x20"\n' >> "$f"
     record "console:/etc/default/console-setup"
+}
+
+# text console login line: "Copland OS Enterprise (Debian 13) <host> tty1". The Debian
+# number is agetty's \S{VERSION_ID}, read from os-release at each login, so it stays right
+# after a release upgrade. /etc/issue belongs to base-files (a conffile): the original is
+# kept for --uninstall, and dpkg asks about the file when base-files ships a new one.
+# /etc/os-release is never changed: apt, the installer and lib/common.sh read ID from it.
+set_issue() {
+    local f="$TGT/etc/issue"
+    [ -f "$f" ] || { echo "no /etc/issue: console login text unchanged"; return 0; }
+    if [ "$DRY" -eq 1 ]; then
+        printf '      %s[dry-run]%s write the Copland login line to %s\n' "$DM" "$R" "$f"; return 0
+    fi
+    install -d -m 755 "$TGT$SYS_STATE"
+    [ -f "$TGT$SYS_STATE/issue.orig" ] || cp -a "$f" "$TGT$SYS_STATE/issue.orig"
+    printf '%s\n\n' 'Copland OS Enterprise (Debian \S{VERSION_ID}) \n \l' > "$f"
+    record "issue:/etc/issue"
 }
 
 # /etc/default/grub.d/copland.cfg: splash, Copland name and theme, console colours
@@ -400,6 +418,9 @@ system_uninstall() {
             console:*) p=${p#console:}
                        [ -f "$TGT$SYS_STATE/console-setup.orig" ] && cp -a "$TGT$SYS_STATE/console-setup.orig" "$TGT$p" \
                            && rm -f "$TGT$SYS_STATE/console-setup.orig" ;;
+            issue:*)  p=${p#issue:}
+                      [ -f "$TGT$SYS_STATE/issue.orig" ] && cp -a "$TGT$SYS_STATE/issue.orig" "$TGT$p" \
+                          && rm -f "$TGT$SYS_STATE/issue.orig" ;;
             plymouth:*) if on_live_root && [ -x /usr/sbin/plymouth-set-default-theme ]; then
                             /usr/sbin/plymouth-set-default-theme "$(cat "$SYS_STATE/previous-plymouth-theme" 2>/dev/null || echo text)" || true
                         fi ;;

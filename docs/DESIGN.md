@@ -122,11 +122,66 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
 | Layer:01 … Layer:04 | workspaces (the show's episodes are "Layers") |
 | Present day, present time | fastfetch title line, installer slide |
 | Close the world, Open the nExt | sign-off (fastfetch, end of the installer output) |
-| NAVI, PROTOCOL, PSYCHE, WIRED, LAYER | fastfetch keys: machine, kernel, CPU, network, desktop |
+| Copland OS Enterprise 0.1.0 (Debian 13) | installer title and launcher (`versionedName`); short form "Copland OS 0.1.0" |
+| Copland OS Enterprise (Debian 13) | text console login line (`/etc/issue`) |
 
 Tone: short, calm, a little cryptic; English UI text stays plain and functional.
 No em dashes anywhere (docs, UI strings, descriptions): use a colon, a comma or a
 full stop instead.
+
+### fastfetch labels
+
+Twelve keys, in `core/config/fastfetch/config.jsonc`. Show terms where the show has one,
+plain words where it doesn't, so every line still reads at a glance:
+
+| Key | Shows | Why this word |
+|---|---|---|
+| NAVI | host name | the show's word for a personal computer |
+| BASE | Debian release | what Copland OS is built on |
+| PROTOCOL | kernel | Protocol 7 is the show's network layer |
+| ONLINE | uptime | time connected |
+| MODULES | packages | installed parts |
+| LAYER | desktop | the show's episodes are Layers, as are the workspaces |
+| SHELL | shell | plain: no show term fits |
+| TERM | terminal | plain |
+| PSYCHE | CPU | the Psyche processor chip in Lain's NAVI |
+| MEMORY | RAM | plain |
+| STORAGE | disk | plain |
+| WIRED | local IP | the show's network |
+
+### Spelling
+
+| Form | Where | Why |
+|---|---|---|
+| Copland OS | text people read: README, docs, UI strings, descriptions | the show's own spelling |
+| CoplandOS | theme name, branded file names (`CoplandOS.png`), the ISO file name; volume label `COPLANDOS` | names that cannot hold a space; the volume label is upper case because ISO 9660 labels are |
+| `copland` (lower case) | every command, config file, folder and package the project installs: `copland-goto`, `copland-send`, `copland-layers`, `copland.cfg`, `copland-theme.json`, `/etc/copland-os`, `copland-os-desktop` | Unix names are lower case; one prefix makes every installed piece easy to find and remove |
+
+### Version and Debian base
+
+- **Copland OS version:** `COPLAND_VERSION` in `iso/release.conf` (0.1.0), major.minor.patch.
+  It names the ISO (`CoplandOS-0.1.0-deb13-amd64.iso`), the installer text and the
+  package (`copland-os-desktop_0.1.0+deb13_all.deb`; a `+`, never a `:`, because a
+  colon is a Debian epoch). Why: without it, two images of the same Debian release
+  could not be told apart, and the package and the ISO would not say they match.
+- **Debian is named, never hidden:** "(Debian 13)" follows the product name in the
+  installer and at the console login. `/etc/os-release` stays Debian's: apt, the
+  installer and `lib/common.sh` read `ID=debian` from it, and the project is honest
+  about its base.
+- **Console login line:** `/etc/issue` says
+  `Copland OS Enterprise (Debian \S{VERSION_ID}) \n \l`, set by `--system` and the
+  ISO. The Debian number comes from os-release at each login, so it stays right after
+  a release upgrade. `/etc/issue` belongs to Debian's `base-files` package, so dpkg
+  asks about it when a new Debian release ships its own; the Debian package
+  (`copland-os-desktop`) leaves it alone, because a package may not change another
+  package's configuration file.
+- **Login session name stays "Xfce Session":** a separate "Copland OS" session would
+  either sit next to Xfce's own entry (two entries that start the same desktop) or need
+  Xfce's entry hidden, which breaks the session that existing accounts have saved. The
+  look already comes from `/etc/xdg/copland-os`, whichever session starts.
+- **Not added on purpose:** Knights, Cyberia, Accela or episode titles as layer
+  subtitles. None of them maps to a real part of the desktop, and they would break the
+  plain-and-functional rule above.
 
 ## Open issues
 
