@@ -31,6 +31,7 @@ XML_DIR="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml"
 CHANNELS=(xsettings xfwm4 xfce4-panel xfce4-desktop xfce4-terminal xfce4-keyboard-shortcuts xfce4-notifyd)
 GREETER=/etc/lightdm/lightdm-gtk-greeter.conf
 GRUB=/etc/default/grub
+CURSOR_THEME="retrosmart-xcursor-mac-ish-classic"
 CHICAGO95_REPO="https://github.com/grassmunk/Chicago95.git"
 CHICAGO95_COMMIT="5da19b8b1e2a886ebf6628403023d5fac3acc3ee"   # pinned
 PLYMOUTH_REPO="https://github.com/faisalhsn/copland-plymouth-theme.git"
@@ -41,19 +42,20 @@ PACKAGES=(xfce4-whiskermenu-plugin xfce4-pulseaudio-plugin xfce4-terminal xfce4-
           fonts-dejavu-mono gtk2-engines-murrine libgtk-3-bin python3 fastfetch devilspie2)
 
 # ---------------------------------------------------------------- components
-IDS=(packages theme icons iconsblue icons95 cursors wallpaper panel terminal layers keys greeter boot)
+IDS=(packages theme icons iconsblue icons95 cursors cursorscyan wallpaper panel terminal layers keys greeter boot)
 declare -A TITLE DESC ON SUDO RESULT NOTE
 TITLE[packages]="Packages";        DESC[packages]="install the missing apt packages";              ON[packages]=1;  SUDO[packages]=1
 TITLE[theme]="Theme";              DESC[theme]="GTK, window borders, notifications";               ON[theme]=1;     SUDO[theme]=0
 TITLE[icons]="Icons";              DESC[icons]="Mac OS 9 icons (NineIcons), bundled";              ON[icons]=1;     SUDO[icons]=0
 TITLE[iconsblue]="Blue icons";     DESC[iconsblue]="instead: blue duotone built from Papirus";     ON[iconsblue]=0; SUDO[iconsblue]=0
 TITLE[icons95]="Win95 icons";      DESC[icons95]="instead: Chicago95 (downloads ~30 MB)"     ;    ON[icons95]=0;   SUDO[icons95]=0
-TITLE[cursors]="Cursors";          DESC[cursors]="Adwaita cursors tinted Copland cyan";            ON[cursors]=1;   SUDO[cursors]=0
+TITLE[cursors]="Cursors";          DESC[cursors]="classic Mac pixel cursors (Retrosmart)";         ON[cursors]=1;   SUDO[cursors]=0
+TITLE[cursorscyan]="Cyan cursors"; DESC[cursorscyan]="instead: Adwaita cursors tinted cyan";       ON[cursorscyan]=0; SUDO[cursorscyan]=0
 TITLE[wallpaper]="Wallpaper";      DESC[wallpaper]="Copland OS Enterprise boot frame";             ON[wallpaper]=1; SUDO[wallpaper]=0
 TITLE[panel]="Top bar";            DESC[panel]="replaces your panel layout (backed up)";           ON[panel]=1;     SUDO[panel]=0
 TITLE[terminal]="Terminal";        DESC[terminal]="palette, font, fastfetch";                      ON[terminal]=1;  SUDO[terminal]=0
 TITLE[layers]="Layers";            DESC[layers]="4 workspaces; you choose which apps go where";               ON[layers]=1;    SUDO[layers]=0
-TITLE[keys]="Shortcuts";           DESC[keys]="Super opens the menu, Super+1-4 layers";                ON[keys]=1;      SUDO[keys]=0
+TITLE[keys]="Shortcuts";           DESC[keys]="Super menu, Super+1-4 go, +Shift send";                ON[keys]=1;      SUDO[keys]=0
 TITLE[greeter]="Login screen";     DESC[greeter]="LightDM greeter in the same theme";              ON[greeter]=0;   SUDO[greeter]=1
 TITLE[boot]="Boot animation";      DESC[boot]="Plymouth theme, third-party, experimental";         ON[boot]=0;      SUDO[boot]=1
 
@@ -146,8 +148,8 @@ preflight() {
     [ "${BASH_VERSINFO[0]}" -ge 4 ] || die "bash 4 or newer is required."
     [ "$EUID" -ne 0 ] || die "Do not run this as root. Run it as your own user; it asks for sudo only where needed."
     local f
-    for f in themes/CoplandOS/gtk-3.0/gtk.css themes/CoplandOS/xfwm4/themerc backgrounds/CoplandOS.png icons/NineIcons/index.theme \
-             fastfetch/config.jsonc devilspie2/layers.lua bin/copland-layers bin/copland-goto tools/copland_assets.py; do
+    for f in themes/CoplandOS/gtk-3.0/gtk.css themes/CoplandOS/xfwm4/themerc backgrounds/CoplandOS.png icons/NineIcons/index.theme "cursors/$CURSOR_THEME/index.theme" \
+             fastfetch/config.jsonc devilspie2/layers.lua bin/copland-layers bin/copland-goto bin/copland-send tools/copland_assets.py; do
         [ -e "$FILES/$f" ] || die "The dotfiles folder is incomplete: files/$f is missing."
     done
     local like=""
@@ -350,6 +352,17 @@ step_icons95() {
 }
 
 step_cursors() {
+    local dest="$HOME/.icons/$CURSOR_THEME"
+    if [ -e "$dest" ] && [ "$DRY" -eq 0 ]; then mkdir -p "$BACKUP"; mv "$dest" "$BACKUP/cursors-$CURSOR_THEME"; fi
+    run mkdir -p "$HOME/.icons"
+    run cp -a "$FILES/cursors/$CURSOR_THEME" "$dest"
+    xf xsettings /Gtk/CursorThemeName string "$CURSOR_THEME"
+    xf xsettings /Gtk/CursorThemeSize int 24
+    if have gsettings; then run gsettings set org.gnome.desktop.interface cursor-theme "$CURSOR_THEME" || true; fi
+    note "apps that are already open keep the old cursor until restarted"
+}
+
+step_cursorscyan() {
     have python3 || skip "python3 is not installed"
     [ -d /usr/share/icons/Adwaita/cursors ] || skip "adwaita-icon-theme (cursors) is not installed"
     if [ -d "$ICON_DIR/cursors" ] && [ "$FORCE" -eq 0 ]; then
@@ -566,10 +579,19 @@ step_keys() {
     # workspace keys, which did not fire on the machine this was built on.
     # Bound on the number row, the numpad (NumLock on) and AZERTY's unshifted number row.
     run install -D -m 755 "$FILES/bin/copland-goto" "$HOME/.local/bin/copland-goto"
+    run install -D -m 755 "$FILES/bin/copland-send" "$HOME/.local/bin/copland-send"
     local i k azerty=(ampersand eacute quotedbl apostrophe)
     for i in 1 2 3 4; do
         for k in "$i" "KP_$i" "${azerty[$((i - 1))]}"; do
             xf xfce4-keyboard-shortcuts "/commands/custom/<Super>$k" string "$HOME/.local/bin/copland-goto $i"
+        done
+    done
+    # Super+Shift+1..4 send the focused window to that layer. With Shift held the number
+    # row produces ! @ # $ on US layouts and the digits on AZERTY, so both are bound.
+    local shifted=(exclam at numbersign dollar)
+    for i in 1 2 3 4; do
+        for k in "${shifted[$((i - 1))]}" "$i"; do
+            xf xfce4-keyboard-shortcuts "/commands/custom/<Shift><Super>$k" string "$HOME/.local/bin/copland-send $i"
         done
     done
 }
@@ -589,18 +611,23 @@ step_greeter() {
     run sudo cp -a "$HOME/.icons/$icons" "/usr/share/icons/$icons"
     run sudo chown -R root:root /usr/share/themes/CoplandOS "/usr/share/icons/$icons"
     run sudo chmod -R go-w /usr/share/themes/CoplandOS "/usr/share/icons/$icons"
-    # the cursors live in their own folder
-    if [ "$icons" != CoplandOS ] && [ -d "$ICON_DIR/cursors" ]; then
-        run sudo mkdir -p /usr/share/icons/CoplandOS
-        run sudo rm -rf /usr/share/icons/CoplandOS/cursors
-        run sudo cp -a "$ICON_DIR/cursors" /usr/share/icons/CoplandOS/cursors
-        run sudo chown -R root:root /usr/share/icons/CoplandOS
-        run sudo chmod -R go-w /usr/share/icons/CoplandOS
+    # the cursor theme lives in its own folder
+    local cursor
+    cursor="$(xfconf-query -c xsettings -p /Gtk/CursorThemeName 2>/dev/null || echo "$CURSOR_THEME")"
+    if [ "$cursor" != "$icons" ] && [ -d "$HOME/.icons/$cursor/cursors" ]; then
+        run sudo mkdir -p "/usr/share/icons/$cursor"
+        run sudo rm -rf "/usr/share/icons/$cursor/cursors"
+        run sudo cp -a "$HOME/.icons/$cursor/cursors" "/usr/share/icons/$cursor/cursors"
+        if [ -f "$HOME/.icons/$cursor/index.theme" ] && [ ! -f "/usr/share/icons/$cursor/index.theme" ]; then
+            run sudo cp -a "$HOME/.icons/$cursor/index.theme" "/usr/share/icons/$cursor/index.theme"
+        fi
+        run sudo chown -R root:root "/usr/share/icons/$cursor"
+        run sudo chmod -R go-w "/usr/share/icons/$cursor"
     fi
     run sudo install -D -m 644 "$WALL" /usr/share/backgrounds/CoplandOS.png
     [ -f "$GREETER.copland-bak" ] || run sudo cp -a "$GREETER" "$GREETER.copland-bak"
     run sudo sed -i '/^# copland-begin$/,/^# copland-end$/d' "$GREETER"
-    run sudo sed -i '0,/^\[greeter\]/s//[greeter]\n# copland-begin\ntheme-name = CoplandOS\nicon-theme-name = '"$icons"'\ncursor-theme-name = CoplandOS\ncursor-theme-size = 24\nbackground = \/usr\/share\/backgrounds\/CoplandOS.png\nuser-background = false\nfont-name = C059 Bold Italic 11\nclock-format = %H:%M\n# copland-end/' "$GREETER"
+    run sudo sed -i '0,/^\[greeter\]/s//[greeter]\n# copland-begin\ntheme-name = CoplandOS\nicon-theme-name = '"$icons"'\ncursor-theme-name = '"$cursor"'\ncursor-theme-size = 24\nbackground = \/usr\/share\/backgrounds\/CoplandOS.png\nuser-background = false\nfont-name = C059 Bold Italic 11\nclock-format = %H:%M\n# copland-end/' "$GREETER"
     [ "$DRY" -eq 1 ] || grep -q '^theme-name = CoplandOS$' "$GREETER" || { echo "greeter config was not updated"; exit 1; }
     note "installed; it is a snapshot, so run this component again after changing the theme or icons"
 }

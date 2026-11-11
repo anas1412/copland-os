@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+"""copland-send N — send the focused window to Layer N (workspace N, counted from 1).
+
+You stay on the layer you are on. Uses EWMH (_NET_ACTIVE_WINDOW, _NET_WM_DESKTOP)
+through libX11 only, so it needs no wmctrl or xdotool.
+"""
+import ctypes
+import ctypes.util
+import sys
+
+
+def main():
+    try:
+        n = int(sys.argv[1])
+    except (IndexError, ValueError):
+        sys.exit("usage: copland-send <layer number>")
+    if n < 1:
+        sys.exit("layer numbers start at 1")
+    lib = ctypes.util.find_library("X11")
+    if not lib:
+        sys.exit("libX11 not found")
+    X = ctypes.CDLL(lib)
+    X.XOpenDisplay.restype = ctypes.c_void_p
+    X.XDefaultRootWindow.restype = ctypes.c_ulong
+    X.XDefaultRootWindow.argtypes = [ctypes.c_void_p]
+    X.XInternAtom.restype = ctypes.c_ulong
+    X.XInternAtom.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int]
+    X.XSendEvent.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_int, ctypes.c_long, ctypes.c_void_p]
+    X.XSync.argtypes = [ctypes.c_void_p, ctypes.c_int]
+    X.XCloseDisplay.argtypes = [ctypes.c_void_p]
+    X.XFree.argtypes = [ctypes.c_void_p]
+    X.XGetWindowProperty.argtypes = [
+        ctypes.c_void_p, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_long, ctypes.c_long, ctypes.c_int,
+        ctypes.c_ulong, ctypes.POINTER(ctypes.c_ulong), ctypes.POINTER(ctypes.c_int),
+        ctypes.POINTER(ctypes.c_ulong), ctypes.POINTER(ctypes.c_ulong),
+        ctypes.POINTER(ctypes.POINTER(ctypes.c_ulong))]
+    d = X.XOpenDisplay(None)
+    if not d:
+        sys.exit("cannot open the X display")
+    root = X.XDefaultRootWindow(d)
+
+    # which window has the focus?
+    actual_type, actual_format = ctypes.c_ulong(), ctypes.c_int()
+    nitems, bytes_after = ctypes.c_ulong(), ctypes.c_ulong()
+    data = ctypes.POINTER(ctypes.c_ulong)()
+    status = X.XGetWindowProperty(d, root, X.XInternAtom(d, b"_NET_ACTIVE_WINDOW", 0), 0, 1, 0, 0,
+                                  ctypes.byref(actual_type), ctypes.byref(actual_format),
+                                  ctypes.byref(nitems), ctypes.byref(bytes_after), ctypes.byref(data))
+    if status != 0 or nitems.value < 1 or not data[0]:
+        X.XCloseDisplay(d)
+        sys.exit("no focused window")
+    window = data[0]
+    X.XFree(data)
+
+    class ClientMessage(ctypes.Structure):
+        _fields_ = [("type", ctypes.c_int), ("serial", ctypes.c_ulong), ("send_event", ctypes.c_int),
+                    ("display", ctypes.c_void_p), ("window", ctypes.c_ulong),
+                    ("message_type", ctypes.c_ulong), ("format", ctypes.c_int), ("data", ctypes.c_long * 5)]
+
+    class Event(ctypes.Union):
+        _fields_ = [("xclient", ClientMessage), ("pad", ctypes.c_long * 24)]
+
+    ev = Event()
+    ev.xclient.type = 33                      # ClientMessage
+    ev.xclient.window = window
+    ev.xclient.message_type = X.XInternAtom(d, b"_NET_WM_DESKTOP", 0)
+    ev.xclient.format = 32
+    ev.xclient.data[0] = n - 1
+    ev.xclient.data[1] = 2                    # source: a pager / direct user action
+    mask = (1 << 20) | (1 << 19)              # SubstructureRedirect | SubstructureNotify
+    X.XSendEvent(d, root, 0, mask, ctypes.byref(ev))
+    X.XSync(d, 0)
+    X.XCloseDisplay(d)
+
+
+if __name__ == "__main__":
+    main()

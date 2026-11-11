@@ -46,12 +46,13 @@ you pick components with the arrow keys and space; enter installs.
 | `icons` | on | Mac OS 9 icons (NineIcons from Platinum9), bundled. The show's Copland OS is drawn from Apple's Copland and Mac OS 8/9 |
 | `iconsblue` | off | instead: a blue duotone icon theme generated from Papirus, with white panel icons |
 | `icons95` | off | instead: Windows 95 icons from [Chicago95](https://github.com/grassmunk/Chicago95) instead, downloaded at a pinned commit |
-| `cursors` | on | Adwaita cursors re-tinted Copland cyan |
+| `cursors` | on | classic Mac pixel-art cursors ([Retrosmart](https://github.com/useless-anvil/retrosmart-cursor), Mac-ish), bundled |
+| `cursorscyan` | off | instead: Adwaita cursors re-tinted Copland cyan |
 | `wallpaper` | on | the Copland OS Enterprise boot frame |
 | `panel` | on | top bar: Copland menu, window list, Layer:01–04, tray, clock, power. **Replaces your current panel layout** |
 | `terminal` | on | xfce4-terminal palette and font, fastfetch config, `~/.bashrc` hook |
 | `layers` | on | 4 workspaces named Layer:01–04, plus `copland-layers`, a small picker to choose which app opens on which layer. Nothing is assigned until you choose |
-| `keys` | on | the Super (Windows) key opens the Copland menu; Super+1–4 (number row or numpad) jump to Layer:01–04 |
+| `keys` | on | the Super (Windows) key opens the Copland menu; Super+1–4 (number row or numpad) jump to Layer:01–04; Super+Shift+1–4 send the focused window there |
 | `greeter` | off | LightDM login screen in the same theme (sudo) |
 | `boot` | off | Plymouth boot animation from a third-party repo (sudo, experimental) |
 
@@ -95,7 +96,7 @@ Both are off by default and need sudo.
 ## What was tested
 
 Tested on Debian 13 (trixie) with XFCE 4.20: the menu, `--dry-run`, and a real
-run of `theme`, `icons`, `iconsblue` (existing build kept), `cursors` (existing build kept),
+run of `theme`, `icons`, `iconsblue` (existing build kept), `cursors`,
 `wallpaper`, `panel`, `terminal`, `layers` and `keys`, and the `copland-layers`
 picker (navigation and loading; window placement from its config file).
 
@@ -112,10 +113,12 @@ install.sh                  the installer
 files/themes/CoplandOS/     GTK theme, xfwm4 borders, notification style, logo
 files/backgrounds/          wallpaper
 files/icons/NineIcons/      Mac OS 9 icon theme
+files/cursors/              classic Mac cursor theme and its licence
 files/fastfetch/            fastfetch config
 files/devilspie2/           per-app workspace rules (read layers.conf)
 files/bin/copland-layers    the layer picker
-files/bin/copland-goto      jump to a layer (used by the Super+number shortcuts)
+files/bin/copland-goto      jump to a layer (Super+number)
+files/bin/copland-send      send the focused window to a layer (Super+Shift+number)
 files/tools/                generators: icon duotone, cursor tint, theme recolour
 ```
 
@@ -124,6 +127,7 @@ files/tools/                generators: icon duotone, cursor tint, theme recolou
 - GTK and xfwm4 theme: a recolour of [Greybird](https://github.com/shimmerproject/Greybird) (GPL-2.0-or-later / CC-BY-SA-3.0).
 - Icons: NineIcons from [Platinum9](https://github.com/grassmunk/Platinum9) by grassmunk (bundled; that repository declares no licence), plus a power glyph of our own.
 - Blue icons (optional): generated at install time from [Papirus](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme) (GPL-3.0).
+- Cursors: [Retrosmart Xcursor](https://github.com/useless-anvil/retrosmart-cursor) v2.0.3 by mdomlop and useless-anvil, GPL-3.0 (licence text in `files/cursors/`).
 - Menu logo: "Copland Os Enterprise Icon" by PsyBear,
   <https://www.deviantart.com/psybear/art/Copland-Os-Enterprise-Icon-65838629>. Copyright PsyBear.
 - Wallpaper: a frame from *Serial Experiments Lain*, via <https://lain.wiki/wiki/Copland_OS>.

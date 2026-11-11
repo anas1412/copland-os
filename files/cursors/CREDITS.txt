@@ -1,0 +1,3 @@
+retrosmart-xcursor-mac-ish-classic: from Retrosmart Xcursor v2.0.3,
+https://github.com/useless-anvil/retrosmart-cursor (a fork of mdomlop/retrosmart-x11-cursors).
+Unmodified release build. Licence: GPL-3.0, see LICENSE.retrosmart.
