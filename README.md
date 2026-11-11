@@ -1,16 +1,50 @@
 # Copland OS
 
-A Serial Experiments Lain desktop for Debian XFCE: the Copland OS look from the
-show, set up as a whole, not just config files. Three ways to get it:
+A Serial Experiments Lain desktop OS built on upstream Debian 13 (trixie) and XFCE:
+the Copland OS look from the show, as a whole system, not just a theme. Every package
+comes from Debian's own servers; Copland OS only adds its look on top.
 
-- **One line** on an existing Debian XFCE install, for your own account (below).
-- **System-wide** for every account on a machine: `sudo ./install.sh --system`.
-- **CoplandOS.iso**, a live and installable Debian 13 image with everything built in
-  (build it yourself for now; see [docs/BUILDING.md](docs/BUILDING.md)).
+- **CoplandOS.iso** is the project: a live and installable image with everything
+  built in (see below).
+- **The installer** is optional, for people who already run Debian XFCE and want the
+  look without reinstalling: one line for your own account, or `--system` for every
+  account on the machine.
 
 ![Copland OS on Debian XFCE](docs/screenshot.png)
 
-## Install
+## CoplandOS.iso
+
+The main way to get Copland OS: a live and installable image. Boot it from USB to try
+it, then install it with the Copland-branded installer.
+
+**Status: no image has been released yet.** Until the first release you can build it
+yourself (below); everything inside it is the same code the installer uses.
+
+What is in it: Debian 13 with a lean XFCE desktop
+(Firefox ESR, terminal, file manager, text editor, image and PDF viewers, no
+LibreOffice), Copland OS applied system-wide with the same `--system` code, and
+the Calamares installer branded as Copland OS. The image's own boot menu and the
+installed system's boot menu both have the Copland look. The live user is `lain`
+(password `live`, live-config's default) and the hostname `coplandos`.
+
+### Building it
+
+```bash
+sudo apt install live-build debootstrap wget git
+sudo ./iso/build.sh            # -> iso/out/CoplandOS-<date>-amd64.iso and .sha256
+./iso/build.sh --check         # only the checks, no root
+```
+
+The build needs root, about 20 GB free and a network connection; it works in
+`/var/tmp/coplandos-build` (set `COPLAND_ISO_WORK` to change it). Each image comes
+with a build record (repo commit, tool versions, every package with its version,
+the log). The whole method is in [docs/BUILDING.md](docs/BUILDING.md). So far the
+configuration is checked (`lb config` accepts every option and every package is
+in trixie); no image has been built or booted yet.
+
+## Already on Debian XFCE? The installer (optional)
+
+For people who already run Debian XFCE and want the look without reinstalling.
 
 One line, from a terminal inside your XFCE session, as your own user:
 
@@ -151,28 +185,6 @@ sudo ./install.sh --system
 
 `--root DIR` writes under another folder (the ISO build uses it), `--no-packages`
 and `--no-rebuild` skip apt and the initramfs/GRUB rebuild.
-
-## CoplandOS.iso (not built yet)
-
-`iso/` builds a live and installable image: Debian 13 with a lean XFCE desktop
-(Firefox ESR, terminal, file manager, text editor, image and PDF viewers, no
-LibreOffice), Copland OS applied system-wide with the same `--system` code, and
-the Calamares installer branded as Copland OS. The image's own boot menu and the
-installed system's boot menu both have the Copland look. The live user is `lain`
-(password `live`, live-config's default) and the hostname `coplandos`.
-
-```bash
-sudo apt install live-build debootstrap wget git
-sudo ./iso/build.sh            # -> iso/out/CoplandOS-<date>-amd64.iso and .sha256
-./iso/build.sh --check         # only the checks, no root
-```
-
-The build needs root, about 20 GB free and a network connection; it works in
-`/var/tmp/coplandos-build` (set `COPLAND_ISO_WORK` to change it). Each image comes
-with a build record (repo commit, tool versions, every package with its version,
-the log). The whole method is in [docs/BUILDING.md](docs/BUILDING.md). So far the
-configuration is checked (`lb config` accepts every option and every package is
-in trixie); no image has been built or booted yet.
 
 ## Supported systems
 

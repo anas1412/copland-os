@@ -6,6 +6,17 @@ Mac (late-1990s) shapes on top of that palette. This page is the reference; when
 value changes, change it here and in the files listed next to it. Every choice here
 states its reason; a value without one is an open question, not a decision.
 
+## What the product is
+
+Copland OS is an operating system: **CoplandOS.iso** (upstream Debian 13 "trixie" +
+XFCE, live and installable) is the product. Every package comes from Debian's own
+servers and the installed system follows trixie's updates and security fixes; Copland
+OS only adds its look on top. The installer in this repo is secondary: it brings the
+same look to people who already run Debian XFCE. Wording follows that order: the ISO
+first, the installer as "optional" (README, GitHub description). Why: the look depends
+on system-wide pieces (login screen, boot menu, boot animation, defaults for every
+account) that only a full system ships reliably.
+
 ## Palette
 
 Sampled from the boot frame (`core/assets/backgrounds/CoplandOS.png`).
