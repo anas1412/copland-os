@@ -1,9 +1,9 @@
-# Copland OS Enterprise for XFCE
+# Copland OS Enterprise for Debian XFCE
 
-A Serial Experiments Lain desktop for Debian + XFCE: the Copland OS look from the
+A Serial Experiments Lain desktop for Debian XFCE: the Copland OS look from the
 show, with one installer that sets up the whole thing, not just config files.
 
-![Copland OS Enterprise on XFCE](docs/screenshot.png)
+![Copland OS Enterprise on Debian XFCE](docs/screenshot.png)
 
 ## Install
 

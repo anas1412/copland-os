@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copland OS Enterprise — dotfiles installer for Debian + XFCE.
+# Copland OS Enterprise for Debian XFCE — dotfiles installer.
 #
 #   curl -fsSL https://raw.githubusercontent.com/anas1412/copland-os-dotfiles/main/install.sh | bash
 #                             one-liner: downloads everything, then opens the menu
@@ -689,7 +689,7 @@ restore() {
 
 usage() {
     cat <<USAGE
-Copland OS Enterprise — dotfiles installer for Debian + XFCE.
+Copland OS Enterprise for Debian XFCE — dotfiles installer.
 
   curl -fsSL https://raw.githubusercontent.com/$REPO_SLUG/main/install.sh | bash
                             one-liner: downloads everything, then opens the menu
