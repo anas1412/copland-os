@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Copland OS</title>
+<meta name="description" content="Copland OS: a Serial Experiments Lain desktop OS built on upstream Debian and XFCE. Live and installable ISO, updated with apt.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="assets/copland-logo.png">
+<!-- Colours, fonts and wording follow docs/DESIGN.md in the copland-os repository. -->
+<style>
+  :root {
+    --navy: #25346a;        /* the wallpaper's background */
+    --navy-deep: #101838;   /* panels, terminal */
+    --navy-ink: #141c3a;    /* darkest surface */
+    --navy-raised: #1c2852; /* raised surfaces */
+    --cyan: #46baef;        /* the eye's glow: accents, focus */
+    --blue: #197aba;        /* the eye's darker ring: selection, buttons */
+    --text: #ccddff;
+    --text-dim: #738dc1;
+    --white: #ffffff;
+    /* serif italic for identity, sans for reading (DESIGN.md, Typography) */
+    --brand: "C059", "Century Schoolbook", "Century Schoolbook L", "TeX Gyre Schola", Georgia, serif;
+    --sans: "Nimbus Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono: "DejaVu Sans Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--navy-deep); }
+  body {
+    margin: 0; color: var(--text); font: 16px/1.6 var(--sans);
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, var(--navy) 0%, var(--navy-deep) 70%) no-repeat, var(--navy-deep);
+  }
+  a { color: var(--cyan); }
+  a:hover { color: var(--white); }
+  :focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+  .wrap { max-width: 64rem; margin: 0 auto; padding: 0 16px; }
+
+  /* top bar, like the desktop's */
+  .bar { position: sticky; top: 0; z-index: 2; background: rgba(16,24,56,0.90); backdrop-filter: blur(6px); }
+  .bar .wrap { display: flex; align-items: center; gap: 1rem; height: 44px; }
+  .bar .name { display: flex; align-items: center; gap: .5rem; text-decoration: none; color: var(--text);
+               font: italic bold 1.05rem var(--brand); }
+  .bar .name img { width: 22px; height: 22px; }
+  .bar nav { margin-left: auto; display: flex; gap: .25rem; overflow-x: auto; }
+  .bar nav a { color: var(--text); text-decoration: none; font: italic bold .95rem var(--brand);
+               padding: .35rem .6rem; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .bar nav a:hover { border-bottom-color: var(--cyan); color: var(--white); }
+
+  header.hero { text-align: center; padding: 3.5rem 0 2rem; }
+  .hero .eye { width: 128px; height: 128px; filter: drop-shadow(0 0 24px rgba(70,186,239,.55)); }
+  .hero h1 { font: italic bold clamp(2.2rem, 7vw, 3.6rem)/1.1 var(--brand); color: var(--white); margin: 1rem 0 .3rem;
+             text-shadow: 0 0 18px rgba(70,186,239,.45); }
+  .hero .credit { color: var(--text-dim); font: italic .95rem var(--brand); margin: 0 0 1.4rem; }
+  .hero .lede { max-width: 40rem; margin: 0 auto 1.8rem; font-size: 1.08rem; }
+  .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; }
+  .btn { display: inline-block; padding: .65rem 1.2rem; border-radius: 4px; text-decoration: none; font-weight: bold;
+         border: 1px solid var(--cyan); color: var(--white); background: rgba(25,122,186,.35); }
+  .btn:hover { background: var(--blue); color: var(--white); }
+  .btn.quiet { background: transparent; color: var(--text); border-color: var(--text-dim); }
+  .btn.quiet:hover { border-color: var(--cyan); color: var(--white); background: rgba(70,186,239,.18); }
+
+  figure.shot { margin: 1rem auto 3rem; max-width: 60rem; }
+  figure.shot img { width: 100%; height: auto; display: block; border: 1px solid var(--blue);
+                    box-shadow: 0 0 40px rgba(70,186,239,.18); }
+  figure.shot figcaption { text-align: center; color: var(--text-dim); font-size: .9rem; margin-top: .5rem; }
+
+  section { padding: 2.2rem 0; border-top: 1px solid var(--navy-raised); }
+  h2 { font: italic bold 1.7rem var(--brand); color: var(--white); margin: 0 0 .3rem; }
+  h2 .layer { display: block; font: italic .95rem var(--brand); color: var(--cyan); margin-bottom: .2rem; }
+  h3 { font: bold 1.05rem var(--sans); color: var(--white); margin: 1.6rem 0 .4rem; }
+  p { margin: .5rem 0 1rem; }
+  .dim { color: var(--text-dim); }
+  .status { display: inline-block; font-size: .85rem; padding: .15rem .55rem; border-radius: 3px;
+            background: var(--navy-raised); border: 1px solid var(--text-dim); color: var(--text); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; margin-top: 1rem; }
+  .card { background: rgba(28,40,82,.6); border: 1px solid var(--navy); border-radius: 6px; padding: 1rem 1.1rem; }
+  .card h3 { margin-top: 0; font: italic bold 1.1rem var(--brand); color: var(--cyan); }
+  .card p { margin: 0; }
+
+  .cmd { position: relative; margin: .6rem 0 1rem; }
+  .cmd pre { margin: 0; padding: .8rem 4.5rem .8rem 1rem; background: var(--navy-ink); border: 1px solid var(--navy);
+             border-left: 3px solid var(--cyan); border-radius: 4px; overflow-x: auto; }
+  .cmd code, code { font-family: var(--mono); font-size: .88rem; }
+  code { color: var(--white); }
+  .cmd pre code { color: var(--text); white-space: pre; }
+  .cmd button { position: absolute; top: .45rem; right: .45rem; font: bold .8rem var(--sans); color: var(--text);
+                background: var(--navy-raised); border: 1px solid var(--text-dim); border-radius: 3px;
+                padding: .3rem .6rem; cursor: pointer; }
+  .cmd button:hover { border-color: var(--cyan); color: var(--white); }
+  .fpr { font-family: var(--mono); font-size: .88rem; color: var(--white); word-break: break-word; }
+
+  ol.steps { padding-left: 1.3rem; }
+  ol.steps li { margin-bottom: .4rem; }
+
+  footer { border-top: 1px solid var(--navy-raised); padding: 2rem 0 3rem; color: var(--text-dim); font-size: .92rem; }
+  footer .signoff { font: italic 1rem var(--brand); color: var(--text); margin-bottom: 1rem; }
+  footer ul { padding-left: 1.2rem; }
+  footer li { margin-bottom: .3rem; }
+
+  .btn[aria-disabled="true"] { opacity: .55; cursor: default; background: transparent; }
+  .soon { color: var(--text-dim); font-size: .92rem; margin-top: .9rem; }
+  ol.steps { counter-reset: s; list-style: none; padding: 0; display: grid; gap: .9rem; }
+  ol.steps li { counter-increment: s; position: relative; padding: .9rem 1rem .9rem 3.4rem;
+                background: rgba(28,40,82,.6); border: 1px solid var(--navy); border-radius: 6px; }
+  ol.steps li::before { content: counter(s, decimal-leading-zero); position: absolute; left: 1rem; top: .75rem;
+                        font: italic bold 1.3rem var(--brand); color: var(--cyan); }
+  ol.steps strong { color: var(--white); }
+  kbd { font-family: var(--mono); font-size: .85rem; color: var(--white); background: var(--navy-raised);
+        border: 1px solid var(--text-dim); border-bottom-width: 2px; border-radius: 3px; padding: 0 .35rem; }
+  @media (max-width: 40rem) {
+    .bar .name span { display: none; }
+    header.hero { padding-top: 2.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="wrap">
+    <a class="name" href="#top"><img src="assets/copland-logo.png" alt="" width="22" height="22"><span>Copland OS</span></a>
+    <nav aria-label="Sections">
+      <a href="#download">Download</a>
+      <a href="#install">Install</a>
+      <a href="#inside">Inside</a>
+      <a href="#updates">Updates</a>
+    </nav>
+  </div>
+</div>
+
+<main class="wrap" id="top">
+  <header class="hero">
+    <img class="eye" src="assets/copland-logo.png" alt="The Copland OS eye" width="128" height="128">
+    <h1>Copland OS Enterprise</h1>
+    <p class="credit">Produced by Tachibana General Laboratories · Present day, present time</p>
+    <p class="lede">The operating system from <em>Serial Experiments Lain</em>, as a real computer you can use
+      every day. Put it on a USB stick, try it without installing anything, and install it when you like it.</p>
+    <div class="actions" id="download">
+      <a class="btn" role="link" aria-disabled="true">Download CoplandOS.iso</a>
+      <a class="btn quiet" href="#install">How to install</a>
+    </div>
+    <p class="soon">The first release is not out yet. It will be downloadable here, free, for 64-bit PCs.</p>
+  </header>
+
+  <figure class="shot">
+    <img src="assets/screenshot-desktop.png" alt="The Copland OS desktop: the eye wallpaper, and the top bar with the Copland OS menu, Layer:01 to Layer:04 and the clock" width="1600" height="900">
+    <figcaption>The Copland OS desktop.</figcaption>
+  </figure>
+
+  <section id="install">
+    <h2><span class="layer">Layer:01</span>Try it, then install it</h2>
+    <ol class="steps">
+      <li><strong>Download CoplandOS.iso</strong> from this page.</li>
+      <li><strong>Put it on a USB stick</strong> with a free tool such as
+        <a href="https://etcher.balena.io/">balenaEtcher</a> (Windows, macOS, Linux). This erases the stick.</li>
+      <li><strong>Start your PC from the stick.</strong> Plug it in, restart, and press your PC's boot menu key
+        while it starts (often <kbd>F12</kbd>, <kbd>F11</kbd> or <kbd>Esc</kbd>), then choose the USB stick.</li>
+      <li><strong>Try it.</strong> Copland OS starts straight from the stick. Nothing on your computer changes.</li>
+      <li><strong>Install it</strong> when you are ready: open <em>Install Copland OS</em> and follow the steps.</li>
+    </ol>
+  </section>
+
+  <section id="inside">
+    <h2><span class="layer">Layer:02</span>What you get</h2>
+    <div class="grid">
+      <div class="card"><h3>The look from the show</h3><p>Navy and cyan from Copland OS's boot screen, the eye, classic Mac icons and cursors.</p></div>
+      <div class="card"><h3>Four layers</h3><p>Four desktops, Layer:01 to Layer:04. Press <kbd>Windows</kbd>+<kbd>1</kbd> to <kbd>4</kbd> to switch, and choose which app opens on which layer.</p></div>
+      <div class="card"><h3>Ready to use</h3><p>Firefox, files, a text editor, image and PDF viewers, sound and Wi-Fi settings.</p></div>
+      <div class="card"><h3>From power on</h3><p>The Copland look from the boot menu and start-up animation to the login screen.</p></div>
+      <div class="card"><h3>Built on Debian</h3><p>Underneath is Debian 13, one of the oldest and most trusted free operating systems.</p></div>
+      <div class="card"><h3>Free</h3><p>No account, no ads, no cost. A fan project, made for fun.</p></div>
+    </div>
+    <figure class="shot">
+      <img src="assets/screenshot-apps.png" alt="Copland OS at work: the terminal with the Copland system summary and colours, and the btop system monitor, all in navy and cyan" width="1600" height="900" loading="lazy">
+      <figcaption>At work: the terminal, its colours, and the system monitor.</figcaption>
+    </figure>
+  </section>
+
+  <section id="updates">
+    <h2><span class="layer">Layer:03</span>Updates</h2>
+    <p>Copland OS gets Debian's security updates and its own updates the same way. To update, open the
+      terminal and run:</p>
+    <div class="cmd"><pre><code>sudo apt update &amp;&amp; sudo apt upgrade</code></pre></div>
+  </section>
+
+  <section id="debian">
+    <h2><span class="layer">Layer:04</span>Already on Debian?</h2>
+    <p>If you already use Debian with the XFCE desktop, you can get the Copland look without reinstalling.
+      The steps are on <a href="https://github.com/anas1412/copland-os#already-on-debian-xfce-the-installer-optional">GitHub</a>.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="signoff">Close the world, Open the nExt.</p>
+    <p>Copland OS is a non-commercial fan project inspired by <em>Serial Experiments Lain</em>. It is
+      not affiliated with the show's owners, Apple, Debian or the artists credited here. The wallpaper,
+      logo, icons and boot animation belong to their owners; if you own one and want it removed,
+      <a href="https://github.com/anas1412/copland-os/issues">open an issue</a> and it will be taken out.</p>
+    <ul>
+      <li>Logo: "Copland Os Enterprise Icon" by <a href="https://www.deviantart.com/psybear/art/Copland-Os-Enterprise-Icon-65838629">PsyBear</a>.</li>
+      <li>Icons: NineIcons from <a href="https://github.com/grassmunk/Platinum9">Platinum9</a> by grassmunk. Cursors: <a href="https://github.com/useless-anvil/retrosmart-cursor">Retrosmart</a>.</li>
+      <li>Theme: a recolour of <a href="https://github.com/shimmerproject/Greybird">Greybird</a>. Boot animation: <a href="https://github.com/faisalhsn/copland-plymouth-theme">copland-plymouth-theme</a>.</li>
+      <li>Source code, full credits and build instructions: <a href="https://github.com/anas1412/copland-os">github.com/anas1412/copland-os</a>.</li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+  // a Copy button on every command; the page works the same without it
+  document.querySelectorAll('.cmd').forEach(function (box) {
+    if (!navigator.clipboard) return;
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = 'Copy';
+    b.addEventListener('click', function () {
+      navigator.clipboard.writeText(box.querySelector('code').textContent).then(function () {
+        b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1500);
+      });
+    });
+    box.appendChild(b);
+  });
+</script>
+</body>
+</html>

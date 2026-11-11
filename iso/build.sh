@@ -40,9 +40,9 @@ load_release() {
 
 checks() {
     local missing=() p
-    for p in lb debootstrap wget git tar dpkg-deb gpgv; do have "$p" || missing+=("$p"); done
+    for p in lb debootstrap wget git tar dpkg-deb apt-get; do have "$p" || missing+=("$p"); done
     if [ "${#missing[@]}" -gt 0 ]; then
-        die "Missing tools: ${missing[*]}. Install them with:  sudo apt install live-build debootstrap wget git gpgv"
+        die "Missing tools: ${missing[*]}. Install them with:  sudo apt install live-build debootstrap wget git"
     fi
     [ -f "$REPO/install.sh" ] && [ -d "$REPO/core" ] && [ -d "$REPO/lib" ] || die "Run this from the copland-os repository."
     mkdir -p "$WORK" 2>/dev/null || true
@@ -64,17 +64,25 @@ checks() {
         say "Low memory (${mem_mb} MB): image compression limited to 2 threads and 768 MB; close other apps while it runs"
     fi
     # the image's apt source must work from the first boot (and live-build runs apt
-    # update with it at the end): the repository has to be published and signed by the
-    # key the image trusts
-    local keyring="$REPO/packaging/copland-os-archive-keyring.gpg" rel
+    # update with it at the end): check it with apt itself, trusting only the key the
+    # image ships. apt is stricter than wget or curl: it refuses an https address that
+    # redirects to plain http, for example.
+    local keyring="$REPO/packaging/copland-os-archive-keyring.gpg" t
     [ -f "$keyring" ] || die "packaging/copland-os-archive-keyring.gpg is missing."
-    rel="$(mktemp)"
-    if ! wget -q -O "$rel" "$COPLAND_APT_URL/dists/$DEBIAN_CODENAME/InRelease"; then
-        rm -f "$rel"
-        die "The apt repository is not published at $COPLAND_APT_URL ($DEBIAN_CODENAME). Publish it first: docs/BUILDING.md, 'apt repository'."
+    t="$(mktemp -d)"
+    mkdir -p "$t/lists/partial" "$t/cache/archives/partial" "$t/parts"; : > "$t/status"
+    printf 'Types: deb\nURIs: %s\nSuites: %s\nComponents: main\nSigned-By: %s\n' \
+        "$COPLAND_APT_URL" "$DEBIAN_CODENAME" "$keyring" > "$t/parts/copland-os.sources"
+    local aptopts=(-o Dir::Etc::SourceList=/dev/null -o Dir::Etc::SourceParts="$t/parts"
+        -o Dir::Etc::Preferences=/dev/null -o Dir::Etc::PreferencesParts="$t/parts"
+        -o Dir::State::Lists="$t/lists" -o Dir::State::Status="$t/status" -o Dir::Cache="$t/cache"
+        -o Debug::NoLocking=1 -o APT::Architecture=amd64 -o APT::Sandbox::User=root)
+    if ! apt-get -q "${aptopts[@]}" update >"$t/log" 2>&1 || grep -qE '^(E|W):' "$t/log" \
+        || ! apt-cache "${aptopts[@]}" show copland-os-desktop >/dev/null 2>&1; then
+        sed 's/^/     /' "$t/log" >&2; rm -rf "$t"
+        die "apt cannot use the Copland repository at $COPLAND_APT_URL ($DEBIAN_CODENAME). Publish it first (docs/BUILDING.md, 'apt repository'), or fix the address."
     fi
-    gpgv --keyring "$keyring" "$rel" >/dev/null 2>&1 || { rm -f "$rel"; die "$COPLAND_APT_URL serves an InRelease that packaging/copland-os-archive-keyring.gpg does not verify."; }
-    rm -f "$rel"
+    rm -rf "$t"
     say "Checks passed: Copland OS $COPLAND_VERSION on Debian $DEBIAN_VERSION ($DEBIAN_CODENAME), tools present, apt repository signed and served, ${free_gb} GB free at $dir"
 }
 

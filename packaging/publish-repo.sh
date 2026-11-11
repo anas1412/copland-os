@@ -13,6 +13,7 @@
 # passphrase, if it has one). It never pushes: it prints the push command for you to run.
 #
 # Layout served by GitHub Pages (COPLAND_APT_URL in iso/release.conf is its apt/ folder):
+#   index.html, assets/                 the project website, from site/
 #   copland-os-archive-keyring.gpg      public key (binary), for Signed-By
 #   copland-os-archive-keyring.asc      the same key, ASCII
 #   apt/pool/main/c/copland-os-desktop/*.deb
@@ -107,16 +108,12 @@ gpgv --keyring "$DIR/copland-os-archive-keyring.gpg" "$DISTS/InRelease" >/dev/nu
 
 # GitHub Pages must serve files as they are
 touch "$DIR/.nojekyll"
-cat > "$DIR/index.html" <<EOF
-<!doctype html><meta charset="utf-8"><title>Copland OS apt repository</title>
-<body style="background:#101838;color:#ccddff;font:15px/1.5 sans-serif;max-width:46em;margin:3em auto;padding:0 1em">
-<h1 style="font-family:C059,serif;font-style:italic;color:#46baef">Copland OS apt repository</h1>
-<p>Packages for <a style="color:#46baef" href="https://github.com/anas1412/copland-os">Copland OS</a>,
-built on upstream Debian. Setup instructions are in the project's README.</p>
-<p>Signing key: <code>copland-os-archive-keyring.gpg</code>
-(fingerprint <code>$(gpg --with-colons --fingerprint "$KEY" | awk -F: '/^fpr/ {print $10; exit}')</code>).</p>
-</body>
-EOF
+# the project website (site/), with its images taken from where the repo keeps them
+[ -f "$REPO/site/index.html" ] || die "site/index.html is missing."
+cp "$REPO/site/index.html" "$DIR/index.html"
+mkdir -p "$DIR/assets"
+cp "$REPO/core/assets/themes/CoplandOS/assets/copland-logo-128.png" "$DIR/assets/copland-logo.png"
+cp "$REPO/docs/screenshot-desktop.png" "$REPO/docs/screenshot-apps.png" "$DIR/assets/"
 
 say "Repository ready in $DIR"
 if [ "$USE_GIT" -eq 1 ]; then

@@ -2,7 +2,10 @@
 
 A Serial Experiments Lain desktop OS built on upstream Debian 13 (trixie) and XFCE:
 the Copland OS look from the show, as a whole system, not just a theme. Every package
-comes from Debian's own servers; Copland OS only adds its look on top.
+but one comes from Debian's own servers; the one is the look itself,
+`copland-os-desktop`, from Copland's own signed apt repository.
+
+Website: <https://anas1412.github.io/copland-os/>
 
 - **CoplandOS.iso** is the project: a live and installable image with everything
   built in (see below).
@@ -10,7 +13,9 @@ comes from Debian's own servers; Copland OS only adds its look on top.
   look without reinstalling: one line for your own account, or `--system` for every
   account on the machine.
 
-![Copland OS on Debian XFCE](docs/screenshot.png)
+![The Copland OS desktop: the eye wallpaper and the top bar with Layer:01 to Layer:04](docs/screenshot-desktop.png)
+
+![Copland OS at work: fastfetch, the terminal colours and btop](docs/screenshot-apps.png)
 
 ## CoplandOS.iso
 
@@ -265,8 +270,9 @@ core/browsers/                browser colour policy and copland-browsers.sh
 tools/xfconf-xml.py           settings.tsv -> XFCE default files for --system
 iso/                          live-build config, hooks, boot menu, installer branding, build.sh;
                               release.conf sets the Copland OS version and the Debian release
-packaging/                    builds the copland-os-desktop .deb (build-deb.sh, install scripts)
-docs/                         screenshot, DESIGN.md (palette, fonts, logo, wording), WHAT-CHANGES.md, BUILDING.md
+packaging/                    builds the copland-os-desktop .deb and publishes the apt repository
+site/                         the website, published with the apt repository on GitHub Pages
+docs/                         screenshots, DESIGN.md (palette, fonts, logo, wording), WHAT-CHANGES.md, BUILDING.md
 ```
 
 ## Fan project

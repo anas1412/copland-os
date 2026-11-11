@@ -43,9 +43,10 @@ Results in `iso/out/`, named from `iso/release.conf` (for example
 
 ## What the build does
 
-1. Checks the tools, free space, the work folder, and that the apt repository is
-   published at `COPLAND_APT_URL` with an `InRelease` signed by
-   `packaging/copland-os-archive-keyring.gpg`. The image's apt source points there, so
+1. Checks the tools, free space, the work folder, and that apt itself can use the
+   repository at `COPLAND_APT_URL` while trusting only
+   `packaging/copland-os-archive-keyring.gpg` (apt is stricter than wget or curl: it
+   refuses an https address that redirects to plain http). The image's apt source points there, so
    an unpublished repository would break `apt update` (live-build itself runs it at the
    end of the build).
 2. Copies `iso/auto` and `iso/config` into the work folder (keeping the package cache from an
@@ -186,5 +187,6 @@ same version.
 `publish-repo.sh` adds every `.deb` in `packaging/out/` to the pool (older versions
 stay), rebuilds the indexes for the release in `iso/release.conf`, signs them (gpg asks
 for the passphrase if the key has one), checks the signature, exports the public key, and commits on the
-`gh-pages` branch in `packaging/out/gh-pages`. It never pushes by itself.
+`gh-pages` branch in `packaging/out/gh-pages`, together with the website: `site/index.html`
+plus the logo and the two screenshots in `docs/`. It never pushes by itself.
 
