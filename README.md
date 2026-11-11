@@ -44,12 +44,13 @@ you pick components with the arrow keys and space; enter installs.
 | `packages` | on | installs the missing apt packages (sudo) |
 | `theme` | on | CoplandOS GTK 2/3 theme, xfwm4 window borders, notification style |
 | `icons` | on | blue duotone icon theme generated from Papirus, white panel icons |
+| `icons95` | off | Windows 95 icons from [Chicago95](https://github.com/grassmunk/Chicago95) instead, downloaded at a pinned commit |
 | `cursors` | on | Adwaita cursors re-tinted Copland cyan |
 | `wallpaper` | on | the Copland OS Enterprise boot frame |
 | `panel` | on | top bar: Copland menu, window list, Layer:01–04, tray, clock, power. **Replaces your current panel layout** |
 | `terminal` | on | xfce4-terminal palette and font, fastfetch config, `~/.bashrc` hook |
 | `layers` | on | 4 workspaces named Layer:01–04, plus `copland-layers`, a small picker to choose which app opens on which layer. Nothing is assigned until you choose |
-| `keys` | on | the Super (Windows) key opens the Copland menu |
+| `keys` | on | the Super (Windows) key opens the Copland menu; Super+1–4 (number row or numpad) jump to Layer:01–04 |
 | `greeter` | off | LightDM login screen in the same theme (sudo) |
 | `boot` | off | Plymouth boot animation from a third-party repo (sudo, experimental) |
 
@@ -112,6 +113,7 @@ files/backgrounds/          wallpaper
 files/fastfetch/            fastfetch config
 files/devilspie2/           per-app workspace rules (read layers.conf)
 files/bin/copland-layers    the layer picker
+files/bin/copland-goto      jump to a layer (used by the Super+number shortcuts)
 files/tools/                generators: icon duotone, cursor tint, theme recolour
 ```
 
@@ -124,4 +126,5 @@ files/tools/                generators: icon duotone, cursor tint, theme recolou
 - Wallpaper: a frame from *Serial Experiments Lain*, via <https://lain.wiki/wiki/Copland_OS>.
   Copyright its owners; not covered by this repository's licence.
 - fastfetch logo: the built-in `LainOS` logo of [fastfetch](https://github.com/fastfetch-cli/fastfetch).
+- Win95 icons (optional): [Chicago95](https://github.com/grassmunk/Chicago95), GPL-3.0+/MIT per its README; downloaded, not bundled.
 - Boot animation (optional): <https://github.com/faisalhsn/copland-plymouth-theme>.

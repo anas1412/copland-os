@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+"""copland-goto N — switch to Layer N (workspace N, counted from 1).
+
+Asks the window manager directly (EWMH _NET_CURRENT_DESKTOP), using only the
+Python standard library and libX11, so it needs no wmctrl or xdotool.
+"""
+import ctypes
+import ctypes.util
+import sys
+
+
+def main():
+    try:
+        n = int(sys.argv[1])
+    except (IndexError, ValueError):
+        sys.exit("usage: copland-goto <layer number>")
+    if n < 1:
+        sys.exit("layer numbers start at 1")
+    lib = ctypes.util.find_library("X11")
+    if not lib:
+        sys.exit("libX11 not found")
+    X = ctypes.CDLL(lib)
+    X.XOpenDisplay.restype = ctypes.c_void_p
+    X.XDefaultRootWindow.restype = ctypes.c_ulong
+    X.XDefaultRootWindow.argtypes = [ctypes.c_void_p]
+    X.XInternAtom.restype = ctypes.c_ulong
+    X.XInternAtom.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int]
+    X.XSendEvent.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_int, ctypes.c_long, ctypes.c_void_p]
+    X.XSync.argtypes = [ctypes.c_void_p, ctypes.c_int]
+    X.XCloseDisplay.argtypes = [ctypes.c_void_p]
+    d = X.XOpenDisplay(None)
+    if not d:
+        sys.exit("cannot open the X display")
+    root = X.XDefaultRootWindow(d)
+
+    class ClientMessage(ctypes.Structure):
+        _fields_ = [("type", ctypes.c_int), ("serial", ctypes.c_ulong), ("send_event", ctypes.c_int),
+                    ("display", ctypes.c_void_p), ("window", ctypes.c_ulong),
+                    ("message_type", ctypes.c_ulong), ("format", ctypes.c_int), ("data", ctypes.c_long * 5)]
+
+    class Event(ctypes.Union):
+        _fields_ = [("xclient", ClientMessage), ("pad", ctypes.c_long * 24)]
+
+    ev = Event()
+    ev.xclient.type = 33                      # ClientMessage
+    ev.xclient.window = root
+    ev.xclient.message_type = X.XInternAtom(d, b"_NET_CURRENT_DESKTOP", 0)
+    ev.xclient.format = 32
+    ev.xclient.data[0] = n - 1
+    mask = (1 << 20) | (1 << 19)              # SubstructureRedirect | SubstructureNotify
+    X.XSendEvent(d, root, 0, mask, ctypes.byref(ev))
+    X.XSync(d, 0)
+    X.XCloseDisplay(d)
+
+
+if __name__ == "__main__":
+    main()

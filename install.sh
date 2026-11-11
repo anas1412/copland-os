@@ -31,6 +31,8 @@ XML_DIR="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml"
 CHANNELS=(xsettings xfwm4 xfce4-panel xfce4-desktop xfce4-terminal xfce4-keyboard-shortcuts xfce4-notifyd)
 GREETER=/etc/lightdm/lightdm-gtk-greeter.conf
 GRUB=/etc/default/grub
+CHICAGO95_REPO="https://github.com/grassmunk/Chicago95.git"
+CHICAGO95_COMMIT="5da19b8b1e2a886ebf6628403023d5fac3acc3ee"   # pinned
 PLYMOUTH_REPO="https://github.com/faisalhsn/copland-plymouth-theme.git"
 PLYMOUTH_COMMIT="4e336d9e264723634ae1ed5dd38888cd2ab37c52"   # pinned: the repo is third-party
 
@@ -39,17 +41,18 @@ PACKAGES=(xfce4-whiskermenu-plugin xfce4-pulseaudio-plugin xfce4-terminal xfce4-
           fonts-dejavu-mono gtk2-engines-murrine libgtk-3-bin python3 fastfetch devilspie2)
 
 # ---------------------------------------------------------------- components
-IDS=(packages theme icons cursors wallpaper panel terminal layers keys greeter boot)
+IDS=(packages theme icons icons95 cursors wallpaper panel terminal layers keys greeter boot)
 declare -A TITLE DESC ON SUDO RESULT NOTE
 TITLE[packages]="Packages";        DESC[packages]="install the missing apt packages";              ON[packages]=1;  SUDO[packages]=1
 TITLE[theme]="Theme";              DESC[theme]="GTK, window borders, notifications";               ON[theme]=1;     SUDO[theme]=0
 TITLE[icons]="Icons";              DESC[icons]="blue duotone of Papirus, white panel icons";       ON[icons]=1;     SUDO[icons]=0
+TITLE[icons95]="Win95 icons";      DESC[icons95]="Chicago95 icons instead (downloads ~30 MB)";    ON[icons95]=0;   SUDO[icons95]=0
 TITLE[cursors]="Cursors";          DESC[cursors]="Adwaita cursors tinted Copland cyan";            ON[cursors]=1;   SUDO[cursors]=0
 TITLE[wallpaper]="Wallpaper";      DESC[wallpaper]="Copland OS Enterprise boot frame";             ON[wallpaper]=1; SUDO[wallpaper]=0
 TITLE[panel]="Top bar";            DESC[panel]="replaces your panel layout (backed up)";           ON[panel]=1;     SUDO[panel]=0
 TITLE[terminal]="Terminal";        DESC[terminal]="palette, font, fastfetch";                      ON[terminal]=1;  SUDO[terminal]=0
 TITLE[layers]="Layers";            DESC[layers]="4 workspaces; you choose which apps go where";               ON[layers]=1;    SUDO[layers]=0
-TITLE[keys]="Super key";           DESC[keys]="Windows key opens the Copland menu";                ON[keys]=1;      SUDO[keys]=0
+TITLE[keys]="Shortcuts";           DESC[keys]="Super opens the menu, Super+1-4 layers";                ON[keys]=1;      SUDO[keys]=0
 TITLE[greeter]="Login screen";     DESC[greeter]="LightDM greeter in the same theme";              ON[greeter]=0;   SUDO[greeter]=1
 TITLE[boot]="Boot animation";      DESC[boot]="Plymouth theme, third-party, experimental";         ON[boot]=0;      SUDO[boot]=1
 
@@ -143,7 +146,7 @@ preflight() {
     [ "$EUID" -ne 0 ] || die "Do not run this as root. Run it as your own user; it asks for sudo only where needed."
     local f
     for f in themes/CoplandOS/gtk-3.0/gtk.css themes/CoplandOS/xfwm4/themerc backgrounds/CoplandOS.png \
-             fastfetch/config.jsonc devilspie2/layers.lua bin/copland-layers tools/copland_assets.py; do
+             fastfetch/config.jsonc devilspie2/layers.lua bin/copland-layers bin/copland-goto tools/copland_assets.py; do
         [ -e "$FILES/$f" ] || die "The dotfiles folder is incomplete: files/$f is missing."
     done
     local like=""
@@ -311,6 +314,28 @@ step_icons() {
     xf xsettings /Net/IconThemeName string CoplandOS
     if have gsettings; then run gsettings set org.gnome.desktop.interface icon-theme CoplandOS || true; fi
     [ "$built" -eq 1 ] || note "already built, kept (use --force to rebuild)"
+}
+
+step_icons95() {
+    have git || skip "git is not installed"
+    local dest="$HOME/.icons/Chicago95" tmp
+    if [ -f "$dest/index.theme" ] && [ "$FORCE" -eq 0 ]; then
+        note "already installed, kept (use --force to download again)"
+    else
+        tmp="$(mktemp -d)"
+        run git clone -q "$CHICAGO95_REPO" "$tmp/repo"
+        run git -C "$tmp/repo" -c advice.detachedHead=false checkout -q "$CHICAGO95_COMMIT"
+        if [ "$DRY" -eq 0 ]; then
+            [ -f "$tmp/repo/Icons/Chicago95/index.theme" ] || { rm -rf "$tmp"; echo "unexpected layout in the Chicago95 repo"; exit 1; }
+            mkdir -p "$HOME/.icons"
+            if [ -e "$dest" ]; then mkdir -p "$BACKUP"; mv "$dest" "$BACKUP/icons-Chicago95"; fi
+            cp -a "$tmp/repo/Icons/Chicago95" "$dest"
+            if have gtk-update-icon-cache; then gtk-update-icon-cache -f -q "$dest" || true; fi
+        fi
+        rm -rf "$tmp"
+    fi
+    xf xsettings /Net/IconThemeName string Chicago95
+    if have gsettings; then run gsettings set org.gnome.desktop.interface icon-theme Chicago95 || true; fi
 }
 
 step_cursors() {
@@ -523,7 +548,19 @@ EOF
 
 step_keys() {
     plugin_exists whiskermenu || skip "xfce4-whiskermenu-plugin is not installed"
+    have python3 || skip "python3 is not installed"
+    # a tap of Super opens the Copland menu
     xf xfce4-keyboard-shortcuts /commands/custom/Super_L string xfce4-popup-whiskermenu
+    # Super+1..4 jump to Layer:01..04. They run a small command instead of xfwm4's own
+    # workspace keys, which did not fire on the machine this was built on.
+    # Bound on the number row, the numpad (NumLock on) and AZERTY's unshifted number row.
+    run install -D -m 755 "$FILES/bin/copland-goto" "$HOME/.local/bin/copland-goto"
+    local i k azerty=(ampersand eacute quotedbl apostrophe)
+    for i in 1 2 3 4; do
+        for k in "$i" "KP_$i" "${azerty[$((i - 1))]}"; do
+            xf xfce4-keyboard-shortcuts "/commands/custom/<Super>$k" string "$HOME/.local/bin/copland-goto $i"
+        done
+    done
 }
 
 step_greeter() {
