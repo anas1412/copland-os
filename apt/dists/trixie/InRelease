@@ -1,0 +1,38 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Architectures: amd64 all
+Codename: trixie
+Components: main
+Date: Wed, 11 Nov 2026 23:33:20 +0000
+Description: Copland OS packages for Debian 13 (trixie)
+Label: Copland OS
+Origin: Copland OS
+Suite: trixie
+MD5Sum:
+ 5a571dc0216e0a1ae3cb98fd0714087c             1442 main/binary-all/Packages
+ 22e73ec8046443d938396ed0140869e7              909 main/binary-all/Packages.gz
+ 5a571dc0216e0a1ae3cb98fd0714087c             1442 main/binary-amd64/Packages
+ 22e73ec8046443d938396ed0140869e7              909 main/binary-amd64/Packages.gz
+SHA1:
+ 997d111d6c15fdbcc4ee13d8968f56e6f0655190             1442 main/binary-all/Packages
+ 4779236e9776f697201e97bfcf094221a2804167              909 main/binary-all/Packages.gz
+ 997d111d6c15fdbcc4ee13d8968f56e6f0655190             1442 main/binary-amd64/Packages
+ 4779236e9776f697201e97bfcf094221a2804167              909 main/binary-amd64/Packages.gz
+SHA256:
+ 97f6633f46e8b65a7740c19281bb5d3c665b2671a37df9e1c987c0fb10f66341             1442 main/binary-all/Packages
+ 7558a877f55e6eb0aea31f10db11481e3c8da13940bc9c8ab17170edc991526a              909 main/binary-all/Packages.gz
+ 97f6633f46e8b65a7740c19281bb5d3c665b2671a37df9e1c987c0fb10f66341             1442 main/binary-amd64/Packages
+ 7558a877f55e6eb0aea31f10db11481e3c8da13940bc9c8ab17170edc991526a              909 main/binary-amd64/Packages.gz
+SHA512:
+ 10e63b08af8242155d25b62c5d6991dc7d44629bd0f8b7de39cf0d8d45111f856cfd482317472e4a6e762836ceac5763845a894fb86805be6b3e81fa19fca359             1442 main/binary-all/Packages
+ fea56fdc3514ef30e3113af5ed629249845b6f6c9ac063ddd0f76a331217a76f67d04543b9127a12ea0283cb276e7dd53c9d5236715749a184c7ae1f90dcff63              909 main/binary-all/Packages.gz
+ 10e63b08af8242155d25b62c5d6991dc7d44629bd0f8b7de39cf0d8d45111f856cfd482317472e4a6e762836ceac5763845a894fb86805be6b3e81fa19fca359             1442 main/binary-amd64/Packages
+ fea56fdc3514ef30e3113af5ed629249845b6f6c9ac063ddd0f76a331217a76f67d04543b9127a12ea0283cb276e7dd53c9d5236715749a184c7ae1f90dcff63              909 main/binary-amd64/Packages.gz
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYKAB0WIQT2Kfeu7w3TCKTjeEhYgYHXNqJorAUCavT7QAAKCRBYgYHXNqJo
+rPnQAQCsschBpyYYGNjeHk0VPsKrbynQtqtz1ZkF3Duao5eBugD/QsKsiKenG7SO
+wXwSLpv53lcKGTDWay3sRW9Uu9KylA4=
+=sh5H
+-----END PGP SIGNATURE-----

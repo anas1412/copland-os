@@ -1,0 +1,23 @@
+Package: copland-os-desktop
+Architecture: all
+Version: 0.1.0+deb13
+Priority: optional
+Section: x11
+Maintainer: Copland OS project <anas1412@users.noreply.github.com>
+Installed-Size: 18372
+Depends: xfce4, xfce4-whiskermenu-plugin, xfce4-terminal, xfce4-notifyd, adwaita-icon-theme, fonts-urw-base35, fonts-dejavu-core, fonts-dejavu-mono, gtk2-engines-murrine, libgtk-3-bin, python3, devilspie2, fastfetch
+Recommends: xfce4-pulseaudio-plugin, lightdm, lightdm-gtk-greeter, plymouth, console-setup, fonts-terminus, grub-common, btop
+Filename: pool/main/c/copland-os-desktop/copland-os-desktop_0.1.0+deb13_all.deb
+Size: 9343360
+MD5sum: 929c402ff9416f381416337b30dc1744
+SHA1: f9298d0785d9934fecdc63f8f9ee0ae8a9e4422a
+SHA256: 4119f22a58bfbfb371b5a915519fabecf83050e696dab4631d477ea886937936
+SHA512: f6f6967ca813891865420053257d63d186d19e8a2ae0670374f95eadc4a5143de680168251b269922d9fef77d657e5c09a79605f116f8f4cfdcad7cbd9d641ee
+Homepage: https://github.com/anas1412/copland-os
+Description: Copland OS look for Debian XFCE (Serial Experiments Lain)
+ Applies the Copland OS Enterprise look system-wide: GTK and window theme, Mac OS 9
+ icons, classic Mac cursors, wallpaper, top bar, terminal colours, fastfetch, four
+ named workspaces (layers) with per-app rules, keyboard shortcuts, login screen, boot
+ animation, boot menu and console colours. Settings are installed as defaults, so
+ every user can still change them. Built on upstream Debian 13.
+
