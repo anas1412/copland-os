@@ -72,7 +72,7 @@ preflight() {
     local f
     for f in assets/themes/CoplandOS/gtk-3.0/gtk.css assets/themes/CoplandOS/xfwm4/themerc assets/backgrounds/CoplandOS.png \
              assets/icons/NineIcons/index.theme "assets/cursors/$CURSOR_THEME/index.theme" \
-             config/fastfetch/config.jsonc config/devilspie2/layers.lua bin/copland-layers bin/copland-goto bin/copland-send; do
+             config/fastfetch/config.jsonc bin/copland-goto bin/copland-send; do
         [ -e "$CORE/$f" ] || die "The Copland OS folder is incomplete: core/$f is missing."
     done
     local like=""
@@ -101,7 +101,6 @@ make_backup() {
     [ -f "$HOME/.bashrc" ] && cp -a "$HOME/.bashrc" "$BACKUP/bashrc"
     [ -f "$HOME/.config/fastfetch/config.jsonc" ] && cp -a "$HOME/.config/fastfetch/config.jsonc" "$BACKUP/fastfetch-config.jsonc"
     [ -f "$HOME/.config/btop/btop.conf" ] && cp -a "$HOME/.config/btop/btop.conf" "$BACKUP/btop.conf"
-    [ -f "$HOME/.config/devilspie2/layers.lua" ] && cp -a "$HOME/.config/devilspie2/layers.lua" "$BACKUP/layers.lua"
     printf 'Copland OS installer backup, %s\nRestore with: %s/install.sh --restore\n' "$STAMP" "$SRC" > "$BACKUP/README"
     ln -sfn "$BACKUP" "$STATE/backups/latest"
     info "Backup saved: ${DM}$BACKUP${R}"
@@ -160,6 +159,22 @@ summary() {
     [ "$fl" -eq 0 ]
 }
 
+# Copland OS once sorted apps into layers with devilspie2 and a picker, copland-layers.
+# That feature is gone; remove what an older install left, and only our own files: the
+# rules file and the autostart entry are checked for their Copland header first.
+remove_old_layer_rules() {
+    local cfg="${XDG_CONFIG_HOME:-$HOME/.config}" f stop=0
+    f="$cfg/devilspie2/layers.lua"
+    if [ -f "$f" ] && head -1 "$f" | grep -q '^-- Copland OS layers'; then run rm -f "$f"; fi
+    f="$cfg/autostart/devilspie2.desktop"
+    if [ -f "$f" ] && grep -q '^Name=Copland OS layers$' "$f"; then run rm -f "$f"; stop=1; fi
+    for f in "$HOME/.local/bin/copland-layers" "$HOME/.local/share/applications/copland-layers.desktop" "$cfg/copland-os/layers.conf"; do
+        if [ -e "$f" ]; then run rm -f "$f"; fi
+    done
+    if [ "$stop" -eq 1 ] && [ "$DRY" -eq 0 ]; then pkill -u "$EUID" -x devilspie2 2>/dev/null || true; fi
+    return 0
+}
+
 # ------------------------------------------------------------------ restore
 restore() {
     local src="$STATE/backups/latest" ch
@@ -179,8 +194,7 @@ restore() {
     [ -f "$src/face" ] && cp -a "$src/face" "$HOME/.face"
     [ -f "$src/fastfetch-config.jsonc" ] && cp -a "$src/fastfetch-config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
     [ -f "$src/btop.conf" ] && cp -a "$src/btop.conf" "$HOME/.config/btop/btop.conf"
-    rm -f "$HOME/.config/autostart/devilspie2.desktop" "$HOME/.local/share/applications/copland-layers.desktop"
-    pkill -u "$EUID" -x devilspie2 2>/dev/null || true
+    remove_old_layer_rules
     if [ -f "$GREETER.copland-bak" ] && confirm "Also restore the login screen config (sudo)?"; then
         sudo cp -a "$GREETER.copland-bak" "$GREETER" && info "Login screen restored."
     fi

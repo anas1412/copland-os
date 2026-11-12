@@ -119,23 +119,12 @@ Every file and setting each component touches, and how to undo it: [docs/WHAT-CH
 | `wallpaper` | on | the Copland OS Enterprise image (eye and wordmark) |
 | `panel` | on | top bar: Copland menu (with the Copland logo as its profile picture), window list, Layer:01–04, tray, clock with date, power. **Replaces your current panel layout** |
 | `terminal` | on | xfce4-terminal palette and font, fastfetch config, `~/.bashrc` hook, btop theme |
-| `layers` | on | 4 workspaces named Layer:01–04, plus `copland-layers`, a small picker to choose which app opens on which layer. Nothing is assigned until you choose |
+| `layers` | on | 4 workspaces named Layer:01–04 (an app asking for attention takes you to its layer) |
 | `keys` | on | the Super (Windows) key opens the Copland menu; Super+1–4 (number row or numpad) jump to Layer:01–04; Super+Shift+1–4 send the focused window there |
 | `browsers` | off | Copland colour for Chromium-family browsers (Brave, Chromium, Chrome, Edge) by managed policy; Firefox follows the GTK theme on its own (sudo) |
 | `greeter` | off | LightDM login screen in the same theme (sudo) |
 | `boot` | off | Plymouth boot animation from a third-party repo (sudo, experimental) |
 | `autologin` | off | log in automatically at startup as you, no password (LightDM, sudo) |
-
-## Choosing your layers
-
-The installer does not assume which apps you use. After installing `layers`, run
-`copland-layers` (or open **Copland Layers** from the menu). It lists your
-installed apps and open windows; move with the arrow keys and press `1`–`4` to
-send an app to a layer, `0` to leave it wherever you are.
-
-- `d` sets where every other app goes (default: anywhere).
-- `f` sets whether opening an app switches you to its layer.
-- `s` saves to `~/.config/copland-os/layers.conf` and applies at once.
 
 ## Safety
 
@@ -251,8 +240,7 @@ installation, the login screen, the boot animation and `--system` will not.
 
 Tested on Debian 13 (trixie) with XFCE 4.20: the menu, `--dry-run`, and a real
 run of `theme`, `icons`, `cursors`,
-`wallpaper`, `panel`, `terminal`, `layers` and `keys`, and the `copland-layers`
-picker (navigation and loading; window placement from its config file).
+`wallpaper`, `panel`, `terminal`, `layers` and `keys`.
 
 Also tested: `--system` into a scratch folder (`--root`), every file it writes,
 and `--system --uninstall` putting that folder back as it was.
@@ -269,8 +257,8 @@ install.sh                    the installer: per-user (default) or --system
 lib/                          the installer's parts: ui, common, components (per-user), system
 core/settings.tsv             every XFCE setting, once (used by both modes)
 core/assets/                  theme (with logo), icons, cursors, wallpaper
-core/config/                  fastfetch config, btop theme and settings, devilspie2 layer rules
-core/bin/                     copland-layers, copland-goto, copland-send
+core/config/                  fastfetch config, btop theme and settings
+core/bin/                     copland-goto, copland-send (the layer shortcuts)
 core/boot/                    full-screen boot script, GRUB theme, copland-boot.sh
 core/browsers/                browser colour policy and copland-browsers.sh
 tools/xfconf-xml.py           settings.tsv -> XFCE default files for --system

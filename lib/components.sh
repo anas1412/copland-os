@@ -12,7 +12,7 @@ TITLE[cursors]="Cursors";          DESC[cursors]="classic Mac pixel cursors (Ret
 TITLE[wallpaper]="Wallpaper";      DESC[wallpaper]="Copland OS Enterprise boot frame";             ON[wallpaper]=1; SUDO[wallpaper]=0
 TITLE[panel]="Top bar";            DESC[panel]="replaces your panel layout (backed up)";           ON[panel]=1;     SUDO[panel]=0
 TITLE[terminal]="Terminal";        DESC[terminal]="palette, font, fastfetch, btop";                ON[terminal]=1;  SUDO[terminal]=0
-TITLE[layers]="Layers";            DESC[layers]="4 workspaces; you choose which apps go where";               ON[layers]=1;    SUDO[layers]=0
+TITLE[layers]="Layers";            DESC[layers]="4 workspaces named Layer:01-04";                       ON[layers]=1;    SUDO[layers]=0
 TITLE[keys]="Shortcuts";           DESC[keys]="Super menu, Super+1-4 go, +Shift send";                ON[keys]=1;      SUDO[keys]=0
 TITLE[browsers]="Browsers";       DESC[browsers]="Copland colour for Chromium-family browsers";  ON[browsers]=0;  SUDO[browsers]=1
 TITLE[greeter]="Login screen";     DESC[greeter]="LightDM greeter in the same theme";              ON[greeter]=0;   SUDO[greeter]=1
@@ -189,55 +189,10 @@ EOF
 }
 
 step_layers() {
-    # 4 named workspaces; an app asking for attention takes you to its layer
+    # four named workspaces, Layer:01-04; an app asking for attention takes you to its layer
     apply_settings layers
-    run install -D -m 644 "$CONFIG/devilspie2/layers.lua" "$HOME/.config/devilspie2/layers.lua"
-    run install -D -m 755 "$BINSRC/copland-layers" "$HOME/.local/bin/copland-layers"
-    # a neutral starting point: no app is assigned until you choose
-    local conf="${XDG_CONFIG_HOME:-$HOME/.config}/copland-os/layers.conf"
-    if [ -f "$conf" ]; then
-        echo "keeping your existing layer choices: $conf"
-    elif [ "$DRY" -eq 0 ]; then
-        mkdir -p "$(dirname "$conf")"
-        printf '# Copland OS layers. Edit with: copland-layers\nfollow = true\ndefault = 0\n' > "$conf"
-    else
-        run write "$conf"
-    fi
-    if [ "$DRY" -eq 0 ]; then
-        mkdir -p "$HOME/.local/share/applications"
-        cat > "$HOME/.local/share/applications/copland-layers.desktop" <<LAUNCHER
-[Desktop Entry]
-Type=Application
-Name=Copland Layers
-Comment=Choose which apps open on which layer
-Exec=xfce4-terminal --title="Copland Layers" --geometry=84x34 -x $HOME/.local/bin/copland-layers
-Icon=$THEME_DIR/assets/copland-logo-128.png
-Categories=Settings;DesktopSettings;
-Terminal=false
-LAUNCHER
-    else
-        run write "$HOME/.local/share/applications/copland-layers.desktop"
-    fi
-    if [ "$DRY" -eq 0 ]; then
-        mkdir -p "$HOME/.config/autostart"
-        cat > "$HOME/.config/autostart/devilspie2.desktop" <<'EOF'
-[Desktop Entry]
-Type=Application
-Name=Copland OS layers
-Comment=Open each app on its own workspace (devilspie2)
-Exec=devilspie2
-OnlyShowIn=XFCE;
-X-GNOME-Autostart-enabled=true
-EOF
-    else
-        run write "$HOME/.config/autostart/devilspie2.desktop"
-    fi
-    have devilspie2 || { note "names set; devilspie2 is missing, so apps are not sorted into layers"; return 0; }
-    if [ "$DRY" -eq 0 ]; then
-        pkill -u "$EUID" -x devilspie2 2>/dev/null || true
-        spawn devilspie2
-    fi
-    note "run 'copland-layers' (or Copland Layers in the menu) to choose your apps"
+    # earlier versions also sorted apps into layers with devilspie2: take that out again
+    remove_old_layer_rules
 }
 
 step_keys() {

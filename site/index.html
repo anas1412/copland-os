@@ -250,8 +250,8 @@
         arrow in pixel art (Retrosmart).</li>
       <li><strong>Layer:01 to Layer:04</strong>, top right. The show calls its episodes Layers; here they are your four desktops.
         <kbd>Windows</kbd>+<kbd>1</kbd> to <kbd>4</kbd> switches layer, <kbd>Windows</kbd>+<kbd>Shift</kbd>+<kbd>1</kbd>
-        to <kbd>4</kbd> sends the current window there, and the <strong>Layers</strong> app sets which app opens on
-        which layer. The current layer is underlined in cyan.</li>
+        to <kbd>4</kbd> sends the current window there. Apps open on the layer you are on. The current layer is
+        underlined in cyan.</li>
       <li><strong>Network, volume, clock and power</strong>, at the right end of the bar. Names on the bar are set in C059 Bold Italic, the
         Copland font for names.</li>
       <li><strong>The Copland OS Enterprise image</strong> as wallpaper. The colours of the whole system, from the
@@ -321,8 +321,8 @@
       <li>XFCE's window manager works only on X11; XFCE's Wayland support is still experimental in 4.20 (the version in Debian 13), and
         XFCE keeps X11 "for the foreseeable future".
         <span class="src">(<a href="https://wiki.xfce.org/releng/wayland_roadmap">XFCE roadmap</a>)</span></li>
-      <li>The layer rules (which app opens where) use devilspie2, an X11 tool.
-        <span class="src">(<a href="https://packages.debian.org/trixie/devilspie2">packages.debian.org</a>)</span></li>
+      <li>The layer shortcuts (<kbd>Windows</kbd>+<kbd>1</kbd> to <kbd>4</kbd>) talk to X11 directly.
+        <span class="src">(<a href="https://github.com/anas1412/copland-os/blob/main/core/bin/copland-goto">copland-goto</a>)</span></li>
     </ul>
     <p class="dim">There is no Wayland session. That is a choice, not something missing by accident.</p>
 

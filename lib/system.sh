@@ -97,7 +97,7 @@ preflight_system() {
     local f
     for f in assets/themes/CoplandOS/gtk-3.0/gtk.css assets/backgrounds/CoplandOS.png assets/icons/NineIcons/index.theme \
              "assets/cursors/$CURSOR_THEME/index.theme" settings.tsv config/fastfetch/config.jsonc \
-             config/devilspie2/layers.lua bin/copland-goto bin/copland-send bin/copland-layers; do
+             bin/copland-goto bin/copland-send; do
         [ -e "$CORE/$f" ] || die "The Copland OS folder is incomplete: core/$f is missing."
     done
     [ -x "$SRC/tools/xfconf-xml.py" ] || die "tools/xfconf-xml.py is missing."
@@ -180,33 +180,21 @@ EOF
 }
 
 sys_layers() {
-    put_file 644 "$CONFIG/devilspie2/layers.lua" /etc/skel/.config/devilspie2/layers.lua
-    put_text 644 /etc/copland-os/layers.conf <<'EOF'
-# Copland OS layers: system default. Each user edits their own copy with copland-layers.
-# <part of the app's window class> = <layer number>
-follow = true
-default = 0
-EOF
-    put_file 755 "$BINSRC/copland-layers" "$SYS_BIN/copland-layers"
-    put_text 644 /usr/share/applications/copland-layers.desktop <<EOF
-[Desktop Entry]
-Type=Application
-Name=Copland Layers
-Comment=Choose which apps open on which layer
-Exec=xfce4-terminal --title="Copland Layers" --geometry=84x34 -x $SYS_BIN/copland-layers
-Icon=$SYS_THEME/assets/copland-logo-128.png
-Categories=Settings;DesktopSettings;
-Terminal=false
-EOF
-    put_text 644 /etc/xdg/autostart/copland-devilspie2.desktop <<'EOF'
-[Desktop Entry]
-Type=Application
-Name=Copland OS layers
-Comment=Open each app on its own workspace (devilspie2)
-Exec=devilspie2
-OnlyShowIn=XFCE;
-X-GNOME-Autostart-enabled=true
-EOF
+    # the four named workspaces are XFCE defaults, written by sys_xdg from settings.tsv.
+    # Earlier versions also sorted apps into layers with devilspie2: remove those files.
+    local f
+    for f in /etc/xdg/autostart/copland-devilspie2.desktop /etc/skel/.config/devilspie2/layers.lua \
+             /etc/copland-os/layers.conf /usr/share/applications/copland-layers.desktop \
+             /usr/local/bin/copland-layers /usr/bin/copland-layers; do
+        [ -e "$TGT$f" ] || continue
+        run rm -f "$TGT$f"
+        if [ "$DRY" -eq 0 ] && [ -f "$MANIFEST" ]; then
+            grep -vxF "$f" "$MANIFEST" > "$MANIFEST.tmp" || true
+            mv "$MANIFEST.tmp" "$MANIFEST"
+        fi
+    done
+    [ "$DRY" -eq 0 ] && [ -d "$TGT/etc/skel/.config/devilspie2" ] && rmdir "$TGT/etc/skel/.config/devilspie2" 2>/dev/null
+    note "Layer:01-04 are set with the other XFCE defaults"
 }
 
 sys_keys() {

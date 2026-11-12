@@ -9,8 +9,7 @@ Before any component runs, the installer copies your current settings to
 - the XFCE settings channels `xsettings`, `xfwm4`, `xfce4-panel`, `xfce4-desktop`,
   `xfce4-terminal`, `xfce4-keyboard-shortcuts` and `xfce4-notifyd`
 - `~/.bashrc`
-- `~/.config/fastfetch/config.jsonc`, `~/.config/btop/btop.conf` and
-  `~/.config/devilspie2/layers.lua`, if present
+- `~/.config/fastfetch/config.jsonc` and `~/.config/btop/btop.conf`, if present
 
 `./install.sh --restore` puts those back. Theme, icon and cursor folders stay on
 disk; delete them by hand if you want them gone.
@@ -92,17 +91,17 @@ You get the Copland colours in xfce4-terminal and btop, plus a fastfetch banner 
 
 ### `layers` (on)
 
-You get four workspaces named Layer:01–04, and a picker that decides which
-app opens on which layer.
+You get four workspaces named Layer:01–04. Apps open on the layer you are on.
 
 | Changes | Value |
 |---|---|
-| `xfwm4` | 4 workspaces, named `Layer:01`–`Layer:04`; `activate_action` set to `switch` |
-| `~/.config/devilspie2/layers.lua` | window rules |
-| `~/.local/bin/copland-layers` | the picker |
-| `~/.config/copland-os/layers.conf` | created only if missing; no app is assigned to a layer |
-| `~/.local/share/applications/copland-layers.desktop` | menu entry |
-| `~/.config/autostart/devilspie2.desktop` | starts devilspie2 at login |
+| `xfwm4` | 4 workspaces, named `Layer:01`–`Layer:04`; `activate_action` set to `switch` (an app asking for attention takes you to its layer) |
+
+Earlier versions also sorted apps into layers with devilspie2 and a picker,
+`copland-layers`. That feature is gone: running `layers` again, or `--restore`, removes
+the files those versions left (`~/.config/devilspie2/layers.lua` and its autostart entry,
+both only if they carry the Copland header, `~/.local/bin/copland-layers`, its menu entry
+and `~/.config/copland-os/layers.conf`). `--system` removes the system-wide copies.
 
 ### `keys` (on)
 

@@ -49,7 +49,7 @@ PLYMOUTH_COMMIT="4e336d9e264723634ae1ed5dd38888cd2ab37c52"   # pinned: the repo 
 
 PACKAGES=(xfce4-whiskermenu-plugin xfce4-pulseaudio-plugin xfce4-terminal xfce4-notifyd
           adwaita-icon-theme fonts-urw-base35 fonts-dejavu-core
-          fonts-dejavu-mono gtk2-engines-murrine libgtk-3-bin python3 fastfetch devilspie2 btop)
+          fonts-dejavu-mono gtk2-engines-murrine libgtk-3-bin python3 fastfetch btop)
 
 # -------------------------------------------------------------------- colour
 if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
@@ -220,11 +220,6 @@ main() {
     done
     local rc=0
     summary || rc=1
-    # offer the app picker right away when Layers was just installed interactively
-    if [ "$DRY" -eq 0 ] && [ "$YES" -eq 0 ] && [ -z "$ONLY" ] && [ "${RESULT[layers]:-}" = ok ] \
-        && [ -t 0 ] && [ -x "$HOME/.local/bin/copland-layers" ]; then
-        if confirm "Choose which apps open on which layer now?"; then "$HOME/.local/bin/copland-layers" || true; fi
-    fi
     exit "$rc"
 }
 
