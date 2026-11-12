@@ -22,7 +22,8 @@ Website: <https://anas1412.github.io/copland-os/>
 The main way to get Copland OS: a live and installable image. Boot it from USB to try
 it, then install it with the Copland-branded installer.
 
-Download it from the [latest release](https://github.com/anas1412/copland-os/releases/latest),
+Download it from the [latest release](https://github.com/anas1412/copland-os/releases/latest)
+(what changed: [CHANGELOG.md](CHANGELOG.md)),
 or build it yourself (below); everything inside it is the same code the installer uses.
 
 What is in it: Debian 13 with a lean XFCE desktop

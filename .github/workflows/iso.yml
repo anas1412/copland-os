@@ -67,8 +67,12 @@ jobs:
             echo "::error::Tag $GITHUB_REF_NAME does not match COPLAND_VERSION=$COPLAND_VERSION in iso/release.conf (expected v$COPLAND_VERSION)."
             exit 1
           fi
-          # a tag builds the release itself; anything else is a labelled test build
-          if [ "${GITHUB_REF_TYPE:-}" = tag ]; then export COPLAND_RELEASE=1; fi
+          # a tag builds the release itself (it needs its CHANGELOG.md section);
+          # anything else is a labelled test build
+          if [ "${GITHUB_REF_TYPE:-}" = tag ]; then
+            export COPLAND_RELEASE=1
+            packaging/changelog-section.sh "$COPLAND_VERSION" > /dev/null
+          fi
           label="$(packaging/build-version.sh)"
           echo "COPLAND_BUILD_VERSION=$label" >> "$GITHUB_ENV"
           echo "codename=$DEBIAN_CODENAME" >> "$GITHUB_OUTPUT"
@@ -200,6 +204,7 @@ jobs:
             echo "::error::Tag $GITHUB_REF_NAME does not match COPLAND_VERSION=$COPLAND_VERSION in iso/release.conf (expected v$COPLAND_VERSION)."
             exit 1
           fi
+          packaging/changelog-section.sh "$COPLAND_VERSION" > /dev/null
           echo "debian=$DEBIAN_VERSION ($DEBIAN_CODENAME)" >> "$GITHUB_OUTPUT"
 
       - name: Build the package in debian:trixie
@@ -231,6 +236,18 @@ jobs:
     permissions:
       contents: write
     steps:
+      # only the changelog and its reader: this job runs no build code
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            CHANGELOG.md
+            packaging/changelog-section.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Read this version's changelog
+        run: packaging/changelog-section.sh "${GITHUB_REF_NAME#v}" > changes.md
+
       - name: Download the ISO
         if: needs.build.result == 'success'
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -270,8 +287,8 @@ jobs:
           run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           if [ "$KIND" = image ]; then
             sha="$(cut -d' ' -f1 "$NAME.iso.sha256")"
-            cat > notes.md <<EOF
-          Copland OS $version, on Debian $DEBIAN.
+            { printf '%s\n\n' "Copland OS $version, on Debian $DEBIAN."; cat ../changes.md; printf '\n'; } > notes.md
+            cat >> notes.md <<EOF
 
           **Download** \`$NAME.iso\` below, put it on a USB stick and start your PC from it:
           https://anas1412.github.io/copland-os/#wired
@@ -289,8 +306,8 @@ jobs:
               --title "Copland OS $version" --notes-file notes.md \
               "$NAME.iso" "$NAME.iso.sha256" "$NAME.build-info.txt" "$NAME.packages" "$deb"
           else
-            cat > notes.md <<EOF
-          Copland OS $version, an update for Debian $DEBIAN. No new image.
+            { printf '%s\n\n' "Copland OS $version, an update for Debian $DEBIAN. No new image."; cat ../changes.md; printf '\n'; } > notes.md
+            cat >> notes.md <<EOF
 
           **Already running Copland OS?** The update icon in the top bar brings it, or
           \`sudo apt update && sudo apt upgrade\`.

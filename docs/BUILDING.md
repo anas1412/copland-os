@@ -110,13 +110,17 @@ had booted it, and its installer pages had to be redone. The commit you tag must
 
 1. `COPLAND_VERSION` in `iso/release.conf` already names the coming release (it is raised
    right after each release). Check it is the one you mean (`x.y.0` or `x.y.z`).
-2. Tag and push: `git tag -a v0.2.0 -m "Copland OS 0.2.0" && git push origin v0.2.0`. The
-   workflow stops at once if the tag does not match `COPLAND_VERSION`.
-3. CI builds and publishes the release (table above).
-4. Publish the package to apt: `./packaging/publish-repo.sh` downloads the package from
+2. In `CHANGELOG.md`, move what is under `[Unreleased]` into a new section
+   `## [0.2.0] - <date>` (Added / Changed / Fixed, written for users). Commit and push.
+3. Tag and push: `git tag -a v0.2.0 -m "Copland OS 0.2.0" && git push origin v0.2.0`. The
+   workflow stops at once if the tag does not match `COPLAND_VERSION`, or if
+   `CHANGELOG.md` has no section for it (`packaging/changelog-section.sh`); the section
+   becomes the top of the release notes.
+4. CI builds and publishes the release (table above).
+5. Publish the package to apt: `./packaging/publish-repo.sh` downloads the package from
    that release (never a local build), names it, signs the indexes; then push `gh-pages`.
    It refuses test builds (versions with `~`).
-5. Raise `COPLAND_VERSION` to the next release, commit and push.
+6. Raise `COPLAND_VERSION` to the next release, commit and push.
 
 ## What the build does
 
