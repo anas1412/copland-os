@@ -3,8 +3,8 @@
 # and check what each one leaves behind. Meant for a throwaway container (CI runs it in
 # debian:trixie, .github/workflows/extras.yml); it changes the system it runs on.
 #
-#   tools/test-extras.sh            install everything, check it, run it again
-#   tools/test-extras.sh --offline  only check that it stops cleanly without a network
+#   tests/test-extras.sh            install everything, check it, run it again
+#   tests/test-extras.sh --offline  only check that it stops cleanly without a network
 set -uo pipefail
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
@@ -60,8 +60,9 @@ node_major="$(node --version | sed 's/^v//; s/\..*//')"
 [ "${node_major:-0}" -ge 24 ] && ok "node $(node --version)" || bad "node $(node --version 2>&1), want 24 or newer"
 go_minor="$(go version | sed -n 's/.*go1\.\([0-9]*\).*/\1/p')"
 [ "${go_minor:-0}" -ge 26 ] && ok "$(go version)" || bad "$(go version 2>&1), want go1.26 or newer (backports)"
-check "rust toolchain for $U" runuser -u "$U" -- env HOME="$H" "$H/.cargo/bin/cargo" --version
-runuser -u "$U" -- env HOME="$H" "$H/.cargo/bin/rustc" --version
+# Debian's rustup puts cargo and rustc in /usr/bin as proxies; the toolchain is in ~/.rustup
+check "rust toolchain for $U" runuser -u "$U" -- env HOME="$H" cargo --version
+runuser -u "$U" -- env HOME="$H" rustc --version
 java -version 2>&1 | head -1 | grep -q '"25' && ok "java 25" || bad "java: $(java -version 2>&1 | head -1)"
 check "docker compose" docker compose version
 check "podman-compose" podman-compose --version

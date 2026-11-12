@@ -98,7 +98,7 @@ had booted it, and its installer pages had to be redone. The commit you tag must
 
 - a green **CoplandOS.iso** run (its test ISO is in the run's artifacts),
 - a green **copland-extras** run (every optional item installed and checked in a clean
-  Debian container, `tools/test-extras.sh`), when `core/bin/copland-extras` changed,
+  Debian container, `tests/test-extras.sh`), when `core/bin/copland-extras` changed,
 - for a minor release, the test ISO booted in a VM and installed, checking at least:
   the boot menu and boot animation; the live desktop; the installer from Welcome to
   Finish, with a few items ticked on Apps and Developer tools; the slideshow moving on

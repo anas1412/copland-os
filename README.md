@@ -68,7 +68,7 @@ the system's window frame, OBS with a Copland theme, GIMP with its System theme
 Qt's GTK theme. Your own settings are never overwritten.
 
 Every item is installed and checked for real on each change to the tool, in a clean
-Debian 13 container on GitHub (`tools/test-extras.sh`, the **copland-extras** workflow).
+Debian 13 container on GitHub (`tests/test-extras.sh`, the **copland-extras** workflow).
 
 The same tool works on an installed system, any time:
 
