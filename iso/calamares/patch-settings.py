@@ -6,7 +6,8 @@
 Debian's file, with four changes, each required to match exactly once (a Debian update
 that moves things stops the ISO build instead of shipping a broken installer):
   - the Copland branding folder
-  - two package chooser pages, "Apps" and "Developer tools" (packagechooser-*.conf)
+  - two checklist pages, "Apps" and "Developer tools" (packagechooserq-*.conf, the QML
+    package chooser: real checkboxes, choose-*.qml in the branding folder)
   - those pages shown right after Users, before Summary
   - the copland-extras job right after sources-final, which writes Debian's online
     sources: before it, apt in the new system only sees the ISO
@@ -28,10 +29,10 @@ def once(pattern, repl):
 once(r"^branding: .*$", "branding: copland")
 once(r"^sequence:",
      "instances:\n"
-     "- id: apps\n  module: packagechooser\n  config: packagechooser-apps.conf\n"
-     "- id: dev\n  module: packagechooser\n  config: packagechooser-dev.conf\n"
+     "- id: apps\n  module: packagechooserq\n  config: packagechooserq-apps.conf\n"
+     "- id: dev\n  module: packagechooserq\n  config: packagechooserq-dev.conf\n"
      "\nsequence:")
-once(r"^(  - users\n)(  - summary\n)", r"\1  - packagechooser@apps\n  - packagechooser@dev\n\2")
+once(r"^(  - users\n)(  - summary\n)", r"\1  - packagechooserq@apps\n  - packagechooserq@dev\n\2")
 once(r"^(  - sources-final\n)", r"\1  - copland-extras\n")
 
 open(dst, "w").write(text)

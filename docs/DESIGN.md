@@ -260,6 +260,12 @@ plain words where it doesn't, so every line still reads at a glance:
   either sit next to Xfce's own entry (two entries that start the same desktop) or need
   Xfce's entry hidden, which breaks the session that existing accounts have saved. The
   look already comes from `/etc/xdg/copland-os`, whichever session starts.
+- **The boot animation talks:** the Plymouth script draws Debian's messages and prompts
+  (live session "remove the live-medium and press ENTER" at shutdown, the disk
+  encryption password, fsck notes) in palette text below the animation's bar. Without
+  it the live session looked frozen at shutdown (2026-11-12), and an encrypted install
+  would wait at boot for a password nobody could see. Checked on Plymouth 24.004 with
+  its X11 renderer.
 - **Not added on purpose:** Knights, Cyberia, Accela or episode titles as layer
   subtitles. None of them maps to a real part of the desktop, and they would break the
   plain-and-functional rule above.
@@ -298,7 +304,7 @@ one topic per slide, like Ubuntu's and EndeavourOS's installer slides (read 2026
 
 ## Installer extras (Apps and Developer tools)
 
-Two optional pages after Users (`iso/calamares/packagechooser-{apps,dev}.conf`); what is
+Two optional pages after Users (`iso/calamares/packagechooserq-{apps,dev}.conf`); what is
 ticked is installed by `core/bin/copland-extras`, run inside the new system by the
 `copland-extras` job right after `sources-final` (Debian's online sources). Before that
 step apt only sees the ISO. The same tool is in the package: `sudo copland-extras`.
@@ -329,11 +335,18 @@ step apt only sees the ISO. The same tool is in the package: `sudo copland-extra
 | VLC, KeePassXC | Qt's GTK platform theme; `55copland-os` sets `QT_QPA_PLATFORMTHEME=gtk3` for Qt 5 (Qt 6 picks it on XFCE by itself) |
 | Flatpak apps | dark scheme through `xdg-desktop-portal-gtk` only: Flatpak apps cannot see the system GTK theme |
 
-- **Sizes on each item's card** (`tools/artwork.py`, `CHOICES`): download and disk,
-  measured 2026-11-12 with apt against the 0.1.2 ISO's own package list, so they are
-  what a fresh install really fetches. Items share parts (Python, Rust and C all pull
-  gcc), so several together download less than their sum. Rust's disk size is an estimate:
-  the unpacked toolchain was not measured. Re-measure when versions move.
+- **The pages are checklists** (`iso/branding/CoplandChooser.qml`, Calamares' QML package
+  chooser): a checkbox per row, a click anywhere on the row ticks it. Calamares' widget
+  chooser was dropped: its list picks one item per click (several only with Ctrl), and
+  its picture slot is one big image per item.
+- **The makers' own pictures, credited:** each app shows its official icon and a
+  screenshot from its store listing (AppStream on Flathub); languages and tools show
+  their project's logo from its own site. Unmodified, only scaled. Screenshots showing
+  someone else's film or brands were swapped for the same app's clean ones. Sources,
+  licences and trademark notes: `iso/branding/extras/CREDITS`; a line on each page says
+  the pictures belong to their owners. Brave, VS Code, Docker and the Go logo ask for
+  written permission in their policies: used anyway by decision (2026-11-12), like the
+  boot animation, and removed if an owner asks. No sizes: they change with every version.
 
 ## Website
 

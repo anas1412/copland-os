@@ -36,3 +36,56 @@ fun refresh_callback () {
     }
 }
 Plymouth.SetRefreshFunction(refresh_callback);
+
+# ---- messages and prompts -------------------------------------------------------
+# Debian's tools talk to the user through the boot screen: the live session's "remove
+# the live-medium and press ENTER" at shutdown, the disk-encryption password at boot,
+# fsck notes. A theme that does not draw them leaves the screen waiting with nothing
+# shown. Text only (no image files): palette text #ccddff, cyan #46baef, white.
+# Below the animation's own progress bar (74-78 % of the height): prompt at 83 %,
+# what is typed at 88 %, other messages at 93 %.
+# Calls as in Plymouth 24.004's own sample theme (themes/script/script.script).
+
+global.message = Sprite();
+global.prompt = Sprite();
+global.entry = Sprite();
+
+fun place_text (sprite, text, y, r, g, b) {
+    local.img = Image.Text(text, r, g, b, 1, "DejaVu Sans 15");
+    sprite.SetImage(local.img);
+    sprite.SetPosition(Window.GetX() + Window.GetWidth() / 2 - local.img.GetWidth() / 2, y, 10000);
+    sprite.SetOpacity(1);
+}
+
+fun display_message_callback (text) {
+    place_text(global.message, text, Window.GetY() + Window.GetHeight() * 0.93, 0.80, 0.867, 1);
+}
+
+fun hide_message_callback (text) {
+    global.message.SetOpacity(0);
+}
+
+# the password itself is never shown: one * per typed character
+fun display_password_callback (prompt, bullets) {
+    place_text(global.prompt, prompt, Window.GetY() + Window.GetHeight() * 0.83, 0.275, 0.729, 0.937);
+    local.stars = "";
+    for (local.i = 0; local.i < bullets; local.i++)
+        local.stars = local.stars + "* ";
+    place_text(global.entry, local.stars + "_", Window.GetY() + Window.GetHeight() * 0.88, 1, 1, 1);
+}
+
+fun display_question_callback (prompt, entry) {
+    place_text(global.prompt, prompt, Window.GetY() + Window.GetHeight() * 0.83, 0.275, 0.729, 0.937);
+    place_text(global.entry, entry + "_", Window.GetY() + Window.GetHeight() * 0.88, 1, 1, 1);
+}
+
+fun display_normal_callback () {
+    global.prompt.SetOpacity(0);
+    global.entry.SetOpacity(0);
+}
+
+Plymouth.SetDisplayMessageFunction(display_message_callback);
+Plymouth.SetHideMessageFunction(hide_message_callback);
+Plymouth.SetDisplayPasswordFunction(display_password_callback);
+Plymouth.SetDisplayQuestionFunction(display_question_callback);
+Plymouth.SetDisplayNormalFunction(display_normal_callback);

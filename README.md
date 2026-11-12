@@ -37,7 +37,8 @@ installed system's boot menu both have the Copland look. The live user is `lain`
 ### Extra apps and developer tools
 
 The installer has two optional pages after Users, **Apps** and **Developer tools**.
-Nothing is ticked: the plain install stays small and works offline. Whatever you tick
+Each is a checklist: click what you want. Nothing is ticked at first, so the plain
+install stays small and works offline. Whatever you tick
 is downloaded at the end of the install (it needs an internet connection; without one
 the install still finishes, and a note in your home folder says what to run later).
 
@@ -53,7 +54,8 @@ the install still finishes, and a note in your home folder says what to run late
 | Flatpak and Flathub | Debian + Flathub | | Docker with Compose and Buildx | Docker's repository |
 | | | | Podman with podman-compose | Debian |
 
-Each item's card in the installer shows its download and disk size. Languages come
+Each item shows its maker's own icon and screenshot or logo (sources and terms in
+`iso/branding/extras/CREDITS`). Languages come
 from wherever their current, supported version is: Debian's own Node.js 20, Go 1.24 and
 Docker 26 are past their makers' end of life, so those three come from newer sources.
 An outside repository is added only when its item is ticked, and its signing key is
@@ -64,6 +66,9 @@ policy as other Chromium browsers, VS Code with Copland colours, terminal palett
 the system's window frame, OBS with a Copland theme, GIMP with its System theme
 (follows the desktop), LibreOffice through its GTK plugin, VLC and KeePassXC through
 Qt's GTK theme. Your own settings are never overwritten.
+
+Every item is installed and checked for real on each change to the tool, in a clean
+Debian 13 container on GitHub (`tools/test-extras.sh`, the **copland-extras** workflow).
 
 The same tool works on an installed system, any time:
 

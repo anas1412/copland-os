@@ -1,0 +1,63 @@
+Pictures on the installer's Apps and Developer tools pages (iso/branding/choose-*.qml)
+
+Every picture is its maker's own, unmodified: icons were only scaled into a 128 px
+square (transparent margins trimmed for Duke), screenshots are as published. They are
+shown only to say which program a checkbox installs. Copland OS is a non-commercial fan
+project and is not affiliated with or endorsed by any of these projects or companies.
+All names and logos are the trademarks of their owners. If an owner asks, its picture
+is removed. Sources and terms checked on 2026-11-12.
+
+APPS (icon and screenshot from each app's AppStream listing on Flathub, the images the
+project publishes for software stores)
+
+App names, logos and screenshots belong to their owners and are shown only to identify
+the software; no endorsement implied.
+
+brave-icon.png      Brave lion (brave.com/static-assets/images/brave-logo-sans-text.svg).
+                    Brave and the Brave logo are trademarks of Brave Software, Inc.
+brave-shot.png      Brave's welcome page, from Brave's Flathub listing (com.brave.Browser,
+                    published by Brave Software). (c) Brave Software, Inc.
+libreoffice-*.png   LibreOffice(R) and the LibreOffice logo are trademarks of The Document
+                    Foundation. Screenshot (c) The Document Foundation, CC BY-SA 3.0.
+thunderbird-*.png   Thunderbird and the Thunderbird logo are trademarks of Mozilla.org in the
+                    U.S. and other countries. Screenshot: Thunderbird project, CC0
+                    (github.com/thunderbird/flatpak-screenshots).
+gimp-*.png          GIMP logo (Wilber) by Aryeom, CC BY-SA 4.0. Screenshot (c) GIMP team,
+                    CC BY-SA 4.0; illustration "ZeMarmot" by Aryeom, CC BY-SA 4.0.
+vlc-*.png           VLC, VLC media player and the VLC cone logo are trademarks of VideoLAN.
+                    Cone icon designed by Richard Oiestad. Screenshot (the open-file dialog)
+                    (c) VideoLAN.
+obs-*.png           OBS, OBS Studio and the OBS Studio logo are registered trademarks of
+                    Wizards of OBS LLC. Screenshot (c) OBS Project.
+keepassxc-*.png     KeePassXC icon (c) 2016 Lorenzo Stella, LGPL-2. Screenshot (the password
+                    generator) (c) KeePassXC Team.
+vscode-icon.png     Visual Studio Code icon (code.visualstudio.com/assets/branding/code-stable.png).
+                    Visual Studio Code is a trademark of Microsoft Corporation.
+vscode-shot.png     From the Visual Studio Code listing on Flathub (com.visualstudio.code,
+                    not published by Microsoft). Visual Studio Code (c) Microsoft Corporation.
+
+LANGUAGES AND TOOLS (logos from each project's own site or artwork repository)
+
+python-icon.png     Python logo. Python Software Foundation, from python.org/community/logos.
+                    "Python" and the Python logos are trademarks of the Python Software
+                    Foundation (TM); use under the PSF trademark usage policy,
+                    python.org/psf/trademarks.
+node-icon.png       Node.js logo (nodejs.org/static/logos/nodejsHex.svg), unmodified.
+                    Node.js(R) is a trademark of the OpenJS Foundation; use under its
+                    trademark policy, trademark-policy.openjsf.org. No endorsement implied.
+go-icon.png         Go logo (go.dev/images/go-logo-blue.svg). Copyright 2018 The Go Authors.
+                    Go brand guidelines: go.dev/brand.
+rust-icon.png       Rust logo (rust-lang/rust-artwork, rust-logo-white-outline.svg).
+                    Rust Foundation, CC BY 4.0. Rust trademark policy:
+                    rustfoundation.org/policy/rust-trademark-policy.
+java-icon.png       Duke, the Java mascot (openjdk/duke, vector/ThumbsUp.svg).
+                    Oracle, BSD license (dev.java/duke).
+cpp-icon.png        C++ logo (isocpp/logos, cpp_logo.png) by Jeremy Kratz, licensed by the
+                    Standard C++ Foundation; unaltered use under isocpp.org/home/terms-of-use.
+docker-icon.png     Docker logo (docker.com media resources, docker-mark-ocean-blue.svg).
+                    Docker and the Docker logo are trademarks of Docker, Inc.,
+                    docker.com/legal/trademark-guidelines.
+podman-icon.png     Podman logo (cncf/artwork, podman-icon-color.png). Podman Container
+                    Tools(TM), a Series of LF Projects, LLC; lfprojects.org/policies/trademark-policy.
+flatpak-icon.png    Flathub logo (flathub-infra/assets, brand/logo-white.svg), CC0 1.0.
+flatpak-shot.png    The same Flathub logo, larger.

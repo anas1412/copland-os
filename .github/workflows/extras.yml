@@ -1,0 +1,38 @@
+# Test copland-extras for real on GitHub's runners: every item installed into a clean
+# debian:trixie container, then checked (tools/test-extras.sh), plus a run without a
+# network. Nothing here is published; it only reads the repository.
+name: copland-extras
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'core/bin/copland-extras'
+      - 'tools/test-extras.sh'
+      - '.github/workflows/extras.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: extras-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install-everything:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install and check every item in debian:trixie
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/src:ro" debian:trixie /src/tools/test-extras.sh
+
+      - name: Without a network
+        run: |
+          docker run --rm --network none -v "$GITHUB_WORKSPACE:/src:ro" debian:trixie \
+            /src/tools/test-extras.sh --offline

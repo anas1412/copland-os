@@ -8,11 +8,12 @@ B=/etc/calamares/branding/copland
 S=/usr/share/copland-os/iso-branding
 C=/usr/share/copland-os/iso-calamares
 install -d -m 755 "$B"
-install -m 644 "$S/branding.desc" "$S/show.qml" "$S/copland-logo.png" "$S/welcome.png" "$S"/slide-*.png \
-    "$S"/choose-*.png "$B/"
+install -m 644 "$S/branding.desc" "$S/copland-logo.png" "$S/welcome.png" "$S"/slide-*.png "$S"/*.qml "$B/"
+install -d -m 755 "$B/extras"
+install -m 644 "$S"/extras/*.png "$B/extras/"
 
 # the Apps and Developer tools pages, and the job that installs what was ticked there
-install -m 644 "$C/packagechooser-apps.conf" "$C/packagechooser-dev.conf" /etc/calamares/modules/
+install -m 644 "$C/packagechooserq-apps.conf" "$C/packagechooserq-dev.conf" /etc/calamares/modules/
 install -d -m 755 /usr/lib/calamares/modules/copland-extras
 install -m 644 "$C/modules/copland-extras/module.desc" "$C/modules/copland-extras/main.py" \
     /usr/lib/calamares/modules/copland-extras/
@@ -22,6 +23,7 @@ dpkg-divert --local --rename --divert /etc/calamares/settings.conf.debian --add 
 python3 "$C/patch-settings.py" /etc/calamares/settings.conf.debian /etc/calamares/settings.conf
 grep -q '^branding: copland$' /etc/calamares/settings.conf
 grep -q '^  - copland-extras$' /etc/calamares/settings.conf
+grep -q '^  - packagechooserq@dev$' /etc/calamares/settings.conf
 
 # the launcher (also copied to the live desktop by add-calamares-desktop-icon)
 L=/usr/share/applications/calamares-install-debian.desktop
