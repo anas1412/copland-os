@@ -233,8 +233,10 @@ people who use computers, not for builders: build and packaging details stay on 
   with a new Debian release (Debian 13, XFCE 4.20), and the release checklist in
   BUILDING.md includes the site.
 - **Real pictures, explained.** "What you get" is the two full screenshots in `docs/`,
-  each with numbered pins on its parts and a numbered list saying what each part is and
-  does; no drawings of the product and no cut-outs (decided 2026-11-12).
+  clean (no numbers or marks on them, because they are what people share), each followed
+  by a list naming every part, where it is and what it does; no drawings of the product
+  and no cut-outs (decided 2026-11-12). The desktop screenshot is also the link preview
+  (Open Graph image).
 - **Atmosphere, drawn by us:** power lines with a pole between sections (the show's best
   known motif) in its power-line navy `#394f70`; a red dot on each title card (the red
   marks in the show's shadows); faint static scanlines (gone under `prefers-contrast:

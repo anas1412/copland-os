@@ -6,6 +6,17 @@
 <title>Copland OS</title>
 <meta name="description" content="Copland OS Enterprise, the operating system from Serial Experiments Lain, as a real Debian 13 desktop: live and installable, free, updated with apt.">
 <meta name="color-scheme" content="dark">
+<!-- link previews in chats and social sites: the clean desktop screenshot -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Copland OS">
+<meta property="og:title" content="Copland OS Enterprise">
+<meta property="og:description" content="The operating system from Serial Experiments Lain, made real: a complete Debian 13 computer in the Copland OS look. Free, live and installable.">
+<meta property="og:url" content="https://anas1412.github.io/copland-os/">
+<meta property="og:image" content="https://anas1412.github.io/copland-os/assets/screenshot-desktop.png">
+<meta property="og:image:width" content="1600">
+<meta property="og:image:height" content="900">
+<meta property="og:image:alt" content="The Copland OS desktop: the eye wallpaper and the top bar with Layer:01 to Layer:04">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/copland-logo.png">
 <!--
   Colours, fonts and wording follow docs/DESIGN.md ("Website" explains each choice).
@@ -107,16 +118,12 @@
   ol.why strong { display: block; font: italic bold 1.2rem var(--brand); color: var(--white); }
 
 
-  /* annotated screenshots: numbered pins over the real desktop, explained in the list below */
-  .annot { position: relative; margin: .4rem 0 1rem; }
+  /* the two screenshots, clean (people share them), each followed by a list of its parts */
+  .annot { margin: .4rem 0 1rem; }
   .annot img { width: 100%; border: 1px solid var(--blue); box-shadow: 0 0 40px rgba(70,186,239,.18); }
-  .pin { position: absolute; transform: translate(-50%, -50%); width: 1.7rem; height: 1.7rem; border-radius: 50%;
-         display: flex; align-items: center; justify-content: center; font: bold .8rem var(--mono);
-         background: var(--cyan); color: var(--navy-deep); border: 2px solid var(--navy-deep);
-         box-shadow: 0 0 0 2px var(--cyan), 0 0 12px rgba(70,186,239,.8); }
-  ol.legend { padding-left: 2.2rem; margin: 0 0 1.5rem; }
-  ol.legend li { margin-bottom: .6rem; padding-left: .3rem; }
-  ol.legend li::marker { font: bold .9rem var(--mono); color: var(--cyan); }
+  ul.parts { padding-left: 1.4rem; margin: 0 0 1.5rem; }
+  ul.parts li { margin-bottom: .6rem; }
+  ul.parts li::marker { color: var(--cyan); }
   ul.apps { columns: 2 16rem; column-gap: 2rem; }
   ul.apps li { break-inside: avoid; margin-bottom: .3rem; }
   dl.facts { display: grid; grid-template-columns: minmax(7rem, max-content) 1fr; gap: .45rem 1.2rem; margin: .5rem 0 1rem; }
@@ -166,7 +173,6 @@
     .bar nav { gap: 0; }
     .bar nav a { font-size: .78rem; padding: .35rem .22rem; }
     .wires { margin-top: 2rem; height: 44px; }
-    .pin { width: 1.25rem; height: 1.25rem; font-size: .68rem; }
   }
 </style>
 </head>
@@ -235,50 +241,40 @@
     <header class="card-title"><p class="layer">Layer:02</p><h2 id="navi-t">NAVI</h2><p class="sub">What you get</p></header>
 
     <h3>The desktop</h3>
-    <figure class="annot">
+    <figure class="annot clean">
       <img src="assets/screenshot-desktop.png" alt="The Copland OS desktop: top bar, desktop icons and the eye wallpaper" width="1600" height="900" loading="lazy">
-      <span class="pin" style="left:8.8%;top:1.8%">1</span>
-      <span class="pin" style="left:8.6%;top:21%">2</span>
-      <span class="pin" style="left:70.3%;top:7%">3</span>
-      <span class="pin" style="left:88.5%;top:7%">4</span>
-      <span class="pin" style="left:65.5%;top:33%">5</span>
     </figure>
-    <ol class="legend">
-      <li><strong>Copland OS menu.</strong> All your apps and a search box; the <kbd>Windows</kbd> key opens it.</li>
-      <li><strong>Desktop icons</strong> in the style of Mac OS 9 (NineIcons). The mouse pointer is a classic Mac
+    <ul class="parts">
+      <li><strong>Copland OS menu</strong>, top left. All your apps and a search box; the <kbd>Windows</kbd> key opens it.</li>
+      <li><strong>Desktop icons</strong>, left, in the style of Mac OS 9 (NineIcons). The mouse pointer is a classic Mac
         arrow in pixel art (Retrosmart).</li>
-      <li><strong>Layer:01 to Layer:04.</strong> The show calls its episodes Layers; here they are your four desktops.
+      <li><strong>Layer:01 to Layer:04</strong>, top right. The show calls its episodes Layers; here they are your four desktops.
         <kbd>Windows</kbd>+<kbd>1</kbd> to <kbd>4</kbd> switches layer, <kbd>Windows</kbd>+<kbd>Shift</kbd>+<kbd>1</kbd>
         to <kbd>4</kbd> sends the current window there, and the <strong>Layers</strong> app sets which app opens on
         which layer. The current layer is underlined in cyan.</li>
-      <li><strong>Network, volume, clock and power.</strong> Names on the bar are set in C059 Bold Italic, the
+      <li><strong>Network, volume, clock and power</strong>, at the right end of the bar. Names on the bar are set in C059 Bold Italic, the
         Copland font for names.</li>
       <li><strong>The Copland OS Enterprise image</strong> as wallpaper. The colours of the whole system, from the
         bar to the terminal, are taken from it: navy, cyan and pale blue.</li>
-    </ol>
+    </ul>
 
     <h3>At work</h3>
-    <figure class="annot">
+    <figure class="annot clean">
       <img src="assets/screenshot-apps.png" alt="Copland OS at work: a terminal with the system summary, a terminal showing its colours, and the btop system monitor" width="1600" height="900" loading="lazy">
-      <span class="pin" style="left:28.5%;top:1.6%">6</span>
-      <span class="pin" style="left:38%;top:55.8%">7</span>
-      <span class="pin" style="left:55.5%;top:13%">8</span>
-      <span class="pin" style="left:35.5%;top:62%">9</span>
-      <span class="pin" style="left:69%;top:22%">10</span>
     </figure>
-    <ol class="legend" start="6">
-      <li><strong>Open windows</strong> of the current layer only, next to the menu.</li>
-      <li><strong>Window titles</strong> centred, in C059 Bold Italic. Everything you read inside windows is in
+    <ul class="parts">
+      <li><strong>Open windows</strong> of the current layer only, in the bar next to the menu.</li>
+      <li><strong>Window titles</strong>, centred at the top of each window, in C059 Bold Italic. Everything you read inside windows is in
         Nimbus Sans.</li>
-      <li><strong>The system summary</strong> every new terminal opens with, next to the eye drawn in text. Its labels
+      <li><strong>The system summary</strong> every new terminal opens with (top left), next to the eye drawn in text. Its labels
         use the show's words: <strong>NAVI</strong> is your computer (the show's name for a personal computer),
         <strong>PROTOCOL</strong> the Linux kernel (Protocol 7 is the show's network protocol),
         <strong>PSYCHE</strong> the processor (the Psyche chip Lain adds to her NAVI), and <strong>WIRED</strong>
         your network address (the Wired is the show's network).</li>
-      <li><strong>Sixteen terminal colours</strong> in the Copland palette. Errors still read red, success green,
+      <li><strong>Sixteen terminal colours</strong> (bottom left) in the Copland palette. Errors still read red, success green,
         warnings yellow, in softer tones. The terminal font is DejaVu Sans Mono.</li>
-      <li><strong>btop</strong>, the system monitor, in the same colours.</li>
-    </ol>
+      <li><strong>btop</strong> (right), the system monitor, in the same colours.</li>
+    </ul>
 
     <h3>From the moment it starts</h3>
     <ul>
