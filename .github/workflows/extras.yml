@@ -1,16 +1,11 @@
 # Test copland-extras for real on GitHub's runners: every item installed into a clean
 # debian:trixie container, then checked (tests/test-extras.sh), plus a run without a
 # network. Nothing here is published; it only reads the repository.
+# Started by hand only (Actions tab, copland-extras, Run workflow).
 name: copland-extras
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'core/bin/copland-extras'
-      - 'tests/test-extras.sh'
-      - '.github/workflows/extras.yml'
 
 permissions:
   contents: read
