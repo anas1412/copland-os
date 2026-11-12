@@ -239,5 +239,11 @@ same version.
 stay), rebuilds the indexes for the release in `iso/release.conf`, signs them (gpg asks
 for the passphrase if the key has one), checks the signature, exports the public key, and commits on the
 `gh-pages` branch in `packaging/out/gh-pages`, together with the website: `site/index.html`
-plus the logo and the two screenshots in `docs/`. It never pushes by itself.
+plus the logo and the two screenshots in `docs/`. It never pushes by itself, and it names
+every package it is about to publish.
+
+**Website changes only:** `./packaging/publish-repo.sh --site-only`. It updates the page
+and its pictures and leaves the packages, indexes and signatures alone. Use it for any
+site change: a full run adds every `.deb` lying in `packaging/out/`, and a package is
+public, for good, the moment `gh-pages` is pushed.
 

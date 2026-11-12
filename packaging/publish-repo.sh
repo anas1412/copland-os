@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Publish the Copland OS apt repository (signed) to the gh-pages branch.
 #
-#   ./packaging/publish-repo.sh                 prepare and commit gh-pages locally
+#   ./packaging/publish-repo.sh                 packages and website: commit gh-pages locally
+#   ./packaging/publish-repo.sh --site-only     the website only; packages and signatures untouched
 #   ./packaging/publish-repo.sh --dir DIR       build into DIR only (no git; for tests)
 #   ./packaging/publish-repo.sh --key KEYID     sign with another key (tests only)
 #
@@ -26,7 +27,7 @@ set -Eeuo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/.." && pwd)"
 KEYRING="$HERE/copland-os-archive-keyring.gpg"
-KEY=""; DIR=""; USE_GIT=1
+KEY=""; DIR=""; USE_GIT=1; SITE_ONLY=0
 
 say() { printf ' > %s\n' "$*"; }
 die() { printf '\n x %s\n' "$*" >&2; exit 1; }
@@ -35,11 +36,18 @@ while [ $# -gt 0 ]; do
     case "$1" in
         --key) shift; KEY="${1:-}" ;;
         --dir) shift; DIR="${1:-}"; USE_GIT=0 ;;
+        --site-only) SITE_ONLY=1 ;;
         -h|--help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;;
         *) die "Unknown option: $1" ;;
     esac
     shift
 done
+# shellcheck source=/dev/null
+. "$REPO/iso/release.conf"
+SUITE="$DEBIAN_CODENAME"
+PAGES_URL="${COPLAND_APT_URL%/apt}"
+
+if [ "$SITE_ONLY" -eq 0 ]; then
 if [ -z "$KEY" ]; then
     [ -f "$KEYRING" ] || die "packaging/copland-os-archive-keyring.gpg is missing."
     KEY="$(gpg --show-keys --with-colons "$KEYRING" | awk -F: '/^fpr/ {print $10; exit}')"
@@ -47,13 +55,12 @@ fi
 for t in apt-ftparchive gpg gzip; do command -v "$t" >/dev/null || die "$t is required (sudo apt install apt-utils gnupg)."; done
 gpg --list-secret-keys "$KEY" >/dev/null 2>&1 || die "No secret key $KEY in your gpg keyring (restore it from your backup: docs/BUILDING.md, 'apt repository')."
 
-# shellcheck source=/dev/null
-. "$REPO/iso/release.conf"
-SUITE="$DEBIAN_CODENAME"
-PAGES_URL="${COPLAND_APT_URL%/apt}"
 shopt -s nullglob
 DEBS=("$HERE"/out/*.deb)
 [ "${#DEBS[@]}" -gt 0 ] || die "No .deb in packaging/out/. Run ./packaging/build-deb.sh first."
+# a package goes public the moment gh-pages is pushed: say exactly which ones are new
+for d in "${DEBS[@]}"; do say "package to publish: $(basename "$d")"; done
+fi
 
 if [ "$USE_GIT" -eq 1 ]; then
     command -v git >/dev/null || die "git is required."
@@ -69,9 +76,11 @@ if [ "$USE_GIT" -eq 1 ]; then
 fi
 mkdir -p "$DIR"
 APT="$DIR/apt"
+POOL="$APT/pool/main/c/copland-os-desktop"
+
+if [ "$SITE_ONLY" -eq 0 ]; then
 
 say "Adding ${#DEBS[@]} package(s) to the pool"
-POOL="$APT/pool/main/c/copland-os-desktop"
 mkdir -p "$POOL"
 for d in "${DEBS[@]}"; do
     name="$(basename "$d")"
@@ -110,6 +119,7 @@ gpg --export "$KEY" > "$DIR/copland-os-archive-keyring.gpg"
 gpg --armor --export "$KEY" > "$DIR/copland-os-archive-keyring.asc"
 gpgv --keyring "$DIR/copland-os-archive-keyring.gpg" "$DISTS/InRelease" >/dev/null 2>&1 \
     || die "The new InRelease does not verify against the exported key."
+fi
 
 # GitHub Pages must serve files as they are
 touch "$DIR/.nojekyll"
@@ -127,7 +137,11 @@ if [ "$USE_GIT" -eq 1 ]; then
     if git -C "$DIR" diff --cached --quiet; then
         say "Nothing changed."
     else
-        git -C "$DIR" commit -q -m "Publish $(cd "$POOL" && ls | tr '\n' ' ')for $SUITE"
+        if [ "$SITE_ONLY" -eq 1 ]; then
+            git -C "$DIR" commit -q -m "Website"
+        else
+            git -C "$DIR" commit -q -m "Publish $(cd "$POOL" && ls | tr '\n' ' ')for $SUITE"
+        fi
         say "Committed on gh-pages. To publish, push it:"
         printf '\n    git -C %q push origin gh-pages\n\n' "$DIR"
     fi
