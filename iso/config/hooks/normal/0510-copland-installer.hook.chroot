@@ -7,7 +7,7 @@ set -e
 B=/etc/calamares/branding/copland
 S=/usr/share/copland-os/iso-branding
 install -d -m 755 "$B"
-install -m 644 "$S/branding.desc" "$S/show.qml" "$S/copland-logo.png" "$S/welcome.png" "$S/slide1.png" "$B/"
+install -m 644 "$S/branding.desc" "$S/show.qml" "$S/copland-logo.png" "$S/welcome.png" "$S/slide1.png" "$S/slide2.png" "$B/"
 
 # settings.conf: same as Debian's, with our branding folder
 dpkg-divert --local --rename --divert /etc/calamares/settings.conf.debian --add /etc/calamares/settings.conf

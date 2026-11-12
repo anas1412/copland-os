@@ -5,7 +5,7 @@
 title-text: ""
 desktop-image: "background.png"
 desktop-image-scale-method: "crop"
-desktop-color: "#171a31"
+desktop-color: "#000000"
 terminal-font: "DejaVu Sans Mono Regular 14"
 terminal-left: "10%"
 terminal-top: "10%"

@@ -292,3 +292,8 @@ removed, open an issue and it will be taken out.
 - Sign-off "Close the world, Open the nExt": the slogan of the 1998 *Serial Experiments Lain* PlayStation game.
 - fastfetch logo and installer banner: the built-in `LainOS` logo of [fastfetch](https://github.com/fastfetch-cli/fastfetch).
 - Boot animation (optional): <https://github.com/faisalhsn/copland-plymouth-theme>.
+- Boot menu orb: "Copland OS Enterprise" by the-blue-spyduck,
+  <https://www.deviantart.com/the-blue-spyduck/art/Copland-OS-Enterprise-131155946>, CC BY-NC-SA 3.0.
+- Login and installer logo: the vector Copland OS logo by @hasecilu, from
+  [The LainOS Project](https://github.com/The-LainOS-Project/LainOS-ricer-arch), CC BY-NC-SA 4.0.
+  Details for both: `core/assets/sources/CREDITS`.

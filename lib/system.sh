@@ -241,6 +241,8 @@ sys_browsers() {
 sys_greeter() {
     local cursor icons
     cursor="$CURSOR_THEME"; icons=NineIcons
+    # its own picture: navy, the logo above the box, the name below (tools/artwork.py)
+    put_file 644 "$ASSETS/backgrounds/CoplandOS-login.png" /usr/share/backgrounds/CoplandOS-login.png
     put_text 644 /etc/lightdm/lightdm-gtk-greeter.conf.d/50-copland.conf <<EOF
 # Copland OS login screen (read after Debian's 01_debian.conf, so these win)
 [greeter]
@@ -248,7 +250,7 @@ theme-name = CoplandOS
 icon-theme-name = $icons
 cursor-theme-name = $cursor
 cursor-theme-size = 24
-background = $SYS_WALL
+background = /usr/share/backgrounds/CoplandOS-login.png
 user-background = false
 font-name = C059 Bold Italic 11
 clock-format = %a %d %b  %H:%M
@@ -398,16 +400,15 @@ EOF
 # GRUB theme from core/boot/grub/copland, with fonts made by grub-mkfont and the
 # animation's first frame as background. Returns 1 (no theme) when a piece is missing.
 build_grub_theme() {
-    local g="$CORE/boot/grub/copland" frame="$TGT$PLY_DIR/progress-1.png" fonts=1
+    local g="$CORE/boot/grub/copland" fonts=1
     [ -f "$g/theme.txt" ] || { echo "no GRUB theme in core/boot/grub/copland"; return 1; }
     if [ "$DRY" -eq 1 ]; then
         printf '      %s[dry-run]%s build GRUB theme into %s\n' "$DM" "$R" "$TGT$GRUB_THEME_DIR"; return 0
     fi
     have grub-mkfont || { echo "grub-mkfont not found: boot menu keeps Debian's look"; return 1; }
-    [ -f "$frame" ] || { echo "boot animation frame missing: boot menu keeps Debian's look"; return 1; }
     local tmp; tmp="$(mktemp -d)"
+    # background.png is the-blue-spyduck's orb on black, made by tools/artwork.py
     cp "$g"/* "$tmp"/
-    cp "$frame" "$tmp/background.png"
     # fonts from the target, or from this machine when building into a staging folder
     local c059=/usr/share/fonts/opentype/urw-base35/C059-BdIta.otf mono=/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf
     [ -f "$TGT$c059" ] && c059="$TGT$c059"

@@ -259,6 +259,7 @@ step_greeter() {
         run sudo chmod -R go-w "/usr/share/icons/$cursor"
     fi
     run sudo install -D -m 644 "$WALL" /usr/share/backgrounds/CoplandOS.png
+    run sudo install -D -m 644 "$ASSETS/backgrounds/CoplandOS-login.png" /usr/share/backgrounds/CoplandOS-login.png
     # a drop-in, read after Debian's 01_debian.conf; the packaged file is not edited
     local dropin=/etc/lightdm/lightdm-gtk-greeter.conf.d/50-copland.conf
     if [ "$DRY" -eq 1 ]; then
@@ -266,7 +267,7 @@ step_greeter() {
     else
         sudo install -d -m 755 "$(dirname "$dropin")"
         printf '%s\n' '# Copland OS login screen' '[greeter]' 'theme-name = CoplandOS' "icon-theme-name = $icons" \
-            "cursor-theme-name = $cursor" 'cursor-theme-size = 24' 'background = /usr/share/backgrounds/CoplandOS.png' \
+            "cursor-theme-name = $cursor" 'cursor-theme-size = 24' 'background = /usr/share/backgrounds/CoplandOS-login.png' \
             'user-background = false' 'font-name = C059 Bold Italic 11' 'clock-format = %a %d %b  %H:%M' \
             | sudo tee "$dropin" >/dev/null
     fi

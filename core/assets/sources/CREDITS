@@ -1,0 +1,21 @@
+Sources the artwork in this repository is generated from (tools/artwork.py).
+
+copland-orb-the-blue-spyduck.png
+  "Copland OS Enterprise" by the-blue-spyduck, 2009, fan art of the Copland OS logo
+  from Serial Experiments Lain.
+  https://www.deviantart.com/the-blue-spyduck/art/Copland-OS-Enterprise-131155946
+  Licence: Creative Commons Attribution-NonCommercial-ShareAlike 3.0
+  (https://creativecommons.org/licenses/by-nc-sa/3.0/). The 800x600 rendition
+  DeviantArt serves without a login; the original is 1600x1200.
+  Used in: the boot menus (installed system and live ISO).
+
+copland-logo-hasecilu.svg
+  "Copland OS logo" by @hasecilu, from The LainOS Project
+  (https://github.com/The-LainOS-Project/LainOS-ricer-arch, usr/share/LainOS/Copland.svg).
+  Licence, as embedded in the file: Creative Commons Attribution-NonCommercial-ShareAlike
+  4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/).
+  Used in: the login screen and the installer's welcome picture, recoloured.
+
+Both are non-commercial, share-alike licences: the images made from them carry the
+same licence and these credits. If an author asks for their work to be removed, it
+will be taken out.

@@ -88,14 +88,21 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
   launchers (128). Keep it on navy; don't recolour it or put it on light backgrounds.
 - **Wallpaper:** the Copland OS Enterprise image from lain.wiki (source not stated there), 996×625, scaled to fill. Its eye and wordmark sit in
   the centre.
-- **Login screen:** the login box stays centred over the eye (decided 2026-11-11 after
-  comparing centre, left, right and bottom placements); the wordmark below it stays visible.
-- **Derived images:** live boot menu splash for BIOS 640×480
-  (`iso/config/bootloaders/syslinux_common/splash.png`), installer welcome and slide
-  467×293 (`iso/branding/`). They are generated from the wallpaper by covering and
-  cropping; regenerate them if the wallpaper changes. The UEFI live boot menu uses the
-  wallpaper itself (`iso/config/bootloaders/grub-pc/splash.png`), cropped to the screen
-  by GRUB, because it runs at the screen's own resolution.
+- **One picture per moment** (decided 2026-11-12): the eye-and-wordmark wallpaper was on the
+  boot menu, the login screen, the installer and the desktop, so it stopped meaning
+  anything. Now each moment has its own, all made by `tools/artwork.py` from the sources
+  in `core/assets/sources/` (credits and licences in its `CREDITS`):
+  - **Boot menus** (installed and live): the-blue-spyduck's scanline orb (CC BY-NC-SA 3.0)
+    on black, edges faded, the menu below it. A firmware screen should look technical and
+    quiet. The 800×600 rendition is used at its own size, never enlarged.
+  - **Boot animation:** the eye, unchanged (faisalhsn; the one moment the logo moves).
+  - **Login:** navy with the website's scanlines, hasecilu's vector logo (CC BY-NC-SA 4.0)
+    recoloured to `cyan` with a soft glow above the box, "Copland OS Enterprise" and
+    "Present day, present time." below it. The eye was just on screen during boot.
+  - **Installer:** the welcome picture is the same vector logo and wordmark; the slides
+    are the two real screenshots in `docs/`, so people see what they are installing.
+  - **Desktop:** the eye wallpaper, unchanged: it is what people know and share.
+  Rerun `tools/artwork.py` after changing a source, a screenshot or the palette.
 - **One resolution from boot menu to desktop:** GRUB runs at the screen's preferred
   mode (`GRUB_GFXMODE=auto`, from the screen's EDID) and hands that mode to Linux
   (`GRUB_GFXPAYLOAD_LINUX=keep`); the live image's menu does the same

@@ -131,7 +131,7 @@ You get the login screen in the same theme.
 |---|---|
 | `/usr/share/themes/CoplandOS`, `/usr/share/icons/<icons>`, the cursor theme | copies; they are snapshots, so run `greeter` again after changing the theme |
 | `/usr/share/backgrounds/CoplandOS.png` | the wallpaper |
-| `/etc/lightdm/lightdm-gtk-greeter.conf.d/50-copland.conf` | a drop-in with the theme, icons, cursor, wallpaper, font and clock. Debian's `/etc/lightdm/lightdm-gtk-greeter.conf` is not edited; if an older version of this installer left a `# copland-begin` block there, it is removed (a `.copland-bak` copy is made first) |
+| `/etc/lightdm/lightdm-gtk-greeter.conf.d/50-copland.conf` | a drop-in with the theme, icons, cursor, its own background (`/usr/share/backgrounds/CoplandOS-login.png`: the vector logo above the box, the name below), font and clock. Debian's `/etc/lightdm/lightdm-gtk-greeter.conf` is not edited; if an older version of this installer left a `# copland-begin` block there, it is removed (a `.copland-bak` copy is made first) |
 
 ### `boot` (off)
 

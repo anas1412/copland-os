@@ -20,12 +20,12 @@ terminal-font: "Unifont Regular 16"
 	font = "Unifont Regular 16"
 }
 
-#boot menu
+#boot menu: under the orb (splash.png), above the timeout bar
 + boot_menu {
-        left = 10%
-        width = 80%
-        top = 52%
-        height = 48%-80
+        left = 30%
+        width = 40%
+        top = 72%
+        height = 28%-90
         item_color = "#ccddff"
 	item_font = "Unifont Regular 16"
         selected_item_color= "#46baef"
