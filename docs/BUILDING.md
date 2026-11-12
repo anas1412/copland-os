@@ -149,6 +149,22 @@ had booted it, and its installer pages had to be redone. The commit you tag must
    - `config/bootloaders/` gives the image's own boot menu the Copland look.
 5. Renames the image, writes the checksum and the build record.
 
+### Withdrawing a release
+
+Normally a released version is never replaced: the next version fixes it. If one must be
+withdrawn and rebuilt under the same version (0.2.0 was, on 2026-11-12, before anyone but
+its author had it), the order matters, because two different packages with one version
+break apt and the image build:
+
+1. Take it out of apt first: `./packaging/publish-repo.sh --retract 0.2.0`, push
+   `gh-pages`, and wait until `apt/dists/<codename>/main/binary-amd64/Packages` no longer
+   lists it. (The rebuilt image installs its own package and stops when apt offers a
+   different one of the same version.)
+2. Delete the GitHub release and its tag: `gh release delete v0.2.0 --cleanup-tag`.
+3. Release again (above), then publish the new package to apt.
+4. Systems that installed the withdrawn build keep it until the next version; reinstall
+   test machines.
+
 ## Repeating a build
 
 The same commit of this repo always runs the same steps, and the boot animation is

@@ -5,6 +5,9 @@
 #   ./packaging/publish-repo.sh --site-only     the website only; packages and signatures untouched
 #   ./packaging/publish-repo.sh --dir DIR       build into DIR only (no git; for tests)
 #   ./packaging/publish-repo.sh --local         take packaging/out/*.deb instead (tests, with --dir)
+#   ./packaging/publish-repo.sh --retract X.Y.Z take version X.Y.Z out of the repository and
+#                                               re-sign (a release that was withdrawn: it must
+#                                               be gone before a new build of that version)
 #   ./packaging/publish-repo.sh --key KEYID     sign with another key (tests only)
 #
 # It signs with the key in packaging/copland-os-archive-keyring.gpg (the one the ISO
@@ -31,7 +34,7 @@ set -Eeuo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/.." && pwd)"
 KEYRING="$HERE/copland-os-archive-keyring.gpg"
-KEY=""; DIR=""; USE_GIT=1; SITE_ONLY=0; LOCAL=0
+KEY=""; DIR=""; USE_GIT=1; SITE_ONLY=0; LOCAL=0; RETRACT=""
 
 say() { printf ' > %s\n' "$*"; }
 die() { printf '\n x %s\n' "$*" >&2; exit 1; }
@@ -42,6 +45,7 @@ while [ $# -gt 0 ]; do
         --dir) shift; DIR="${1:-}"; USE_GIT=0 ;;
         --site-only) SITE_ONLY=1 ;;
         --local) LOCAL=1 ;;
+        --retract) shift; RETRACT="${1:-}"; [[ "$RETRACT" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "--retract needs a version like 0.2.0" ;;
         -h|--help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;;
         *) die "Unknown option: $1" ;;
     esac
@@ -61,7 +65,9 @@ for t in apt-ftparchive gpg gzip; do command -v "$t" >/dev/null || die "$t is re
 gpg --list-secret-keys "$KEY" >/dev/null 2>&1 || die "No secret key $KEY in your gpg keyring (restore it from your backup: docs/BUILDING.md, 'apt repository')."
 
 shopt -s nullglob
-if [ "$LOCAL" -eq 1 ]; then
+if [ -n "$RETRACT" ]; then
+    DEBS=()
+elif [ "$LOCAL" -eq 1 ]; then
     [ "$USE_GIT" -eq 0 ] || die "--local is for tests: use it with --dir."
     DEBS=("$HERE"/out/*.deb)
     [ "${#DEBS[@]}" -gt 0 ] || die "No .deb in packaging/out/. Run ./packaging/build-deb.sh first."
@@ -105,8 +111,14 @@ POOL="$APT/pool/main/c/copland-os-desktop"
 
 if [ "$SITE_ONLY" -eq 0 ]; then
 
-say "Adding ${#DEBS[@]} package(s) to the pool"
 mkdir -p "$POOL"
+if [ -n "$RETRACT" ]; then
+    gone="$POOL/copland-os-desktop_${RETRACT}+deb${DEBIAN_VERSION}_all.deb"
+    [ -f "$gone" ] || die "$(basename "$gone") is not in the repository."
+    rm -f "$gone"
+    say "Retracted $(basename "$gone"): apt no longer offers it once gh-pages is pushed"
+fi
+say "Adding ${#DEBS[@]} package(s) to the pool"
 for d in "${DEBS[@]}"; do
     name="$(basename "$d")"
     case "$name" in *"+deb${DEBIAN_VERSION}_"*) ;; *) die "$name was not built for Debian $DEBIAN_VERSION ($SUITE)." ;; esac
@@ -164,6 +176,8 @@ if [ "$USE_GIT" -eq 1 ]; then
     else
         if [ "$SITE_ONLY" -eq 1 ]; then
             git -C "$DIR" commit -q -m "Website"
+        elif [ -n "$RETRACT" ]; then
+            git -C "$DIR" commit -q -m "Retract copland-os-desktop $RETRACT for $SUITE"
         else
             git -C "$DIR" commit -q -m "Publish $(cd "$POOL" && ls | tr '\n' ' ')for $SUITE"
         fi
