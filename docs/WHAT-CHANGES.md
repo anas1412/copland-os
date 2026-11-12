@@ -30,7 +30,7 @@ font is Nimbus Sans.
 | `xfwm4 /general/theme` | `CoplandOS` |
 | `xfwm4 /general/title_font` | `C059 Bold Italic 10` |
 | `xfwm4 /general/title_alignment` | `center` |
-| `xfwm4 /general/button_layout` | `O|SHMC` |
+| `xfwm4 /general/button_layout` | `O|HMC` (app icon on the left; minimize, maximize, close on the right) |
 | `xfce4-notifyd /theme` | `CoplandOS` |
 | GNOME settings (if `gsettings` exists) | `gtk-theme`, `color-scheme prefer-dark`, `font-name` |
 

@@ -279,7 +279,7 @@ removed, open an issue and it will be taken out.
 
 ## Credits
 
-- GTK and xfwm4 theme: a recolour of [Greybird](https://github.com/shimmerproject/Greybird) (GPL-2.0-or-later / CC-BY-SA-3.0).
+- GTK theme: a recolour of [Greybird](https://github.com/shimmerproject/Greybird) (GPL-2.0-or-later / CC-BY-SA-3.0). Window frame: our own, drawn by `tools/xfwm4-frame.py`.
 - Icons: NineIcons from [Platinum9](https://github.com/grassmunk/Platinum9) by grassmunk (bundled; that repository declares no licence), plus a power glyph of our own.
 - Cursors: [Retrosmart Xcursor](https://github.com/useless-anvil/retrosmart-cursor) v2.0.3 by mdomlop and useless-anvil, GPL-3.0 (licence text in `core/assets/cursors/`).
 - Menu logo: "Copland Os Enterprise Icon" by PsyBear,

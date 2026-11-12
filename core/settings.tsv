@@ -6,7 +6,7 @@ theme	xsettings	/Net/ThemeName	string	CoplandOS
 theme	xfwm4	/general/theme	string	CoplandOS
 theme	xfwm4	/general/title_font	string	C059 Bold Italic 10
 theme	xfwm4	/general/title_alignment	string	center
-theme	xfwm4	/general/button_layout	string	O|SHMC
+theme	xfwm4	/general/button_layout	string	O|HMC
 theme	xfce4-notifyd	/theme	string	CoplandOS
 theme	xsettings	/Gtk/FontName	string	Nimbus Sans 10
 theme	xsettings	/Xft/Antialias	int	1
