@@ -41,6 +41,37 @@ Results in `iso/out/`, named from `iso/release.conf` (for example
 
 `sudo ./iso/build.sh --clean` removes the work folder, including the package cache.
 
+## Building in GitHub Actions (recommended)
+
+The ISO is built on GitHub's runners: free for public repositories, 4 CPUs and 16 GB of
+memory, against the 4 GB a small PC may have. Start it from the repository's Actions tab:
+**CoplandOS.iso**, **Run workflow**, pick the branch. It also runs by itself on a push to
+`main` that changes a file inside the image (`iso/`, `core/`, `lib/`, `tools/`,
+`packaging/`, `install.sh` or the workflow); README, `docs/` and `site/` never start a
+build. A newer push cancels an older running build; a manual start waits for it.
+
+What `.github/workflows/iso.yml` does, and why:
+
+- **A clean Debian 13 container** (`debian:trixie`, its exact digest written to the build
+  record) runs `iso/ci-build.sh`, which installs exactly what the build needs and calls
+  `iso/build.sh`. Nothing from a personal machine can leak into the image, and the same
+  commit builds the same way.
+- **No secrets.** The build only checks the apt repository against the public key in
+  `packaging/`; the signing key never goes near CI.
+- **Disk:** the runner has about 14 GB free, so the workflow first deletes preinstalled
+  SDKs the build does not use, then builds on whichever disk has the most room.
+- **Package cache:** every `.deb` live-build downloads is kept with `actions/cache`
+  and restored next time, so a rebuild downloads only what changed. The cache key follows
+  the package list and `iso/auto/config`; a changed list starts from the closest older
+  cache. It is saved even when a build fails, and older versions of a package are
+  dropped first, so it does not grow forever. live-build still upgrades the system
+  inside the image on every build, so a cache never makes an image older.
+- **Results:** the ISO is uploaded as a plain file (not zipped, so it can be written to a
+  USB stick as downloaded), plus a second artifact with the checksum, the build record,
+  the package list and the full log (also on failure). Both are kept 30 days.
+- **Pinned actions:** each action is pinned to a commit, with its version in a comment, so
+  a moved tag cannot change what runs. The workflow can only read the repository.
+
 ## What the build does
 
 1. Checks the tools, free space, the work folder, and that apt itself can use the

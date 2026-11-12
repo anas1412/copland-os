@@ -47,6 +47,10 @@ if [ -d "$ROOT/boot/grub/themes/copland" ]; then
     rm -rf "$ROOT/boot"
 fi
 [ -L "$ROOT/usr/share/backgrounds/xfce/xfce-x.svg" ] || die "Wallpaper link missing from staging."
+# a package without these would install, but without its boot look: stop instead
+[ -f "$ROOT/usr/share/copland-os/grub-theme/theme.txt" ] \
+    || { cat "$STAGE/stage.log"; die "The boot menu theme was not built (needs grub-common, fonts-urw-base35, fonts-dejavu-mono)."; }
+[ -f "$ROOT/usr/share/plymouth/themes/copland/copland.plymouth" ] || die "The boot animation is missing from staging."
 
 # licence and credits
 DOC="$ROOT/usr/share/doc/$PKG"

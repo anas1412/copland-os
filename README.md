@@ -36,6 +36,9 @@ installed system's boot menu both have the Copland look. The live user is `lain`
 
 ### Building it
 
+The easy way: GitHub Actions builds it for free (Actions tab, **CoplandOS.iso**, **Run
+workflow**); the ISO is attached to the run. To build on your own Debian 13 machine:
+
 ```bash
 sudo apt install live-build debootstrap wget git
 sudo ./iso/build.sh            # -> iso/out/CoplandOS-<version>-deb13-amd64.iso and .sha256

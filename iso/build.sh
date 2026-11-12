@@ -17,7 +17,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/.." && pwd)"
 WORK="${COPLAND_ISO_WORK:-/var/tmp/coplandos-build}"
 OUT="$HERE/out"
-NEED_GB=20
+NEED_GB="${COPLAND_NEED_GB:-20}"   # free space the build asks for; override for a measured smaller need
 PLYMOUTH_REPO="https://github.com/faisalhsn/copland-plymouth-theme.git"
 PLYMOUTH_COMMIT="4e336d9e264723634ae1ed5dd38888cd2ab37c52"   # same pin as install.sh
 
@@ -147,6 +147,8 @@ record_build() {
         echo "apt source:     $COPLAND_APT_URL $DEBIAN_CODENAME main"
         echo "debian release: $DEBIAN_VERSION ($DEBIAN_CODENAME), from iso/release.conf"
         echo "build host:     $(. /etc/os-release && echo "$PRETTY_NAME"), $(uname -m)"
+        [ -n "${COPLAND_BUILD_IMAGE:-}" ] && echo "container:      $COPLAND_BUILD_IMAGE"
+        [ -n "${GITHUB_RUN_ID:-}" ] && echo "ci run:         ${GITHUB_SERVER_URL:-https://github.com}/${GITHUB_REPOSITORY:-}/actions/runs/$GITHUB_RUN_ID"
         echo "boot animation: $PLYMOUTH_REPO @ $PLYMOUTH_COMMIT"
         echo "sha256:         $(cut -d' ' -f1 "$OUT/$name.sha256")"
         echo

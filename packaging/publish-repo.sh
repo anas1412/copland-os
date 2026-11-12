@@ -76,7 +76,12 @@ mkdir -p "$POOL"
 for d in "${DEBS[@]}"; do
     name="$(basename "$d")"
     case "$name" in *"+deb${DEBIAN_VERSION}_"*) ;; *) die "$name was not built for Debian $DEBIAN_VERSION ($SUITE)." ;; esac
-    cp -f "$d" "$POOL/$name"
+    # a published version never changes: apt clients and mirrors already hold its checksum
+    if [ -f "$POOL/$name" ]; then
+        cmp -s "$d" "$POOL/$name" || { say "$name is already published; keeping the published file (raise COPLAND_VERSION for a new one)"; }
+        continue
+    fi
+    cp "$d" "$POOL/$name"
 done
 
 say "Writing indexes for $SUITE"
