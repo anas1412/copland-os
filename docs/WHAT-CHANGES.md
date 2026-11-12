@@ -222,10 +222,14 @@ Undo with `core/browsers/copland-browsers.sh --undo`.
 
 ### Firefox
 
-Nothing to install. Firefox draws its tabs and toolbar from the GTK theme by
-default, so it follows CoplandOS once `theme` is installed (checked with Firefox
-ESR 153 on a fresh profile). A profile that already uses another Firefox theme
-keeps it.
+Nothing to install. Firefox draws its tabs and toolbar from the GTK theme, but it
+picks light or dark from the GNOME setting `color-scheme`. The `theme` component
+sets it to `prefer-dark` for your account, and `--system` (and so the ISO and the
+package) makes it the default for every account with a GSettings override in
+`/usr/share/glib-2.0/schemas/50_copland-os-theme.gschema.override`. Without it,
+Firefox stays light under the dark theme: found on the first installed ISO, and
+checked both ways with Firefox ESR 153 on a fresh profile. A profile that already
+uses another Firefox theme keeps it.
 
 ### Font smoothing (now part of `theme`)
 

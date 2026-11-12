@@ -170,6 +170,9 @@ sudo ./install.sh --system
 
 - Themes, icons, cursors and the wallpaper go to `/usr/share`, the helper
   commands to `/usr/local/bin`.
+- GNOME-side defaults (dark preference, theme, font, icons, cursor) go to
+  `/usr/share/glib-2.0/schemas/50_copland-os-*.gschema.override`, which Firefox and
+  other GTK apps read.
 - The XFCE settings go to `/etc/xdg/copland-os` as defaults, and
   `/etc/X11/Xsession.d/55copland-os` puts that folder first in XFCE's search path.
   Anyone's own changes still win over these defaults.

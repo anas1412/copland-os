@@ -127,17 +127,43 @@ sys_packages() {
     note "installed ${#missing[@]} packages"
 }
 
+# GNOME-side defaults (org.gnome.desktop.interface) for every account, the same values
+# the per-user installer sets with gsettings. Firefox and other GTK apps read them: without
+# color-scheme=prefer-dark Firefox picks its light look even under a dark GTK theme.
+# An override file in /usr/share/glib-2.0/schemas; Debian's libglib trigger recompiles the
+# schemas when a package installs or removes one, so only a direct --system run compiles.
+schema_default() {
+    local name=$1
+    put_text 644 "/usr/share/glib-2.0/schemas/50_copland-os-$name.gschema.override"
+    if on_live_root && have glib-compile-schemas; then run glib-compile-schemas /usr/share/glib-2.0/schemas || true; fi
+}
+
 sys_theme() {
     put_tree "$ASSETS/themes/CoplandOS" "$SYS_THEME"
+    schema_default theme <<'EOF'
+[org.gnome.desktop.interface]
+gtk-theme='CoplandOS'
+color-scheme='prefer-dark'
+font-name='Nimbus Sans 10'
+EOF
 }
 
 sys_icons() {
     put_tree "$ASSETS/icons/NineIcons" /usr/share/icons/NineIcons
     if on_live_root && have gtk-update-icon-cache; then run gtk-update-icon-cache -f -q /usr/share/icons/NineIcons || true; fi
+    schema_default icons <<'EOF'
+[org.gnome.desktop.interface]
+icon-theme='NineIcons'
+EOF
 }
 
 sys_cursors() {
     put_tree "$ASSETS/cursors/$CURSOR_THEME" "/usr/share/icons/$CURSOR_THEME"
+    schema_default cursors <<EOF
+[org.gnome.desktop.interface]
+cursor-theme='$CURSOR_THEME'
+cursor-size=24
+EOF
 }
 
 sys_wallpaper() {
@@ -457,6 +483,7 @@ system_uninstall() {
     for d in /etc/copland-os "$SYS_XDG" "${BROWSER_POLICY_DIRS[@]}"; do
         rmdir -p --ignore-fail-on-non-empty "$TGT$d" 2>/dev/null || true
     done
+    if on_live_root && have glib-compile-schemas; then glib-compile-schemas /usr/share/glib-2.0/schemas || true; fi
     if on_live_root && [ "$NO_REBUILD" -eq 0 ]; then
         have update-initramfs && update-initramfs -u -k all || true
         have update-grub && update-grub || true
