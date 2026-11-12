@@ -192,10 +192,10 @@
   <p class="lede">The operating system from <em>Serial Experiments Lain</em>, made real: a complete Debian 13
     computer in the Copland OS look, from the boot menu to the terminal. Free, live and installable.</p>
   <div class="actions">
-    <a class="btn" role="link" aria-disabled="true">Download CoplandOS.iso</a>
+    <a class="btn dl" href="https://github.com/anas1412/copland-os/releases/latest">Download CoplandOS.iso</a>
     <a class="btn quiet" href="#navi">See what you get</a>
   </div>
-  <p class="status">The first release is not out yet. It will be downloadable here, free.</p>
+  <p class="status dl-status">Free. Every release is on GitHub.</p>
 </header>
 
 <div class="wrap">
@@ -352,11 +352,11 @@
   <section id="wired" aria-labelledby="wired-t">
     <header class="card-title"><p class="layer">Layer:05</p><h2 id="wired-t">WIRED</h2><p class="sub">Get it</p></header>
     <div class="actions" style="justify-content:flex-start">
-      <a class="btn" role="link" aria-disabled="true">Download CoplandOS.iso</a>
+      <a class="btn dl" href="https://github.com/anas1412/copland-os/releases/latest">Download CoplandOS.iso</a>
     </div>
-    <p class="status" style="text-align:left">Not released yet.</p>
+    <p class="status dl-status" style="text-align:left">Free. Every release is on GitHub.</p>
     <ol class="steps">
-      <li><strong>Download CoplandOS.iso</strong> from this page.</li>
+      <li><strong>Download CoplandOS.iso</strong> with the button above (it always gives the newest release).</li>
       <li><strong>Put it on a USB stick</strong> with a free tool such as
         <a href="https://etcher.balena.io/">balenaEtcher</a> (Windows, macOS, Linux). This erases the stick.</li>
       <li><strong>Start your PC from the stick.</strong> Plug it in, restart, and press your PC's boot menu key
@@ -402,6 +402,33 @@
     });
     box.appendChild(b);
   });
+
+  // Download buttons: point at the ISO of the newest GitHub release, so the page never needs
+  // editing for a release. Without JavaScript, or if GitHub cannot be reached, they open
+  // the latest release page instead, which always exists.
+  (function () {
+    var buttons = document.querySelectorAll('.dl'), notes = document.querySelectorAll('.dl-status');
+    function say(text) { notes.forEach(function (n) { n.textContent = text; }); }
+    fetch('https://api.github.com/repos/anas1412/copland-os/releases/latest', { headers: { Accept: 'application/vnd.github+json' } })
+      .then(function (r) {
+        if (r.status === 404) {
+          buttons.forEach(function (b) { b.setAttribute('aria-disabled', 'true'); b.removeAttribute('href'); });
+          say('The first release is not out yet. It will be downloadable here, free.');
+          return null;
+        }
+        return r.ok ? r.json() : null;
+      })
+      .then(function (rel) {
+        if (!rel) return;
+        var iso = (rel.assets || []).filter(function (a) { return /\.iso$/.test(a.name); })[0];
+        if (!iso) return;
+        buttons.forEach(function (b) { b.href = iso.browser_download_url; });
+        var gib = (iso.size / 1073741824).toFixed(1);
+        var day = (rel.published_at || '').slice(0, 10);
+        say(rel.tag_name + (day ? ', released ' + day : '') + ', ' + gib + ' GiB. Free.');
+      })
+      .catch(function () { /* keep the link to the release page */ });
+  })();
 
   // Boot intro: once per visit, about a second, skipped by a click or any key, never with reduced motion
   (function () {

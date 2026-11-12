@@ -223,6 +223,11 @@ people who use computers, not for builders: build and packaging details stay on 
 - **Facts only, each with its source.** Requirements and dates from Debian, show facts
   from lain.wiki; a link sits next to each. Hardware figures are Debian 13's own
   (decided 2026-11-12).
+- **The download button finds the newest release itself.** It links to GitHub's
+  `releases/latest`; a script asks GitHub's API for that release and points the button
+  at its `.iso`, with version, date and size underneath. With no release yet, it says
+  so; without JavaScript, the link opens the release page. A release never needs an
+  edit to the site.
 - **No version numbers of apps or of the ISO.** Debian updates the apps all the time;
   a number on the page would be wrong within weeks. The page names only what changes
   with a new Debian release (Debian 13, XFCE 4.20), and the release checklist in
