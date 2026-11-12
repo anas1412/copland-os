@@ -159,6 +159,12 @@ step_terminal() {
     apply_settings terminal
 
     run install -D -m 644 "$CONFIG/fastfetch/config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
+    # the version fastfetch shows on its first line
+    if [ "$DRY" -eq 0 ]; then
+        mkdir -p "$STATE"; copland_version > "$STATE/version"; echo >> "$STATE/version"
+    else
+        run write "$STATE/version"
+    fi
     if [ -f "$HOME/.bashrc" ] && grep -q 'fastfetch' "$HOME/.bashrc"; then
         echo "~/.bashrc already runs fastfetch; left alone"
     elif [ "$DRY" -eq 0 ]; then

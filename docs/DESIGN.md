@@ -186,6 +186,11 @@ full stop instead.
 
 ### fastfetch labels
 
+The first line names the system and its version, `COPLAND OS ENTERPRISE 0.1.2`, read at
+each run from `~/.local/share/copland-os/version` (per-user install) or
+`/usr/share/copland-os/version` (ISO, package, `--system`), both written from
+`COPLAND_VERSION`. `BASE` below it names the Debian release, so both versions show.
+
 Twelve keys, in `core/config/fastfetch/config.jsonc`. Show terms where the show has one,
 plain words where it doesn't, so every line still reads at a glance:
 

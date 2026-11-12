@@ -19,6 +19,9 @@ trap 'on_err "$LINENO" "$BASH_COMMAND"' ERR
 trap 'printf "\n %sInterrupted. Nothing further was changed.%s\n" "$YL" "$R"; exit 130' INT TERM
 
 # ------------------------------------------------------------------ helpers
+# copland_version: the Copland OS version this copy of the repo installs (iso/release.conf)
+copland_version() { ( . "$SRC/iso/release.conf" 2>/dev/null && printf '%s' "${COPLAND_VERSION:-}" ); }
+
 # run: execute a command, or only print it in --dry-run
 run() {
     if [ "$DRY" -eq 1 ]; then printf '      %s[dry-run]%s %s\n' "$DM" "$R" "$*"; else "$@"; fi

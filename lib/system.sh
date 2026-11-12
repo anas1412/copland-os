@@ -184,6 +184,8 @@ sys_panel() {
 
 sys_terminal() {
     put_file 644 "$CONFIG/fastfetch/config.jsonc" /etc/skel/.config/fastfetch/config.jsonc
+    # the version fastfetch shows on its first line (the package and the ISO ship it too)
+    printf '%s\n' "$(copland_version)" | put_text 644 /usr/share/copland-os/version
     # btop: the theme in btop's own system folder (every account can pick it), the
     # settings for new accounts
     put_file 644 "$CONFIG/btop/copland.theme" /usr/share/btop/themes/copland.theme
