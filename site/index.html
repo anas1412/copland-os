@@ -47,7 +47,10 @@
   .bar .wrap { display: flex; align-items: center; gap: 1rem; height: 44px; }
   .bar .name { display: flex; align-items: center; gap: .5rem; text-decoration: none; color: var(--text);
                font: italic bold 1.05rem var(--brand); white-space: nowrap; }
-  .bar nav { margin-left: auto; display: flex; gap: .1rem; overflow-x: auto; scrollbar-width: none; }
+  /* the menu always fits (smaller on narrow phones, below); if a screen is narrower still it
+     can be swiped, but no scrollbar is ever drawn, in any browser */
+  .bar nav { margin-left: auto; display: flex; gap: .1rem; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+  .bar nav::-webkit-scrollbar { display: none; }
   .bar nav a { color: var(--text); text-decoration: none; font: italic bold .95rem var(--brand);
                padding: .35rem .55rem; border-bottom: 2px solid transparent; white-space: nowrap; }
   .bar nav a:hover { border-bottom-color: var(--cyan); color: var(--white); }
@@ -157,6 +160,11 @@
     .bar .name span { display: none; }
     .bar nav a { font-size: .85rem; padding: .35rem .32rem; }
     .hero { padding-top: 2.2rem; }
+  }
+  @media (max-width: 22.5rem) {
+    .bar .wrap { gap: .4rem; }
+    .bar nav { gap: 0; }
+    .bar nav a { font-size: .78rem; padding: .35rem .22rem; }
     .wires { margin-top: 2rem; height: 44px; }
     .pin { width: 1.25rem; height: 1.25rem; font-size: .68rem; }
   }

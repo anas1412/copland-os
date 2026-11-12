@@ -73,6 +73,24 @@ What `.github/workflows/iso.yml` does, and why:
 - **Pinned actions:** each action is pinned to a commit, with its version in a comment, so
   a moved tag cannot change what runs. The workflow can only read the repository.
 
+## Releasing a version
+
+A release is a version tag; CI builds the ISO and prepares a **draft** release, and a
+person publishes it after testing. Nothing reaches users untested: a draft is not public,
+and the website's download button only follows published releases.
+
+1. Raise `COPLAND_VERSION` in `iso/release.conf` (a published version never changes).
+   Commit and push.
+2. Publish the package of that version to the apt repository:
+   `./packaging/build-deb.sh`, `./packaging/publish-repo.sh`, then push `gh-pages`.
+3. Tag and push: `git tag v0.1.2 && git push origin v0.1.2`. The workflow stops at once
+   if the tag does not match `COPLAND_VERSION`.
+4. CI builds the ISO and creates a draft release with the ISO, its checksum, the build
+   record and the package list. The release notes give the checksum and the CI run.
+5. Download the ISO from the draft and test it in a VM (live session, install, login,
+   `apt update && apt upgrade`).
+6. Publish the draft on GitHub. From then on the website's download button points at it.
+
 ## What the build does
 
 1. Checks the tools, free space, the work folder, and that apt itself can use the
