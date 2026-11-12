@@ -100,7 +100,8 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
     recoloured to `cyan` with a soft glow above the box, "Copland OS Enterprise" and
     "Present day, present time." below it. The eye was just on screen during boot.
   - **Installer:** the welcome picture is the same vector logo and wordmark; the slides
-    are the two real screenshots in `docs/`, so people see what they are installing.
+    show real screenshots, so people see what they are installing (see "Installer
+    slideshow").
   - **Desktop:** the eye wallpaper, unchanged: it is what people know and share.
   Rerun `tools/artwork.py` after changing a source, a screenshot or the palette.
 - **One resolution from boot menu to desktop:** GRUB runs at the screen's preferred
@@ -256,6 +257,77 @@ plain words where it doesn't, so every line still reads at a glance:
 - **Not added on purpose:** Knights, Cyberia, Accela or episode titles as layer
   subtitles. None of them maps to a real part of the desktop, and they would break the
   plain-and-functional rule above.
+
+## Installer slideshow
+
+`iso/branding/show.qml`, shown by Calamares while it copies the system. A short tour,
+one topic per slide, like Ubuntu's and EndeavourOS's installer slides (read 2026-11-12).
+
+| Slide | Says | Picture |
+|---|---|---|
+| Welcome to Copland OS Enterprise | built on Debian 13, runs by itself, a few minutes | the desktop |
+| Four layers | Super+1 to 4 switches, Super+Shift+1 to 4 moves the window; Super is the Windows key | the top bar on Layer:02 |
+| The menu | Super opens it; the apps the ISO ships (`copland.list.chroot`) | the menu |
+| Updates | daily check, notification and top-bar icon, one click; or `sudo apt update && sudo apt upgrade` | none |
+| More software | everything in Debian, one command | a terminal with `sudo apt install libreoffice gimp vlc` typed, not run |
+| The terminal | fastfetch on every new terminal, btop | btop |
+| Help | website, GitHub issues, debian.org/doc; the sign-off | none |
+
+- **Every line is true of the installed system.** Check the repo before changing one:
+  the shortcuts are in `lib/components.sh` (`keys`), the apps and the update icon in
+  `iso/config/package-lists/copland.list.chroot`.
+- **Pictures are real and sharp:** 1:1 crops of real screenshots (`docs/screenshot-*.png`,
+  and `docs/installer/*.png`, taken in a fresh account at 1280x720), made by
+  `tools/artwork.py`. No picture is drawn to look like a screen. A slide without a real
+  picture has none (Updates: the icon only shows when updates are waiting).
+- **Fits any window:** each slide fills the panel and the picture shrinks to the room
+  left by the heading and the text (Calamares' `Slide` sits 20 % down by default, which
+  cut the text off). Checked at 840x480, the panel in a 1280x800 VM, and 600x400.
+- **Moves by itself, never runs away:** 25 s a slide (two lines take about 10 s to read),
+  only while the install page is shown (Qt's `Timer` does not run by default; Calamares'
+  example binds it to `activatedInCalamares`). A click, the arrow keys or a dot move on,
+  and the next slide gets its full 25 s. It starts from the first slide every time.
+- Navy-deep panel like the sidebar; headings in C059 Bold Italic, text in Nimbus Sans,
+  commands in DejaVu Sans Mono and `cyan`; dots `cyan` (here) and `term8`.
+
+## Installer extras (Apps and Developer tools)
+
+Two optional pages after Users (`iso/calamares/packagechooser-{apps,dev}.conf`); what is
+ticked is installed by `core/bin/copland-extras`, run inside the new system by the
+`copland-extras` job right after `sources-final` (Debian's online sources). Before that
+step apt only sees the ISO. The same tool is in the package: `sudo copland-extras`.
+
+- **Nothing ticked by default.** The plain install stays as small as before and works
+  offline. Offline, the job installs nothing, never fails the install, and leaves
+  `~/Extra software.txt` with the command to run later.
+- **Current and supported, from the nearest trustworthy source.** Debian first. When
+  Debian's version is past its maker's end of life, the next source: Node.js 24 from
+  NodeSource (Debian has 20, end of life 2026-04-30), Go from Debian backports (Debian
+  has 1.24, end of life 2026-02-10), Docker from Docker (Debian has 26.1, end of life
+  2025-02-17), Rust through Debian's rustup. Checked 2026-11-12 (nodejs/Release,
+  endoflife.date, qa.debian.org/madison).
+- **Outside repositories only when ticked**, under their makers' own file names (so the
+  vendor's package does not add a second copy), each key checked against a pinned
+  fingerprint before apt trusts it: Brave `DBF1A116...`, Microsoft `BC528686...`,
+  NodeSource `6F71F525...`, Docker `9DC85822...` (full values in the script).
+- **The Copland look wherever the app has a way in**, never over a user's own file:
+
+| App | How |
+|---|---|
+| Brave Origin | `BrowserThemeColor` policy (`navy`), like every Chromium browser |
+| VS Code | `settings.json`: palette colours, the 16 terminal colours, native title bar (the xfwm4 frame), DejaVu Sans Mono |
+| OBS Studio | `Copland.ovt`, a variant of OBS's Yami theme with the navies in Yami's grey order, chosen in `global.ini` |
+| GIMP 3 | its "System" theme, which draws with the GTK theme |
+| LibreOffice | `libreoffice-gtk3`: drawn with the GTK theme |
+| Thunderbird | GTK theme and dark scheme, like Firefox |
+| VLC, KeePassXC | Qt's GTK platform theme; `55copland-os` sets `QT_QPA_PLATFORMTHEME=gtk3` for Qt 5 (Qt 6 picks it on XFCE by itself) |
+| Flatpak apps | dark scheme through `xdg-desktop-portal-gtk` only: Flatpak apps cannot see the system GTK theme |
+
+- **Sizes on each item's card** (`tools/artwork.py`, `CHOICES`): download and disk,
+  measured 2026-11-12 with apt against the 0.1.2 ISO's own package list, so they are
+  what a fresh install really fetches. Items share parts (Python, Rust and C all pull
+  gcc), so several together download less than their sum. Rust's disk size is an estimate:
+  the unpacked toolchain was not measured. Re-measure when versions move.
 
 ## Website
 

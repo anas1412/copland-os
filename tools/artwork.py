@@ -12,7 +12,10 @@ One picture per moment, so the wallpaper's eye is not repeated on every screen:
   login screen   navy with scanlines, hasecilu's vector logo above the login box and the
                  wordmark below it          core/assets/backgrounds/CoplandOS-login.png
   installer      welcome picture: logo and wordmark      iso/branding/welcome.png
-                 slides: the two screenshots in docs/    iso/branding/slide1.png, slide2.png
+                 slide pictures: real screenshots, cropped 1:1 so the text stays sharp
+                 (docs/screenshot-*.png; docs/installer/*.png are already cropped,
+                 from a fresh account at 1280x720)
+                                                         iso/branding/slide-*.png
 
 Sources and their licences: core/assets/sources/CREDITS. The boot animation and the
 desktop wallpaper are not made here. Needs python3-gi with GdkPixbuf (SVG loader),
@@ -186,14 +189,16 @@ def welcome(w=467, h=293):
     return s
 
 
-def slide(shot, w=640, h=360):
-    """a docs/ screenshot, scaled to the slide with a thin blue frame"""
+def slide(shot, box=None, scale=1.0):
+    """part of a docs/ screenshot (box = x, y, w, h), scaled by `scale`, with a thin
+    blue frame; 1:1 crops keep the screen's own text sharp in the installer"""
     src = cairo.ImageSurface.create_from_png(os.path.join(ROOT, "docs", shot))
+    x, y, bw, bh = box or (0, 0, src.get_width(), src.get_height())
+    w, h = round(bw * scale), round(bh * scale)
     s = cairo.ImageSurface(cairo.FORMAT_RGB24, w, h)
     c = cairo.Context(s)
-    k = min(w / src.get_width(), h / src.get_height())
-    c.scale(k, k)
-    c.set_source_surface(src, 0, 0)
+    c.scale(scale, scale)
+    c.set_source_surface(src, -x, -y)
     c.get_source().set_filter(cairo.FILTER_BEST)
     c.paint()
     c.identity_matrix()
@@ -202,6 +207,72 @@ def slide(shot, w=640, h=360):
     c.rectangle(1, 1, w - 2, h - 2)
     c.stroke()
     return s
+
+
+# The installer's Apps and Developer tools pages (iso/calamares/packagechooser-*.conf):
+# one card per item with what a person must know before ticking it: where it comes
+# from, and how much it downloads and takes on disk. Sizes were measured 2026-11-12 with
+# apt against the 0.1.2 ISO's own package set (docs/DESIGN.md, "Installer extras");
+# Rust adds the toolchain rustup fetches. Rounded, since versions move.
+CHOICES = [
+    # id, name, source, MB download, MB on disk
+    ("brave", "Brave Origin", "Brave's own repository", 133, 469),
+    ("libreoffice", "LibreOffice", "Debian", 104, 381),
+    ("thunderbird", "Thunderbird", "Debian", 76, 318),
+    ("gimp", "GIMP", "Debian", 43, 239),
+    ("vlc", "VLC", "Debian", 29, 125),
+    ("obs", "OBS Studio", "Debian", 49, 195),
+    ("keepassxc", "KeePassXC", "Debian", 20, 74),
+    ("flatpak", "Flatpak and Flathub", "Debian; apps from Flathub", 2, 11),
+    ("vscode", "Visual Studio Code", "Microsoft's repository", 278, 1141),
+    ("python", "Python", "Debian", 104, 418),
+    ("node", "Node.js", "NodeSource's repository", 38, 246),
+    ("go", "Go", "Debian backports", 125, 571),
+    # Rust on disk is an estimate (apt part measured; the unpacked toolchain was not)
+    ("rust", "Rust", "Debian's rustup; toolchain from rust-lang.org", 237, 1270),
+    ("java", "Java", "Debian", 415, 718),
+    ("cpp", "C and C++", "Debian", 103, 408),
+    ("docker", "Docker", "Docker's repository", 98, 391),
+    ("podman", "Podman", "Debian", 79, 326),
+]
+INTROS = [
+    ("apps", "Apps"),
+    ("dev", "Developer tools"),
+]
+
+
+def about(mb):
+    """10 MB steps above 100 MB, 5 MB below: precise enough, honest about drift"""
+    step = 10 if mb >= 100 else 5
+    mb = max(step, round(mb / step) * step)
+    return "%.1f GB" % (mb / 1024) if mb >= 1000 else "%d MB" % mb
+
+
+def card(name, lines, w=640, h=400):
+    s = cairo.ImageSurface(cairo.FORMAT_RGB24, w, h)
+    c = cairo.Context(s)
+    navy_field(c, w, h)
+    text(c, name, "C059 Bold Italic %d" % round(h * 0.11), WHITE, w / 2, h * 0.36)
+    for i, (line, colour) in enumerate(lines):
+        text(c, line, "Nimbus Sans %d" % round(h * 0.05), colour, w / 2, h * (0.56 + 0.1 * i))
+    c.set_source_rgb(*rgb("#197aba"))
+    c.set_line_width(2)
+    c.rectangle(1, 1, w - 2, h - 2)
+    c.stroke()
+    return s
+
+
+def choices():
+    br = ("iso", "branding")
+    for ident, name in INTROS:
+        save(card(name, [("Nothing is ticked: the plain install stays", TEXT),
+                         ("small and works offline.", TEXT),
+                         ("Items share parts: several together download less.", TEXT_DIM)]),
+             out(*br, "choose-%s.png" % ident))
+    for ident, name, source, dl, disk in CHOICES:
+        save(card(name, [("From " + source, CYAN),
+                         ("About %s to download, %s on disk" % (about(dl), about(disk)), TEXT)]),
+             out(*br, "choose-%s.png" % ident))
 
 
 def main():
@@ -213,8 +284,19 @@ def main():
     save(boot_menu(640, 480, 180, 105), out("iso", "config", "bootloaders", "syslinux_common", "splash.png"))
     save(login(), out("core", "assets", "backgrounds", "CoplandOS-login.png"))
     save(welcome(), out("iso", "branding", "welcome.png"))
-    save(slide("screenshot-desktop.png"), out("iso", "branding", "slide1.png"))
-    save(slide("screenshot-apps.png"), out("iso", "branding", "slide2.png"))
+    # installer slideshow (iso/branding/show.qml), one picture per slide that has one
+    br = ("iso", "branding")
+    save(slide("screenshot-desktop.png", scale=0.4), out(*br, "slide-welcome.png"))
+    # the top bar's right half on Layer:02: the four layer buttons, the second one active
+    save(slide(os.path.join("installer", "layer2.png")), out(*br, "slide-layers.png"))
+    # the menu without its bottom row (search field and the account's name)
+    save(slide(os.path.join("installer", "menu.png")), out(*br, "slide-menu.png"))
+    # a new terminal: fastfetch, then the install line typed at the prompt (never run)
+    save(slide(os.path.join("installer", "terminal.png")), out(*br, "slide-software.png"))
+    # btop beside it, from the desktop screenshot
+    save(slide("screenshot-apps.png", (930, 40, 670, 600)), out(*br, "slide-terminal.png"))
+    # one card per item on the installer's Apps and Developer tools pages
+    choices()
 
 
 if __name__ == "__main__":

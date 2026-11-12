@@ -129,7 +129,12 @@ stage() {
     mkdir -p "$inc/usr/share/copland-os/iso-branding"
     cp -a "$HERE/branding/." "$inc/usr/share/copland-os/iso-branding/"
     fill "$inc/usr/share/copland-os/iso-branding/branding.desc"
-    if grep -rqE '@(COPLAND|DEBIAN)_VERSION@' "$WORK/config" "$inc/usr/share/copland-os/iso-branding"; then die "A release placeholder was left unfilled."; fi
+    fill "$inc/usr/share/copland-os/iso-branding/show.qml"
+    # the installer's Apps and Developer tools pages and their job (the 0510 hook installs them)
+    mkdir -p "$inc/usr/share/copland-os/iso-calamares"
+    cp -a "$HERE/calamares/." "$inc/usr/share/copland-os/iso-calamares/"
+    if grep -rqE '@(COPLAND|DEBIAN)_VERSION@' "$WORK/config" "$inc/usr/share/copland-os/iso-branding" \
+        "$inc/usr/share/copland-os/iso-calamares"; then die "A release placeholder was left unfilled."; fi
 }
 
 # record_build NAME: what went into the image, next to it, so a build can be traced and repeated

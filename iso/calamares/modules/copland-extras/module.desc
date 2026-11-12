@@ -1,0 +1,7 @@
+# Copland OS: install what was ticked on the Apps and Developer tools pages.
+# Runs after Debian's online sources are written (sources-final). See main.py.
+---
+type:       "job"
+name:       "copland-extras"
+interface:  "python"
+script:     "main.py"

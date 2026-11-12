@@ -22,17 +22,58 @@ Website: <https://anas1412.github.io/copland-os/>
 The main way to get Copland OS: a live and installable image. Boot it from USB to try
 it, then install it with the Copland-branded installer.
 
-**Status: no image has been released yet.** Until the first release you can build it
-yourself (below); everything inside it is the same code the installer uses.
+Download it from the [latest release](https://github.com/anas1412/copland-os/releases/latest),
+or build it yourself (below); everything inside it is the same code the installer uses.
 
 What is in it: Debian 13 with a lean XFCE desktop
 (Firefox ESR, terminal, file manager, text editor, image and PDF viewers, no
-LibreOffice), Copland OS installed as the `copland-os-desktop` package (the same
+LibreOffice: that and more are one tick away, see below), Copland OS installed as the `copland-os-desktop` package (the same
 files as `--system`), and the Calamares installer branded as Copland OS. Installed
 systems get Debian's updates and Copland's with the same `sudo apt update && sudo apt
 upgrade` (or one click on the update icon in the top bar, which checks once a day): the image includes Copland's signed apt source next to Debian's. The image's own boot menu and the
 installed system's boot menu both have the Copland look. The live user is `lain`
 (password `live`, live-config's default) and the hostname `coplandos`.
+
+### Extra apps and developer tools
+
+The installer has two optional pages after Users, **Apps** and **Developer tools**.
+Nothing is ticked: the plain install stays small and works offline. Whatever you tick
+is downloaded at the end of the install (it needs an internet connection; without one
+the install still finishes, and a note in your home folder says what to run later).
+
+| Apps | From | | Developer tools | From |
+|---|---|---|---|---|
+| Brave Origin (becomes the default browser) | Brave's repository | | Visual Studio Code | Microsoft's repository |
+| LibreOffice (Writer, Calc, Impress) | Debian | | Python (pip, venv, pipx) | Debian |
+| Thunderbird | Debian | | Node.js, current LTS | NodeSource's repository |
+| GIMP | Debian | | Go, current release | Debian backports |
+| VLC | Debian | | Rust (rustup, stable toolchain) | Debian's rustup |
+| OBS Studio | Debian | | Java (OpenJDK 25) | Debian |
+| KeePassXC | Debian | | C and C++ (gcc, make, cmake, gdb) | Debian |
+| Flatpak and Flathub | Debian + Flathub | | Docker with Compose and Buildx | Docker's repository |
+| | | | Podman with podman-compose | Debian |
+
+Each item's card in the installer shows its download and disk size. Languages come
+from wherever their current, supported version is: Debian's own Node.js 20, Go 1.24 and
+Docker 26 are past their makers' end of life, so those three come from newer sources.
+An outside repository is added only when its item is ticked, and its signing key is
+checked against the published fingerprint first.
+
+Everything gets the Copland look where the app allows it: Brave by the same colour
+policy as other Chromium browsers, VS Code with Copland colours, terminal palette and
+the system's window frame, OBS with a Copland theme, GIMP with its System theme
+(follows the desktop), LibreOffice through its GTK plugin, VLC and KeePassXC through
+Qt's GTK theme. Your own settings are never overwritten.
+
+The same tool works on an installed system, any time:
+
+```bash
+sudo copland-extras --list
+```
+
+```bash
+sudo copland-extras vscode node docker
+```
 
 ### Building it
 
@@ -121,7 +162,7 @@ Every file and setting each component touches, and how to undo it: [docs/WHAT-CH
 | `terminal` | on | xfce4-terminal palette and font, fastfetch config, `~/.bashrc` hook, btop theme |
 | `layers` | on | 4 workspaces named Layer:01–04 (an app asking for attention takes you to its layer) |
 | `keys` | on | the Super (Windows) key opens the Copland menu; Super+1–4 (number row or numpad) jump to Layer:01–04; Super+Shift+1–4 send the focused window there |
-| `browsers` | off | Copland colour for Chromium-family browsers (Brave, Chromium, Chrome, Edge) by managed policy; Firefox follows the GTK theme on its own (sudo) |
+| `browsers` | off | Copland colour for Chromium-family browsers (Brave, Chromium, Chrome, Edge) by managed policy; Firefox follows the GTK theme on its own. Also installs `copland-extras` (more apps, see CoplandOS.iso above) (sudo) |
 | `greeter` | off | LightDM login screen in the same theme (sudo) |
 | `boot` | off | Plymouth boot animation from a third-party repo (sudo, experimental) |
 | `autologin` | off | log in automatically at startup as you, no password (LightDM, sudo) |
@@ -195,10 +236,10 @@ sudo ./install.sh --system
 `--root DIR` writes under another folder (the ISO build uses it), `--no-packages`
 and `--no-rebuild` skip apt and the initramfs/GRUB rebuild.
 
-## Install with apt (not published yet)
+## Install with apt
 
-Once the repository is published, any Debian 13 XFCE system can get Copland OS as a
-normal package and keep it updated with `apt`. It works like any third-party apt
+Any Debian 13 XFCE system can get Copland OS as a normal package and keep it updated
+with `apt`. It works like any third-party apt
 repository (Brave's, for example): Debian's own sources stay as they are, and one
 more source is added for this one package. CoplandOS.iso already includes it.
 
@@ -261,11 +302,12 @@ lib/                          the installer's parts: ui, common, components (per
 core/settings.tsv             every XFCE setting, once (used by both modes)
 core/assets/                  theme (with logo), icons, cursors, wallpaper
 core/config/                  fastfetch config, btop theme and settings
-core/bin/                     copland-goto, copland-send (the layer shortcuts)
+core/bin/                     copland-goto, copland-send (the layer shortcuts), copland-extras
 core/boot/                    full-screen boot script, GRUB theme, copland-boot.sh
 core/browsers/                browser colour policy and copland-browsers.sh
 tools/xfconf-xml.py           settings.tsv -> XFCE default files for --system
-iso/                          live-build config, hooks, boot menu, installer branding, build.sh;
+iso/                          live-build config, hooks, boot menu, installer branding and pages
+                              (iso/calamares), build.sh;
                               release.conf sets the Copland OS version and the Debian release
 packaging/                    builds the copland-os-desktop .deb and publishes the apt repository
 site/                         the website, published with the apt repository on GitHub Pages

@@ -14,7 +14,7 @@ TITLE[panel]="Top bar";            DESC[panel]="replaces your panel layout (back
 TITLE[terminal]="Terminal";        DESC[terminal]="palette, font, fastfetch, btop";                ON[terminal]=1;  SUDO[terminal]=0
 TITLE[layers]="Layers";            DESC[layers]="4 workspaces named Layer:01-04";                       ON[layers]=1;    SUDO[layers]=0
 TITLE[keys]="Shortcuts";           DESC[keys]="Super menu, Super+1-4 go, +Shift send";                ON[keys]=1;      SUDO[keys]=0
-TITLE[browsers]="Browsers";       DESC[browsers]="Copland colour for Chromium-family browsers";  ON[browsers]=0;  SUDO[browsers]=1
+TITLE[browsers]="Browsers";       DESC[browsers]="Chromium colour, and copland-extras for more apps";  ON[browsers]=0;  SUDO[browsers]=1
 TITLE[greeter]="Login screen";     DESC[greeter]="LightDM greeter in the same theme";              ON[greeter]=0;   SUDO[greeter]=1
 TITLE[boot]="Boot animation";      DESC[boot]="Plymouth theme, third-party, experimental";         ON[boot]=0;      SUDO[boot]=1
 TITLE[autologin]="Auto login";     DESC[autologin]="log you in at startup, no password (LightDM)";  ON[autologin]=0; SUDO[autologin]=1
@@ -228,7 +228,9 @@ step_keys() {
 step_browsers() {
     [ -f "$CORE/browsers/copland-browsers.sh" ] || skip "core/browsers is missing"
     run bash "$CORE/browsers/copland-browsers.sh"
+    run install -D -m 755 "$BINSRC/copland-extras" "$BIN_DIR/copland-extras"
     note "Chromium-family browsers get the Copland colour; Firefox follows the GTK theme"
+    note "More apps and developer tools, in the Copland look: sudo $BIN_DIR/copland-extras --list"
 }
 
 step_greeter() {

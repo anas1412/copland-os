@@ -97,7 +97,7 @@ preflight_system() {
     local f
     for f in assets/themes/CoplandOS/gtk-3.0/gtk.css assets/backgrounds/CoplandOS.png assets/icons/NineIcons/index.theme \
              "assets/cursors/$CURSOR_THEME/index.theme" settings.tsv config/fastfetch/config.jsonc \
-             bin/copland-goto bin/copland-send; do
+             bin/copland-goto bin/copland-send bin/copland-extras; do
         [ -e "$CORE/$f" ] || die "The Copland OS folder is incomplete: core/$f is missing."
     done
     [ -x "$SRC/tools/xfconf-xml.py" ] || die "tools/xfconf-xml.py is missing."
@@ -235,7 +235,10 @@ sys_browsers() {
     for d in "${BROWSER_POLICY_DIRS[@]}"; do
         put_file 644 "$CORE/browsers/copland-theme.json" "$d/copland-theme.json"
     done
+    # optional apps and developer tools, themed (the ISO's installer pages use it too)
+    put_file 755 "$BINSRC/copland-extras" "$SYS_BIN/copland-extras"
     note "Chromium-family browsers get the Copland colour; Firefox follows the GTK theme"
+    note "More apps and developer tools, in the Copland look: sudo copland-extras --list"
 }
 
 sys_greeter() {
@@ -445,6 +448,13 @@ case ":${XDG_CONFIG_DIRS:-}:" in
     *:/etc/xdg/copland-os:*) ;;
     *) XDG_CONFIG_DIRS="/etc/xdg/copland-os:${XDG_CONFIG_DIRS:-/etc/xdg}"; export XDG_CONFIG_DIRS ;;
 esac
+# Qt apps (VLC, KeePassXC...) draw with the GTK theme, so they are in Copland colours too.
+# Qt 6 does this by itself on XFCE; Qt 5 needs to be told. Only when the plugin is there.
+if [ -z "${QT_QPA_PLATFORMTHEME:-}" ]; then
+    for f in /usr/lib/*/qt5/plugins/platformthemes/libqgtk3.so /usr/lib/*/qt6/plugins/platformthemes/libqgtk3.so; do
+        if [ -e "$f" ]; then QT_QPA_PLATFORMTHEME=gtk3; export QT_QPA_PLATFORMTHEME; break; fi
+    done
+fi
 EOF
 }
 

@@ -1,0 +1,422 @@
+#!/usr/bin/env bash
+# copland-extras: install optional apps and developer tools, in the Copland look.
+#
+#   sudo copland-extras --list                 what can be installed
+#   sudo copland-extras brave vscode node      install these (the account that ran sudo
+#                                              gets the per-user settings)
+#   sudo copland-extras --user NAME ID...      settings for another account
+#   sudo copland-extras --dry-run ID...        show what would happen, change nothing
+#
+# The Copland OS installer runs it at the end of an install, after Debian's online
+# sources are in place, with the items ticked on its "Apps" and "Developer tools" pages.
+# Run it again any time: items already installed are only updated and re-themed.
+#
+# Debian's own packages come from Debian. Four items come from their makers' apt
+# repositories (Brave, Microsoft, NodeSource, Docker), added only when the item is
+# picked, with the signing key checked against its published fingerprint. Go comes
+# from Debian's backports, Rust from rustup (Debian's package), Flatpak apps from
+# Flathub. A per-user setting is never overwritten: an existing file is left alone.
+set -uo pipefail
+
+PROG=copland-extras
+# palette tokens (docs/DESIGN.md)
+NAVY=#25346a NAVY_DEEP=#101838 NAVY_INK=#141c3a NAVY_RAISED=#1c2852
+CYAN=#46baef BLUE=#197aba TEXT=#ccddff TEXT_DIM=#738dc1 TERM8=#4a5c9a
+
+# id | page | name | what it installs (shown by --list and the installer)
+ITEMS=(
+  "brave|apps|Brave Origin|Brave without its AI, Rewards, Wallet and VPN; ad blocking stays. Becomes the default browser (Brave's repository)"
+  "libreoffice|apps|LibreOffice|Writer, Calc and Impress (Debian)"
+  "thunderbird|apps|Thunderbird|mail and calendar (Debian)"
+  "gimp|apps|GIMP|image editor (Debian)"
+  "vlc|apps|VLC|video and music player (Debian)"
+  "obs|apps|OBS Studio|screen recording and streaming (Debian)"
+  "keepassxc|apps|KeePassXC|password manager (Debian)"
+  "flatpak|apps|Flatpak and Flathub|apps like Steam, Discord and Spotify from Flathub (Debian + Flathub)"
+  "vscode|dev|Visual Studio Code|code editor (Microsoft's repository)"
+  "python|dev|Python|pip, venv and pipx for Python 3 (Debian)"
+  "node|dev|Node.js|current LTS with npm (NodeSource's repository)"
+  "go|dev|Go|current Go (Debian backports)"
+  "rust|dev|Rust|rustup with the current stable toolchain (Debian's rustup)"
+  "java|dev|Java|OpenJDK 25, the current LTS (Debian)"
+  "cpp|dev|C and C++|gcc, g++, make, cmake and gdb (Debian)"
+  "docker|dev|Docker|Docker Engine with Compose and Buildx (Docker's repository)"
+  "podman|dev|Podman|rootless containers with podman-compose (Debian)"
+)
+
+# signing keys: where they come from, and a fingerprint each must contain
+BRAVE_KEY_URL=https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+BRAVE_FPR=DBF1A116C220B8C7164F98230686B78420038257
+MS_KEY_URL=https://packages.microsoft.com/keys/microsoft.asc
+MS_FPR=BC528686B50D79E339D3721CEB3E94ADBE1229CF
+NODE_KEY_URL=https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+NODE_FPR=6F71F525282841EEDAF851B42F59B5F99B1BE0B4
+NODE_MAJOR=24
+DOCKER_KEY_URL=https://download.docker.com/linux/debian/gpg
+DOCKER_FPR=9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+
+DRY=0 USER_NAME="${SUDO_USER:-}" FROM_INSTALLER=0
+declare -a WANT=() DONE=() FAILED=()
+
+say()  { printf '%s: %s\n' "$PROG" "$*"; }
+warn() { printf '%s: warning: %s\n' "$PROG" "$*" >&2; }
+die()  { printf '%s: %s\n' "$PROG" "$*" >&2; exit 2; }
+run()  { if [ "$DRY" -eq 1 ]; then printf '  would run: %s\n' "$*"; else "$@"; fi; }
+
+usage() { sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; }
+
+list() {
+    local it id page name what last=""
+    for it in "${ITEMS[@]}"; do
+        IFS='|' read -r id page name what <<<"$it"
+        if [ "$page" != "$last" ]; then
+            [ "$page" = apps ] && echo "Apps" || printf '\nDeveloper tools\n'
+            last=$page
+        fi
+        printf '  %-12s %s: %s\n' "$id" "$name" "$what"
+    done
+}
+
+known() { local it; for it in "${ITEMS[@]}"; do [ "${it%%|*}" = "$1" ] && return 0; done; return 1; }
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --list) list; exit 0 ;;
+        --dry-run) DRY=1 ;;
+        --user) USER_NAME="${2:-}"; shift ;;
+        --from-installer) FROM_INSTALLER=1 ;;
+        -h|--help) usage; exit 0 ;;
+        -*) die "unknown option $1 (see --help)" ;;
+        *) for id in ${1//,/ }; do known "$id" || die "unknown item '$id' (see --list)"; WANT+=("$id"); done ;;
+    esac
+    shift
+done
+[ ${#WANT[@]} -gt 0 ] || { usage; exit 0; }
+[ "$DRY" -eq 1 ] || [ "$(id -u)" -eq 0 ] || die "run it with sudo"
+
+. /etc/os-release
+CODENAME="${VERSION_CODENAME:-trixie}"
+ARCH="$(dpkg --print-architecture)"
+export DEBIAN_FRONTEND=noninteractive
+APT=(apt-get -y -q -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold)
+
+HOME_DIR="" USER_GROUP=""
+if [ -n "$USER_NAME" ] && getent passwd "$USER_NAME" >/dev/null; then
+    HOME_DIR="$(getent passwd "$USER_NAME" | cut -d: -f6)"
+    USER_GROUP="$(id -gn "$USER_NAME")"
+elif [ -n "$USER_NAME" ]; then
+    warn "no account '$USER_NAME': per-user settings go to /etc/skel only"
+    USER_NAME=""
+fi
+
+# ------------------------------------------------------------------ helpers
+
+# a key file from $1 to $2, accepted only if it carries fingerprint $3
+fetch_key() {
+    local url=$1 dest=$2 fpr=$3 tmp
+    [ "$DRY" -eq 1 ] && { printf '  would fetch %s to %s (fingerprint %s)\n' "$url" "$dest" "$fpr"; return 0; }
+    tmp="$(mktemp)"
+    curl -fsSL --retry 3 --max-time 60 "$url" -o "$tmp" || { rm -f "$tmp"; warn "could not download $url"; return 1; }
+    if ! gpg --show-keys --with-colons "$tmp" 2>/dev/null | awk -F: '/^fpr/{print $10}' | grep -qx "$fpr"; then
+        rm -f "$tmp"; warn "$url does not carry the expected key $fpr: not trusted"; return 1
+    fi
+    install -D -m 644 "$tmp" "$dest"; rm -f "$tmp"
+}
+
+# an apt source in deb822 form: file, URI, suite, component, keyring
+add_source() {
+    local file=$1 uri=$2 suite=$3 comp=$4 key=$5
+    [ "$DRY" -eq 1 ] && { printf '  would add %s (%s %s)\n' "$file" "$uri" "$suite"; return 0; }
+    cat > "$file" <<EOF
+Types: deb
+URIs: $uri
+Suites: $suite
+Components: $comp
+Architectures: $ARCH
+Signed-By: $key
+EOF
+}
+
+NEED_UPDATE=1
+apt_update() { [ "$NEED_UPDATE" -eq 1 ] || return 0; run "${APT[@]}" update && NEED_UPDATE=0; }
+apt_install() { apt_update && run "${APT[@]}" install "$@"; }
+
+# a per-user file: written into /etc/skel (accounts made later) and the user's home,
+# never over an existing one. $1 path below home, $2 mode; content on stdin
+user_file() {
+    local rel=$1 mode=$2 content dest
+    content="$(cat)"
+    for dest in "/etc/skel/$rel" ${HOME_DIR:+"$HOME_DIR/$rel"}; do
+        if [ -e "$dest" ]; then say "  kept your $dest"; continue; fi
+        [ "$DRY" -eq 1 ] && { printf '  would write %s\n' "$dest"; continue; }
+        install -d -m 755 "$(dirname "$dest")"
+        printf '%s\n' "$content" > "$dest"; chmod "$mode" "$dest"
+        # in the user's home, the file and the folders above it belong to the user
+        if [ -n "$HOME_DIR" ] && [ "${dest#"$HOME_DIR"/}" != "$dest" ]; then
+            local d=$dest
+            while [ "$d" != "$HOME_DIR" ] && [ "$d" != / ]; do
+                chown "$USER_NAME:$USER_GROUP" "$d"; d="$(dirname "$d")"
+            done
+        fi
+    done
+}
+
+as_user() { [ -n "$USER_NAME" ] && run runuser -u "$USER_NAME" -- env HOME="$HOME_DIR" "$@"; }
+
+# ------------------------------------------------------------------ items
+
+item_brave() {
+    fetch_key "$BRAVE_KEY_URL" /usr/share/keyrings/brave-browser-archive-keyring.gpg "$BRAVE_FPR" || return 1
+    # the same file name and keyring Brave's own instructions use, so nothing is doubled
+    add_source /etc/apt/sources.list.d/brave-browser-release.sources \
+        https://brave-browser-apt-release.s3.brave.com stable main \
+        /usr/share/keyrings/brave-browser-archive-keyring.gpg
+    NEED_UPDATE=1
+    apt_install brave-origin || return 1
+    # the Copland colour: Chromium-family browsers read it from their policy folder
+    copland_browser_policy
+    # default browser: x-www-browser (the menu's "Web Browser") and links opened by apps
+    local desk exe
+    desk="$(cd /usr/share/applications && ls brave-origin*.desktop 2>/dev/null | head -1)"
+    exe="$(command -v brave-origin || command -v brave-origin-stable || true)"
+    [ -n "$exe" ] && run update-alternatives --set x-www-browser "$(readlink -f "$exe")" 2>/dev/null
+    if [ -n "$desk" ]; then
+        user_file .config/mimeapps.list 644 <<EOF
+[Default Applications]
+x-scheme-handler/http=$desk
+x-scheme-handler/https=$desk
+text/html=$desk
+application/xhtml+xml=$desk
+EOF
+    fi
+}
+
+copland_browser_policy() {
+    local d
+    for d in /etc/brave/policies/managed /etc/chromium/policies/managed /etc/opt/chrome/policies/managed; do
+        [ -f "$d/copland-theme.json" ] && continue
+        [ "$DRY" -eq 1 ] && { printf '  would write %s/copland-theme.json\n' "$d"; continue; }
+        install -d -m 755 "$d"
+        printf '{\n  "BrowserThemeColor": "%s"\n}\n' "$NAVY" > "$d/copland-theme.json"
+    done
+}
+
+item_libreoffice() {
+    # libreoffice-gtk3 draws LibreOffice with the GTK theme, so it is in Copland colours
+    apt_install libreoffice-writer libreoffice-calc libreoffice-impress libreoffice-gtk3
+}
+
+item_thunderbird() { apt_install thunderbird; }   # follows the GTK theme, like Firefox
+
+item_gimp() {
+    apt_install gimp || return 1
+    # GIMP 3's "System" theme draws GIMP with the GTK theme (Copland) instead of its own grey
+    user_file .config/GIMP/3.0/gimprc 644 <<'EOF'
+# Copland OS: use the desktop's GTK theme
+(theme "System")
+EOF
+}
+
+# Qt apps draw with the GTK theme through Qt's gtk3 platform theme (set for the session
+# in /etc/X11/Xsession.d/55copland-os)
+item_vlc() { apt_install vlc qt5-gtk-platformtheme; }
+item_keepassxc() { apt_install keepassxc qt6-gtk-platformtheme; }
+
+item_obs() {
+    apt_install obs-studio || return 1
+    # OBS draws its own theme: a Copland variant of its Yami theme, chosen by default
+    user_file .config/obs-studio/themes/Copland.ovt 644 <<EOF
+@OBSThemeMeta {
+    name: 'Copland';
+    id: 'com.obsproject.Yami.Copland';
+    extends: 'com.obsproject.Yami';
+    author: 'Copland OS';
+    dark: 'true';
+}
+
+@OBSThemeVars {
+    /* Yami's greys run from light (1) to dark (8): Copland's navies in the same order */
+    --grey1: $TERM8;
+    --grey2: $TERM8;
+    --grey3: $NAVY;
+    --grey4: $NAVY;
+    --grey5: $NAVY_RAISED;
+    --grey6: $NAVY_INK;
+    --grey7: $NAVY_DEEP;
+    --grey8: $NAVY_DEEP;
+
+    --bg_window: var(--grey7);
+    --bg_base: var(--grey6);
+    --bg_preview: var(--grey8);
+
+    --primary: $BLUE;
+    --primary_light: $CYAN;
+    --highlight: $BLUE;
+
+    --text: $TEXT;
+    --text_light: $TEXT;
+    --text_muted: $TEXT_DIM;
+}
+EOF
+    user_file .config/obs-studio/global.ini 644 <<'EOF'
+[Appearance]
+Theme=com.obsproject.Yami.Copland
+EOF
+}
+
+item_flatpak() {
+    apt_install flatpak xdg-desktop-portal-gtk || return 1
+    # the portal passes the dark colour scheme to Flatpak apps
+    run flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+}
+
+item_vscode() {
+    fetch_key "$MS_KEY_URL" /usr/share/keyrings/microsoft.asc "$MS_FPR" || return 1
+    # Microsoft's file name: the code package keeps its own source file under this name
+    add_source /etc/apt/sources.list.d/vscode.sources \
+        https://packages.microsoft.com/repos/code stable main /usr/share/keyrings/microsoft.asc
+    NEED_UPDATE=1
+    # tell the package not to add a second copy of the source
+    [ "$DRY" -eq 1 ] || echo "code code/add-microsoft-repo boolean false" | debconf-set-selections
+    apt_install code || return 1
+    # Copland colours, Copland's terminal palette and the system's window frame
+    user_file .config/Code/User/settings.json 644 <<EOF
+{
+    "window.titleBarStyle": "native",
+    "window.menuBarVisibility": "classic",
+    "workbench.colorTheme": "Default Dark Modern",
+    "editor.fontFamily": "'DejaVu Sans Mono', monospace",
+    "terminal.integrated.fontFamily": "'DejaVu Sans Mono'",
+    "telemetry.telemetryLevel": "off",
+    "workbench.colorCustomizations": {
+        "focusBorder": "$CYAN",
+        "foreground": "$TEXT",
+        "descriptionForeground": "$TEXT_DIM",
+        "editor.background": "$NAVY_INK",
+        "editor.foreground": "$TEXT",
+        "editor.lineHighlightBackground": "$NAVY_RAISED",
+        "editor.selectionBackground": "${BLUE}88",
+        "editorCursor.foreground": "$CYAN",
+        "editorLineNumber.foreground": "$TERM8",
+        "editorLineNumber.activeForeground": "$CYAN",
+        "editorGroupHeader.tabsBackground": "$NAVY_DEEP",
+        "tab.activeBackground": "$NAVY_INK",
+        "tab.inactiveBackground": "$NAVY_DEEP",
+        "tab.activeBorderTop": "$CYAN",
+        "tab.activeForeground": "#ffffff",
+        "tab.inactiveForeground": "$TEXT_DIM",
+        "sideBar.background": "$NAVY_DEEP",
+        "sideBar.foreground": "$TEXT",
+        "sideBarSectionHeader.background": "$NAVY_RAISED",
+        "activityBar.background": "$NAVY_DEEP",
+        "activityBar.foreground": "$CYAN",
+        "activityBar.inactiveForeground": "$TEXT_DIM",
+        "activityBarBadge.background": "$BLUE",
+        "statusBar.background": "$NAVY_DEEP",
+        "statusBar.foreground": "$TEXT",
+        "statusBar.noFolderBackground": "$NAVY_DEEP",
+        "statusBar.debuggingBackground": "$BLUE",
+        "titleBar.activeBackground": "$NAVY_DEEP",
+        "titleBar.activeForeground": "$TEXT",
+        "panel.background": "$NAVY_DEEP",
+        "panel.border": "$BLUE",
+        "terminal.background": "$NAVY_DEEP",
+        "terminal.foreground": "$TEXT",
+        "terminalCursor.foreground": "$CYAN",
+        "input.background": "$NAVY_RAISED",
+        "dropdown.background": "$NAVY_RAISED",
+        "button.background": "$BLUE",
+        "button.hoverBackground": "$NAVY",
+        "list.activeSelectionBackground": "${BLUE}88",
+        "list.hoverBackground": "#46baef2e",
+        "editorWidget.background": "$NAVY_RAISED",
+        "quickInput.background": "$NAVY_RAISED",
+        "terminal.ansiBlack": "#141c3a", "terminal.ansiRed": "#e0507a",
+        "terminal.ansiGreen": "#5fd7a7", "terminal.ansiYellow": "#e6d28a",
+        "terminal.ansiBlue": "#197aba", "terminal.ansiMagenta": "#9a7cf0",
+        "terminal.ansiCyan": "#46baef", "terminal.ansiWhite": "#c5cfee",
+        "terminal.ansiBrightBlack": "#4a5c9a", "terminal.ansiBrightRed": "#ff7096",
+        "terminal.ansiBrightGreen": "#8af0c8", "terminal.ansiBrightYellow": "#f5e6a8",
+        "terminal.ansiBrightBlue": "#5aa8e8", "terminal.ansiBrightMagenta": "#b8a0ff",
+        "terminal.ansiBrightCyan": "#8fd6fa", "terminal.ansiBrightWhite": "#ffffff"
+    }
+}
+EOF
+}
+
+item_python() { apt_install python3-pip python3-venv python3-dev pipx; }
+
+item_node() {
+    fetch_key "$NODE_KEY_URL" /usr/share/keyrings/nodesource.asc "$NODE_FPR" || return 1
+    add_source /etc/apt/sources.list.d/nodesource.sources \
+        "https://deb.nodesource.com/node_${NODE_MAJOR}.x" nodistro main /usr/share/keyrings/nodesource.asc
+    NEED_UPDATE=1
+    # NodeSource's nodejs carries npm; Debian's older nodejs must not win
+    [ "$DRY" -eq 1 ] || cat > /etc/apt/preferences.d/nodesource <<'EOF'
+Package: nodejs
+Pin: origin deb.nodesource.com
+Pin-Priority: 600
+EOF
+    apt_install nodejs
+}
+
+item_go() {
+    # Debian's backports carry the current Go; the installer already lists them
+    if ! grep -rqs "$CODENAME-backports" /etc/apt/sources.list /etc/apt/sources.list.d/; then
+        add_source /etc/apt/sources.list.d/debian-backports.sources \
+            http://deb.debian.org/debian "$CODENAME-backports" main /usr/share/keyrings/debian-archive-keyring.gpg
+        NEED_UPDATE=1
+    fi
+    apt_install -t "$CODENAME-backports" golang-go
+}
+
+item_rust() {
+    apt_install rustup build-essential || return 1
+    # rustup installs the toolchain per user, in ~/.rustup and ~/.cargo
+    if [ -n "$USER_NAME" ]; then
+        as_user rustup default stable || { warn "rustup could not fetch the toolchain; run 'rustup default stable' later"; return 1; }
+    else
+        say "  run 'rustup default stable' as your user to fetch the toolchain"
+    fi
+}
+
+item_java() { apt_install openjdk-25-jdk; }
+item_cpp() { apt_install build-essential cmake gdb; }
+
+item_docker() {
+    fetch_key "$DOCKER_KEY_URL" /etc/apt/keyrings/docker.asc "$DOCKER_FPR" || return 1
+    add_source /etc/apt/sources.list.d/docker.sources \
+        https://download.docker.com/linux/debian "$CODENAME" stable /etc/apt/keyrings/docker.asc
+    NEED_UPDATE=1
+    apt_install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin || return 1
+    # use docker without sudo (takes effect at the next login)
+    [ -n "$USER_NAME" ] && run usermod -aG docker "$USER_NAME"
+    return 0
+}
+
+item_podman() { apt_install podman podman-compose; }
+
+# ------------------------------------------------------------------ run
+
+# without a connection nothing here can work: say so once instead of per item
+if [ "$DRY" -eq 0 ] && ! curl -fsS --max-time 20 -o /dev/null "http://deb.debian.org/debian/dists/$CODENAME/Release"; then
+    say "no internet connection (deb.debian.org did not answer)"
+    say "not installed: ${WANT[*]}. Try again later with: sudo $PROG ${WANT[*]}"
+    exit 1
+fi
+
+n=0 total=${#WANT[@]}
+for id in "${WANT[@]}"; do
+    n=$((n + 1))
+    name="$(for it in "${ITEMS[@]}"; do [ "${it%%|*}" = "$id" ] && { IFS='|' read -r _ _ nm _ <<<"$it"; echo "$nm"; }; done)"
+    say "[$n/$total] $name"
+    if "item_$id"; then DONE+=("$id"); else FAILED+=("$id"); warn "$name was not installed"; fi
+done
+
+[ "$DRY" -eq 1 ] && { say "dry run: nothing was changed"; exit 0; }
+say "installed: ${DONE[*]:-none}"
+if [ ${#FAILED[@]} -gt 0 ]; then
+    say "not installed: ${FAILED[*]}. Try again later with: sudo $PROG ${FAILED[*]}"
+    exit 1
+fi
+exit 0

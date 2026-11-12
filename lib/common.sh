@@ -75,7 +75,7 @@ preflight() {
     local f
     for f in assets/themes/CoplandOS/gtk-3.0/gtk.css assets/themes/CoplandOS/xfwm4/themerc assets/backgrounds/CoplandOS.png \
              assets/icons/NineIcons/index.theme "assets/cursors/$CURSOR_THEME/index.theme" \
-             config/fastfetch/config.jsonc bin/copland-goto bin/copland-send; do
+             config/fastfetch/config.jsonc bin/copland-goto bin/copland-send bin/copland-extras; do
         [ -e "$CORE/$f" ] || die "The Copland OS folder is incomplete: core/$f is missing."
     done
     local like=""
