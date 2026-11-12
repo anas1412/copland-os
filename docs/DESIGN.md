@@ -1,7 +1,10 @@
 # Copland OS design system
 
-The look is the Copland OS Enterprise boot screen from *Serial Experiments Lain*:
-deep navy, a glowing cyan eye, a serif italic wordmark. Everything else is classic
+The look starts from the Copland OS Enterprise image on lain.wiki
+(`File:CoplandOS.png`, 996×625; the wiki does not say where it comes from): deep navy,
+a glowing cyan eye, a serif italic wordmark. In *Serial Experiments Lain*, Copland OS
+Enterprise is the system on the NAVI computers, made by Tachibana General Laboratories,
+in blue (lain.wiki/wiki/Copland_OS). Everything else is classic
 Mac (late-1990s) shapes on top of that palette. This page is the reference; when a
 value changes, change it here and in the files listed next to it. Every choice here
 states its reason; a value without one is an open question, not a decision.
@@ -20,7 +23,7 @@ account) that only a full system ships reliably.
 
 ## Palette
 
-Sampled from the boot frame (`core/assets/backgrounds/CoplandOS.png`).
+Sampled from the wallpaper (`core/assets/backgrounds/CoplandOS.png`).
 
 | Token | Hex | Role | Used in |
 |---|---|---|---|
@@ -83,7 +86,7 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
   Files: `core/assets/themes/CoplandOS/assets/copland-logo-{24,48,128}.png`, transparent.
   Used for the menu button (48), the user picture (`~/.face`, 128), the installer and
   launchers (128). Keep it on navy; don't recolour it or put it on light backgrounds.
-- **Wallpaper:** the boot frame, 996×625, scaled to fill. Its eye and wordmark sit in
+- **Wallpaper:** the Copland OS Enterprise image from lain.wiki (source not stated there), 996×625, scaled to fill. Its eye and wordmark sit in
   the centre.
 - **Login screen:** the login box stays centred over the eye (decided 2026-11-11 after
   comparing centre, left, right and bottom placements); the wordmark below it stays visible.
@@ -145,7 +148,7 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
 | Produced By Tachibana Lab / Tachibana General Laboratories | credits line (wallpaper, fastfetch, installer banner) |
 | Layer:01 … Layer:04 | workspaces (the show's episodes are "Layers") |
 | Present day, present time | fastfetch title line, installer slide |
-| Close the world, Open the nExt | sign-off (fastfetch, end of the installer output) |
+| Close the world, Open the nExt | sign-off (fastfetch, end of the installer output, website); the slogan of the 1998 *Serial Experiments Lain* PlayStation game (Wikipedia) |
 | Copland OS Enterprise 0.1.1 (Debian 13) | installer title and launcher (`versionedName`); short form "Copland OS 0.1.1" |
 | Copland OS Enterprise (Debian 13) | text console login line (`/etc/issue`) |
 
@@ -206,6 +209,30 @@ plain words where it doesn't, so every line still reads at a glance:
 - **Not added on purpose:** Knights, Cyberia, Accela or episode titles as layer
   subtitles. None of them maps to a real part of the desktop, and they would break the
   plain-and-functional rule above.
+
+## Website
+
+`site/index.html`, published with the apt repository (`packaging/publish-repo.sh`). For
+people who use computers, not for builders: build and packaging details stay on GitHub.
+
+- **Sections are Layers.** The show titles its episodes `Layer:01 WEIRD` (colon, two
+  digits, title in capitals). The site's five cards use that format with the project's
+  own fastfetch words, so the site and the system speak one language: PRESENT DAY (why it
+  exists), NAVI (what you get), PROTOCOL (what it's for), PSYCHE (what it runs on), WIRED
+  (get it). Each card has a plain subtitle for people who never saw the show.
+- **Facts only, each with its source.** Versions come from the ISO's build record,
+  requirements and dates from Debian, show facts from lain.wiki; a link sits next to
+  each. Hardware figures are Debian 13's own (decided 2026-11-12).
+- **Real pictures.** The two screenshots in `docs/` and parts cut from them by
+  `tools/site-images.py`; no drawings of the product.
+- **Atmosphere, drawn by us:** power lines with a pole between sections (the show's best
+  known motif) in its power-line navy `#394f70`; a red dot on each title card (the red
+  marks in the show's shadows); faint static scanlines (gone under `prefers-contrast:
+  more`); the fastfetch words drifting behind the title, like the show's floating text
+  (still under `prefers-reduced-motion`); a one-second boot screen once per visit,
+  skippable, never with reduced motion, added by script so the page reads without it.
+- **Readability:** text-dim only on navy-deep (contrast 5.2), never on cards (4.3);
+  blue never as text (3.7).
 
 ## Open issues
 

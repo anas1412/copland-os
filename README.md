@@ -116,7 +116,7 @@ Every file and setting each component touches, and how to undo it: [docs/WHAT-CH
 | `theme` | on | CoplandOS GTK 2/3 theme, xfwm4 window borders, notification style, fonts (C059 for titles, Nimbus Sans for the interface) |
 | `icons` | on | Mac OS 9 icons (NineIcons from Platinum9). The show's Copland OS is drawn from Apple's Copland and Mac OS 8/9 |
 | `cursors` | on | classic Mac pixel-art cursors ([Retrosmart](https://github.com/useless-anvil/retrosmart-cursor), Mac-ish) |
-| `wallpaper` | on | the Copland OS Enterprise boot frame |
+| `wallpaper` | on | the Copland OS Enterprise image (eye and wordmark) |
 | `panel` | on | top bar: Copland menu (with the Copland logo as its profile picture), window list, Layer:01–04, tray, clock with date, power. **Replaces your current panel layout** |
 | `terminal` | on | xfce4-terminal palette and font, fastfetch config, `~/.bashrc` hook, btop theme |
 | `layers` | on | 4 workspaces named Layer:01–04, plus `copland-layers`, a small picker to choose which app opens on which layer. Nothing is assigned until you choose |
@@ -296,7 +296,8 @@ removed, open an issue and it will be taken out.
 - Cursors: [Retrosmart Xcursor](https://github.com/useless-anvil/retrosmart-cursor) v2.0.3 by mdomlop and useless-anvil, GPL-3.0 (licence text in `core/assets/cursors/`).
 - Menu logo: "Copland Os Enterprise Icon" by PsyBear,
   <https://www.deviantart.com/psybear/art/Copland-Os-Enterprise-Icon-65838629>. Copyright PsyBear.
-- Wallpaper: a frame from *Serial Experiments Lain*, via <https://lain.wiki/wiki/Copland_OS>.
+- Wallpaper: the Copland OS Enterprise image from lain.wiki, <https://lain.wiki/wiki/File:CoplandOS.png>; the wiki does not state its source.
   Copyright its owners; not covered by this repository's licence.
+- Sign-off "Close the world, Open the nExt": the slogan of the 1998 *Serial Experiments Lain* PlayStation game.
 - fastfetch logo and installer banner: the built-in `LainOS` logo of [fastfetch](https://github.com/fastfetch-cli/fastfetch).
 - Boot animation (optional): <https://github.com/faisalhsn/copland-plymouth-theme>.

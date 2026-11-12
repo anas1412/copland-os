@@ -118,7 +118,9 @@ touch "$DIR/.nojekyll"
 cp "$REPO/site/index.html" "$DIR/index.html"
 mkdir -p "$DIR/assets"
 cp "$REPO/core/assets/themes/CoplandOS/assets/copland-logo-128.png" "$DIR/assets/copland-logo.png"
-cp "$REPO/docs/screenshot-desktop.png" "$REPO/docs/screenshot-apps.png" "$DIR/assets/"
+cp "$REPO/docs/screenshot-desktop.png" "$DIR/assets/"
+rm -f "$DIR/assets/screenshot-apps.png"   # the page shows parts of it (assets/shots/) instead
+"$REPO/tools/site-images.py" "$DIR/assets/shots" >/dev/null || die "Could not cut the website pictures (tools/site-images.py)."
 
 say "Repository ready in $DIR"
 if [ "$USE_GIT" -eq 1 ]; then

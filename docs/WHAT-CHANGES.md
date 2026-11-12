@@ -56,7 +56,7 @@ You get classic Mac pixel cursors (Retrosmart).
 
 ### `wallpaper` (on)
 
-You get the Copland OS Enterprise boot frame as your wallpaper.
+You get the Copland OS Enterprise image (the eye and the wordmark) as your wallpaper.
 
 - Copies `~/.local/share/backgrounds/CoplandOS.png`.
 - Sets every monitor's `last-image` to that file, and `image-style` to `5`.
