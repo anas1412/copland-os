@@ -220,11 +220,16 @@ people who use computers, not for builders: build and packaging details stay on 
   own fastfetch words, so the site and the system speak one language: PRESENT DAY (why it
   exists), NAVI (what you get), PROTOCOL (what it's for), PSYCHE (what it runs on), WIRED
   (get it). Each card has a plain subtitle for people who never saw the show.
-- **Facts only, each with its source.** Versions come from the ISO's build record,
-  requirements and dates from Debian, show facts from lain.wiki; a link sits next to
-  each. Hardware figures are Debian 13's own (decided 2026-11-12).
-- **Real pictures.** The two screenshots in `docs/` and parts cut from them by
-  `tools/site-images.py`; no drawings of the product.
+- **Facts only, each with its source.** Requirements and dates from Debian, show facts
+  from lain.wiki; a link sits next to each. Hardware figures are Debian 13's own
+  (decided 2026-11-12).
+- **No version numbers of apps or of the ISO.** Debian updates the apps all the time;
+  a number on the page would be wrong within weeks. The page names only what changes
+  with a new Debian release (Debian 13, XFCE 4.20), and the release checklist in
+  BUILDING.md includes the site.
+- **Real pictures, explained.** "What you get" is the two full screenshots in `docs/`,
+  each with numbered pins on its parts and a numbered list saying what each part is and
+  does; no drawings of the product and no cut-outs (decided 2026-11-12).
 - **Atmosphere, drawn by us:** power lines with a pole between sections (the show's best
   known motif) in its power-line navy `#394f70`; a red dot on each title card (the red
   marks in the show's shadows); faint static scanlines (gone under `prefers-contrast:

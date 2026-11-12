@@ -80,13 +80,10 @@
   figure { margin: 0; }
   figure img { display: block; max-width: 100%; height: auto; }
   figcaption { color: var(--text-dim); font-size: .9rem; margin-top: .5rem; }
-  .shot img { width: 100%; border: 1px solid var(--blue); box-shadow: 0 0 40px rgba(70,186,239,.18); }
-  .shot { margin: 1rem auto 0; max-width: 60rem; }
-  .shot figcaption { text-align: center; }
 
   /* power lines between Layers: a pole and three sagging wires, drawn here */
   .wires { height: 64px; margin-top: 3rem; opacity: .9;
-           background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1000' height='64' viewBox='0 0 1000 64' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23394f70' stroke-width='1.6'%3E%3Cpath d='M0 14 Q250 40 500 14 T1000 14'/%3E%3Cpath d='M0 24 Q250 52 500 24 T1000 24'/%3E%3Cpath d='M0 34 Q250 62 500 34 T1000 34'/%3E%3Cpath d='M500 4 V64 M478 12 H522 M484 22 H516'/%3E%3C/g%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+           background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1000' height='64' viewBox='0 0 1000 64' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23394f70' stroke-width='1.6' vector-effect='non-scaling-stroke'%3E%3Cpath d='M0 22 Q111 44 222 12 Q472 44 722 12 Q861 44 1000 22' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M0 22 Q125 44 250 12 Q500 44 750 12 Q875 44 1000 22' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M0 22 Q139 44 278 12 Q528 44 778 12 Q889 44 1000 22' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M250 2 V64 M216 12 H284' vector-effect='non-scaling-stroke'/%3E%3Ccircle cx='222' cy='12' r='2.2' fill='%23394f70'/%3E%3Ccircle cx='250' cy='12' r='2.2' fill='%23394f70'/%3E%3Ccircle cx='278' cy='12' r='2.2' fill='%23394f70'/%3E%3Cpath d='M750 2 V64 M716 12 H784' vector-effect='non-scaling-stroke'/%3E%3Ccircle cx='722' cy='12' r='2.2' fill='%23394f70'/%3E%3Ccircle cx='750' cy='12' r='2.2' fill='%23394f70'/%3E%3Ccircle cx='778' cy='12' r='2.2' fill='%23394f70'/%3E%3C/g%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 
   /* title cards: the show's format, Layer:01 WEIRD */
   section { padding: .5rem 0 1rem; }
@@ -106,30 +103,25 @@
                       font: bold .95rem var(--mono); color: var(--cyan); }
   ol.why strong { display: block; font: italic bold 1.2rem var(--brand); color: var(--white); }
 
-  .pair { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.2rem; align-items: start; }
-  @media (min-width: 46rem) { .pair { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); } }
-  .barshot img { border: 1px solid var(--navy); }
-  .barshot img + img { margin-top: .5rem; }
 
+  /* annotated screenshots: numbered pins over the real desktop, explained in the list below */
+  .annot { position: relative; margin: .4rem 0 1rem; }
+  .annot img { width: 100%; border: 1px solid var(--blue); box-shadow: 0 0 40px rgba(70,186,239,.18); }
+  .pin { position: absolute; transform: translate(-50%, -50%); width: 1.7rem; height: 1.7rem; border-radius: 50%;
+         display: flex; align-items: center; justify-content: center; font: bold .8rem var(--mono);
+         background: var(--cyan); color: var(--navy-deep); border: 2px solid var(--navy-deep);
+         box-shadow: 0 0 0 2px var(--cyan), 0 0 12px rgba(70,186,239,.8); }
+  ol.legend { padding-left: 2.2rem; margin: 0 0 1.5rem; }
+  ol.legend li { margin-bottom: .6rem; padding-left: .3rem; }
+  ol.legend li::marker { font: bold .9rem var(--mono); color: var(--cyan); }
+  ul.apps { columns: 2 16rem; column-gap: 2rem; }
+  ul.apps li { break-inside: avoid; margin-bottom: .3rem; }
   dl.facts { display: grid; grid-template-columns: minmax(7rem, max-content) 1fr; gap: .45rem 1.2rem; margin: .5rem 0 1rem; }
   dl.facts dt { font: bold .88rem var(--mono); color: var(--cyan); padding-top: .1rem; }
   dl.facts dd { margin: 0; }
   @media (max-width: 30rem) { dl.facts { grid-template-columns: 1fr; gap: .1rem; } dl.facts dd { margin-bottom: .6rem; } }
 
-  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: .6rem; margin: .8rem 0 1.2rem; }
-  .swatch { display: flex; align-items: center; gap: .6rem; font: .8rem var(--mono); }
-  .swatch i { width: 2.2rem; height: 2.2rem; border-radius: 4px; border: 1px solid rgba(255,255,255,.15); flex: none; }
-  .swatch b { display: block; color: var(--white); font-weight: normal; }
-  .fonts p { margin: .2rem 0; }
-  .fonts .f-brand { font: italic bold 1.6rem var(--brand); color: var(--white); }
-  .fonts .f-sans { font: 1.15rem var(--sans); color: var(--white); }
-  .fonts .f-mono { font: 1rem var(--mono); color: var(--white); }
 
-  table { width: 100%; border-collapse: collapse; margin: .6rem 0 1.2rem; font-size: .95rem; }
-  th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid var(--navy-raised); vertical-align: top; }
-  th { font: bold .82rem var(--mono); color: var(--cyan); }
-  td.v { font-family: var(--mono); font-size: .85rem; white-space: nowrap; color: var(--white); }
-  .tablewrap { overflow-x: auto; }
 
   .cmd { position: relative; margin: .6rem 0 1rem; }
   .cmd pre { margin: 0; padding: .8rem 4.5rem .8rem 1rem; background: var(--navy-ink); border: 1px solid var(--navy);
@@ -166,6 +158,7 @@
     .bar nav a { font-size: .85rem; padding: .35rem .32rem; }
     .hero { padding-top: 2.2rem; }
     .wires { margin-top: 2rem; height: 44px; }
+    .pin { width: 1.25rem; height: 1.25rem; font-size: .68rem; }
   }
 </style>
 </head>
@@ -200,16 +193,12 @@
     computer in the Copland OS look, from the boot menu to the terminal. Free, live and installable.</p>
   <div class="actions">
     <a class="btn" role="link" aria-disabled="true">Download CoplandOS.iso</a>
-    <a class="btn quiet" href="#why">Why it exists</a>
+    <a class="btn quiet" href="#navi">See what you get</a>
   </div>
   <p class="status">The first release is not out yet. It will be downloadable here, free.</p>
 </header>
 
 <div class="wrap">
-  <figure class="shot">
-    <img src="assets/screenshot-desktop.png" alt="The Copland OS desktop: the eye wallpaper, and the top bar with the Copland OS menu, Layer:01 to Layer:04 and the clock" width="1600" height="900">
-    <figcaption>The Copland OS desktop, 1600×900.</figcaption>
-  </figure>
 
   <div class="wires" aria-hidden="true"></div>
   <section id="why" aria-labelledby="why-t">
@@ -237,104 +226,76 @@
   <section id="navi" aria-labelledby="navi-t">
     <header class="card-title"><p class="layer">Layer:02</p><h2 id="navi-t">NAVI</h2><p class="sub">What you get</p></header>
 
-    <h3>The top bar</h3>
-    <figure class="barshot">
-      <img src="assets/shots/bar-left.png" alt="Left end of the top bar: the Copland OS menu button" width="150" height="31" loading="lazy">
-      <img src="assets/shots/bar-right.png" alt="Right end of the top bar: Layer:01 to Layer:04, network, volume, the clock and the power button" width="640" height="31" loading="lazy">
+    <h3>The desktop</h3>
+    <figure class="annot">
+      <img src="assets/screenshot-desktop.png" alt="The Copland OS desktop: top bar, desktop icons and the eye wallpaper" width="1600" height="900" loading="lazy">
+      <span class="pin" style="left:8.8%;top:1.8%">1</span>
+      <span class="pin" style="left:8.6%;top:21%">2</span>
+      <span class="pin" style="left:70.3%;top:7%">3</span>
+      <span class="pin" style="left:88.5%;top:7%">4</span>
+      <span class="pin" style="left:65.5%;top:33%">5</span>
     </figure>
-    <dl class="facts">
-      <dt>Menu</dt><dd><strong>Copland OS</strong> button at the left; the <kbd>Windows</kbd> key opens it.</dd>
-      <dt>Windows</dt><dd>The open windows of the current layer, next to the menu.</dd>
-      <dt>Layers</dt><dd><strong>Layer:01</strong> to <strong>Layer:04</strong>; the current one is underlined in cyan.</dd>
-      <dt>Right side</dt><dd>Tray, volume, the clock with the date (<span class="mono">Wed 11 Nov 22:59</span>), power.</dd>
-    </dl>
+    <ol class="legend">
+      <li><strong>Copland OS menu.</strong> All your apps and a search box; the <kbd>Windows</kbd> key opens it.</li>
+      <li><strong>Desktop icons</strong> in the style of Mac OS 9 (NineIcons). The mouse pointer is a classic Mac
+        arrow in pixel art (Retrosmart).</li>
+      <li><strong>Layer:01 to Layer:04.</strong> The show calls its episodes Layers; here they are your four desktops.
+        <kbd>Windows</kbd>+<kbd>1</kbd> to <kbd>4</kbd> switches layer, <kbd>Windows</kbd>+<kbd>Shift</kbd>+<kbd>1</kbd>
+        to <kbd>4</kbd> sends the current window there, and the <strong>Layers</strong> app sets which app opens on
+        which layer. The current layer is underlined in cyan.</li>
+      <li><strong>Network, volume, clock and power.</strong> Names on the bar are set in C059 Bold Italic, the
+        Copland font for names.</li>
+      <li><strong>The Copland OS Enterprise image</strong> as wallpaper. The colours of the whole system, from the
+        bar to the terminal, are taken from it: navy, cyan and pale blue.</li>
+    </ol>
 
-    <h3>Four layers</h3>
-    <p>The show calls its episodes Layers; here they are your four desktops. <kbd>Windows</kbd>+<kbd>1</kbd> to
-      <kbd>4</kbd> switches layer, <kbd>Windows</kbd>+<kbd>Shift</kbd>+<kbd>1</kbd> to <kbd>4</kbd> sends the
-      current window there. The <strong>Layers</strong> app sets which app opens on which layer; nothing is
-      assigned until you choose. Four, because it is XFCE's own default and fits one hand on the keyboard.</p>
-
-    <h3>The look</h3>
-    <div class="pair">
-      <div>
-        <p>Nine colours, taken from the Copland OS Enterprise image:</p>
-        <div class="swatches">
-          <div class="swatch"><i style="background:#25346a"></i><span><b>navy</b>#25346a</span></div>
-          <div class="swatch"><i style="background:#101838"></i><span><b>navy-deep</b>#101838</span></div>
-          <div class="swatch"><i style="background:#141c3a"></i><span><b>navy-ink</b>#141c3a</span></div>
-          <div class="swatch"><i style="background:#1c2852"></i><span><b>navy-raised</b>#1c2852</span></div>
-          <div class="swatch"><i style="background:#46baef"></i><span><b>cyan</b>#46baef</span></div>
-          <div class="swatch"><i style="background:#197aba"></i><span><b>blue</b>#197aba</span></div>
-          <div class="swatch"><i style="background:#ccddff"></i><span><b>text</b>#ccddff</span></div>
-          <div class="swatch"><i style="background:#738dc1"></i><span><b>text-dim</b>#738dc1</span></div>
-          <div class="swatch"><i style="background:#ffffff"></i><span><b>white</b>#ffffff</span></div>
-        </div>
-        <div class="fonts">
-          <p class="f-brand">C059 Bold Italic</p><p class="dim">for names: the menu, the layers, window titles, the clock</p>
-          <p class="f-sans">Nimbus Sans</p><p class="dim">for everything you read</p>
-          <p class="f-mono">DejaVu Sans Mono</p><p class="dim">in the terminal</p>
-        </div>
-      </div>
-      <figure>
-        <img src="assets/shots/icons.png" alt="Desktop icons in the Mac OS 9 style: Home, File System, Trash" width="104" height="300" loading="lazy">
-        <figcaption>Icons: NineIcons, in the style of Mac OS 9. Cursor: Retrosmart, a classic Mac pointer in pixel art.</figcaption>
-      </figure>
-    </div>
-
-    <h3>The terminal</h3>
-    <figure>
-      <img src="assets/shots/fastfetch.png" alt="A terminal showing the Copland OS system summary next to the eye drawn in text" width="781" height="430" loading="lazy">
-      <figcaption>Every new terminal opens with this summary (fastfetch). The labels use the show's words.</figcaption>
+    <h3>At work</h3>
+    <figure class="annot">
+      <img src="assets/screenshot-apps.png" alt="Copland OS at work: a terminal with the system summary, a terminal showing its colours, and the btop system monitor" width="1600" height="900" loading="lazy">
+      <span class="pin" style="left:28.5%;top:1.6%">6</span>
+      <span class="pin" style="left:38%;top:55.8%">7</span>
+      <span class="pin" style="left:55.5%;top:13%">8</span>
+      <span class="pin" style="left:35.5%;top:62%">9</span>
+      <span class="pin" style="left:69%;top:22%">10</span>
     </figure>
-    <dl class="facts">
-      <dt>NAVI</dt><dd>your computer: in the show, a NAVI is a personal computer</dd>
-      <dt>BASE</dt><dd>the Debian release underneath</dd>
-      <dt>PROTOCOL</dt><dd>the Linux kernel: Protocol 7 is the show's network protocol</dd>
-      <dt>LAYER</dt><dd>the desktop (XFCE)</dd>
-      <dt>PSYCHE</dt><dd>the processor: the Psyche chip Lain adds to her NAVI</dd>
-      <dt>WIRED</dt><dd>your network address: the Wired is the show's network</dd>
-    </dl>
-    <div class="pair">
-      <figure>
-        <img src="assets/shots/colours.png" alt="The 16 terminal colours: navy, rose, mint, sand, blue, violet, cyan, pale blue, and their bright versions" width="781" height="128" loading="lazy">
-        <figcaption>The 16 terminal colours: errors still read red, success green, warnings yellow, in softer tones.</figcaption>
-      </figure>
-      <figure>
-        <img src="assets/shots/btop.png" alt="btop, the system monitor, in the Copland colours: processor, memory, disks and network" width="654" height="835" loading="lazy">
-        <figcaption>btop, the system monitor, in the same colours.</figcaption>
-      </figure>
-    </div>
+    <ol class="legend" start="6">
+      <li><strong>Open windows</strong> of the current layer only, next to the menu.</li>
+      <li><strong>Window titles</strong> centred, in C059 Bold Italic. Everything you read inside windows is in
+        Nimbus Sans.</li>
+      <li><strong>The system summary</strong> every new terminal opens with, next to the eye drawn in text. Its labels
+        use the show's words: <strong>NAVI</strong> is your computer (the show's name for a personal computer),
+        <strong>PROTOCOL</strong> the Linux kernel (Protocol 7 is the show's network protocol),
+        <strong>PSYCHE</strong> the processor (the Psyche chip Lain adds to her NAVI), and <strong>WIRED</strong>
+        your network address (the Wired is the show's network).</li>
+      <li><strong>Sixteen terminal colours</strong> in the Copland palette. Errors still read red, success green,
+        warnings yellow, in softer tones. The terminal font is DejaVu Sans Mono.</li>
+      <li><strong>btop</strong>, the system monitor, in the same colours.</li>
+    </ol>
 
     <h3>From the moment it starts</h3>
-    <dl class="facts">
-      <dt>Boot menu</dt><dd>Named Copland OS Enterprise, in the Copland colours, at your screen's own resolution.</dd>
-      <dt>Animation</dt><dd>The eye, full screen, while the system starts.</dd>
-      <dt>Login</dt><dd>The login screen in the same theme, the box centred over the eye.</dd>
-      <dt>Console</dt><dd>Even the text console greets you with <span class="mono">Copland OS Enterprise (Debian 13)</span>.</dd>
-    </dl>
+    <ul>
+      <li><strong>Boot menu</strong> named Copland OS Enterprise, in the Copland colours, at your screen's resolution.</li>
+      <li><strong>Boot animation:</strong> the eye, full screen, while the system starts.</li>
+      <li><strong>Login screen</strong> in the same theme, the box centred over the eye.</li>
+      <li><strong>Text console:</strong> even it greets you with <span class="mono">Copland OS Enterprise (Debian 13)</span>.</li>
+    </ul>
     <p class="dim">Pictures of these come with the first release.</p>
 
     <h3>Apps</h3>
-    <div class="tablewrap">
-    <table>
-      <thead><tr><th>For</th><th>App</th><th>Version</th></tr></thead>
-      <tbody>
-        <tr><td>The web</td><td>Firefox ESR</td><td class="v">153.6</td></tr>
-        <tr><td>Files</td><td>Thunar</td><td class="v">4.20</td></tr>
-        <tr><td>Text</td><td>Mousepad</td><td class="v">0.6</td></tr>
-        <tr><td>Images</td><td>Ristretto</td><td class="v">0.13</td></tr>
-        <tr><td>PDFs</td><td>Atril</td><td class="v">1.26</td></tr>
-        <tr><td>Archives</td><td>Xarchiver</td><td class="v">0.5</td></tr>
-        <tr><td>Screenshots</td><td>XFCE Screenshooter</td><td class="v">1.11</td></tr>
-        <tr><td>Sound</td><td>Volume control (pavucontrol)</td><td class="v">6.1</td></tr>
-        <tr><td>Wi-Fi and network</td><td>NetworkManager applet</td><td class="v">1.36</td></tr>
-        <tr><td>System monitor</td><td>btop</td><td class="v">1.3</td></tr>
-        <tr><td>Installing</td><td>Calamares, as "Install Copland OS"</td><td class="v">3.3</td></tr>
-      </tbody>
-    </table>
-    </div>
-    <p class="src">Versions from the build record of CoplandOS 0.1.1, with XFCE 4.20 and Linux 6.12.</p>
+    <ul class="apps">
+      <li><strong>Firefox ESR</strong> for the web</li>
+      <li><strong>Thunar</strong> for files</li>
+      <li><strong>Mousepad</strong> for text</li>
+      <li><strong>Ristretto</strong> for images</li>
+      <li><strong>Atril</strong> for PDFs</li>
+      <li><strong>Xarchiver</strong> for archives</li>
+      <li><strong>Screenshooter</strong> for screenshots</li>
+      <li><strong>Volume control</strong> for sound</li>
+      <li><strong>Network manager</strong> for Wi-Fi and wired networks</li>
+      <li><strong>btop</strong> to see what the computer is doing</li>
+      <li><strong>Install Copland OS</strong> (Calamares) to install it</li>
+    </ul>
+    <p>Debian keeps every one of them up to date, with the rest of the system.</p>
   </section>
 
   <div class="wires" aria-hidden="true"></div>
@@ -343,7 +304,7 @@
 
     <h3>An everyday computer</h3>
     <p>Browse, write, read PDFs, look at photos, listen, connect to Wi-Fi: the apps above do it from the first
-      start. Underneath is <strong>Debian 13 "trixie"</strong>, released on 9 August 2025 with 69,830 packages,
+      start. Underneath is <strong>Debian 13 "trixie"</strong>, released on 9 August 2025 with 69,830 packages at the time,
       and every one of them installs with one command. For example LibreOffice, GIMP, VLC, OBS Studio,
       Flatpak, and Steam (from Debian's contrib section).
       <span class="src">(<a href="https://www.debian.org/News/2025/20250809">Debian</a>,
@@ -353,15 +314,11 @@
     <h3>Why X11</h3>
     <p>Copland OS runs the XFCE desktop on X11, the display system Linux desktops have used for decades, on purpose:</p>
     <ul>
-      <li>XFCE's window manager works only on X11; XFCE's Wayland support is still experimental in 4.20, and
+      <li>XFCE's window manager works only on X11; XFCE's Wayland support is still experimental in 4.20 (the version in Debian 13), and
         XFCE keeps X11 "for the foreseeable future".
         <span class="src">(<a href="https://wiki.xfce.org/releng/wayland_roadmap">XFCE roadmap</a>)</span></li>
       <li>The layer rules (which app opens where) use devilspie2, an X11 tool.
         <span class="src">(<a href="https://packages.debian.org/trixie/devilspie2">packages.debian.org</a>)</span></li>
-      <li>Remote desktop with x11vnc needs X11, and Deskflow (one keyboard and mouse for several computers)
-        warns that some of its features may not work on Wayland.
-        <span class="src">(<a href="https://packages.debian.org/trixie/x11vnc">x11vnc</a>,
-        <a href="https://github.com/deskflow/deskflow">Deskflow</a>)</span></li>
     </ul>
     <p class="dim">There is no Wayland session. That is a choice, not something missing by accident.</p>
 
@@ -384,7 +341,7 @@
       <dt>Memory</dt><dd><strong>1 GB</strong> minimum, <strong>2 GB</strong> recommended.</dd>
       <dt>Disk</dt><dd><strong>10 GB</strong>.</dd>
       <dt>Starts on</dt><dd>UEFI and older BIOS PCs.</dd>
-      <dt>USB stick</dt><dd>2 GB or more for the ISO (1.6 GiB).</dd>
+      <dt>USB stick</dt><dd>2 GB or more.</dd>
     </dl>
     <p class="src">Memory and disk are Debian 13's own figures for a desktop install
       (<a href="https://www.debian.org/releases/trixie/amd64/ch03s04.en.html">Debian installation guide</a>).

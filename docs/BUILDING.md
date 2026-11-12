@@ -153,7 +153,8 @@ up before release day.
    - the login screen in `lightdm --test-mode`;
    - build the ISO, then boot it in a VM (BIOS and UEFI): live session, install,
      second user.
-7. **Text.** Update the release named in README.md, docs/DESIGN.md and the GitHub
+7. **Text.** Update the release named in README.md, docs/DESIGN.md, `site/index.html`
+   (Debian version, support dates, XFCE version, hardware figures) and the GitHub
    description, then merge and tag.
 
 Installed systems move to the new release with Debian's own upgrade procedure (its
