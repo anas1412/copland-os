@@ -88,6 +88,19 @@ step_wallpaper() {
         xf xfce4-desktop "${p%/last-image}/image-style" int 5
         n=$((n + 1))
     done <<< "$props"
+    # XFCE 4.20 reads /backdrop/screen0/monitor<output>/workspace0/last-image (one image
+    # for all workspaces by default). A fresh account has no such key yet, and the old
+    # monitor0/monitor1 keys above are ignored, so write it for every connected screen.
+    if have xrandr; then
+        local out
+        for out in $(xrandr --listmonitors 2>/dev/null | awk 'NR > 1 {print $NF}'); do
+            p="/backdrop/screen0/monitor$out/workspace0/last-image"
+            case $'\n'"$props"$'\n' in *$'\n'"$p"$'\n'*) continue ;; esac
+            xf xfce4-desktop "$p" string "$WALL"
+            xf xfce4-desktop "${p%/last-image}/image-style" int 5
+            n=$((n + 1))
+        done
+    fi
     if have xfdesktop; then run xfdesktop --reload || true; fi
     [ "$n" -gt 0 ] || note "copied; no monitor entry found yet. Open Desktop settings once, then run again"
 }
