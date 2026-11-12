@@ -1,28 +1,28 @@
 Architectures: amd64 all
 Codename: trixie
 Components: main
-Date: Thu, 12 Nov 2026 16:43:58 +0000
+Date: Thu, 12 Nov 2026 16:58:57 +0000
 Description: Copland OS packages for Debian 13 (trixie)
 Label: Copland OS
 Origin: Copland OS
 Suite: trixie
 MD5Sum:
- 4de1cb80ac1f5f1fb197a17db2c2173f             4295 main/binary-all/Packages
- ff1fe4224d679199607717aa49fde586             1344 main/binary-all/Packages.gz
- 4de1cb80ac1f5f1fb197a17db2c2173f             4295 main/binary-amd64/Packages
- ff1fe4224d679199607717aa49fde586             1344 main/binary-amd64/Packages.gz
+ b769910aa273ee3296fe17e872c219db             5706 main/binary-all/Packages
+ 0d67f9f22e47dd795391e736e41efe51             1543 main/binary-all/Packages.gz
+ b769910aa273ee3296fe17e872c219db             5706 main/binary-amd64/Packages
+ 0d67f9f22e47dd795391e736e41efe51             1543 main/binary-amd64/Packages.gz
 SHA1:
- 0858cff7d01c0a5858f4622a401ecc09b9814039             4295 main/binary-all/Packages
- c87d2a1e62403d9aeeabebc4a6d2674d31d7247e             1344 main/binary-all/Packages.gz
- 0858cff7d01c0a5858f4622a401ecc09b9814039             4295 main/binary-amd64/Packages
- c87d2a1e62403d9aeeabebc4a6d2674d31d7247e             1344 main/binary-amd64/Packages.gz
+ fea4027da1f3f9d4da09de6bdc45405cacbf5ceb             5706 main/binary-all/Packages
+ d817de7735dd24d7a62d30a03a74ed27615dd049             1543 main/binary-all/Packages.gz
+ fea4027da1f3f9d4da09de6bdc45405cacbf5ceb             5706 main/binary-amd64/Packages
+ d817de7735dd24d7a62d30a03a74ed27615dd049             1543 main/binary-amd64/Packages.gz
 SHA256:
- 0bc402ec1c906325298277f0802d105f0314c2e9f8c600e47492b668339999b0             4295 main/binary-all/Packages
- 19323dcbb2d6418721fa314116bb8b47d9e613a6e74a1c231f31d3d9ffce9541             1344 main/binary-all/Packages.gz
- 0bc402ec1c906325298277f0802d105f0314c2e9f8c600e47492b668339999b0             4295 main/binary-amd64/Packages
- 19323dcbb2d6418721fa314116bb8b47d9e613a6e74a1c231f31d3d9ffce9541             1344 main/binary-amd64/Packages.gz
+ 14aecc62bfff43edef8a7d91d99422aa2aba06cf24c1de81383111ca7f50befa             5706 main/binary-all/Packages
+ 64b1c196b7358e9ef5efd0bd89e7df34d2b64e7e1c31318dbcb996b5bd196e1c             1543 main/binary-all/Packages.gz
+ 14aecc62bfff43edef8a7d91d99422aa2aba06cf24c1de81383111ca7f50befa             5706 main/binary-amd64/Packages
+ 64b1c196b7358e9ef5efd0bd89e7df34d2b64e7e1c31318dbcb996b5bd196e1c             1543 main/binary-amd64/Packages.gz
 SHA512:
- 6c9f33d6cbfad101bc49fc6d10e9eb7f92edea3e1d31e403863fee1327a5ad3f13fa5e60b5f0ffa2a4cd7078b1287a1b923762456ca7c040bef0854ec6fea4b5             4295 main/binary-all/Packages
- bd2b315914ea712858ec4d17dd58b9f1a20eed7bbe93ad5b8bdc73fe380020cefdb1f43eeeeff5787beb31d90af455cb2e9736cc6527e02638eeabe0be8cf07c             1344 main/binary-all/Packages.gz
- 6c9f33d6cbfad101bc49fc6d10e9eb7f92edea3e1d31e403863fee1327a5ad3f13fa5e60b5f0ffa2a4cd7078b1287a1b923762456ca7c040bef0854ec6fea4b5             4295 main/binary-amd64/Packages
- bd2b315914ea712858ec4d17dd58b9f1a20eed7bbe93ad5b8bdc73fe380020cefdb1f43eeeeff5787beb31d90af455cb2e9736cc6527e02638eeabe0be8cf07c             1344 main/binary-amd64/Packages.gz
+ 9504a7dd7299f903bdbe1da2d93619e62a2dce2c33e1d1dee7a3118327bb1b2f5b482f5834c196164abe8689291cd5d2c8746537df6fae8bf1dd2d21f269c765             5706 main/binary-all/Packages
+ b52d500cae5029837e67491a75af70dc9fa2715bbae236e9325980dfa55203935633e0dc24f66d5b73dab3dc93f6d494d56522770980175983ed24d603044bd0             1543 main/binary-all/Packages.gz
+ 9504a7dd7299f903bdbe1da2d93619e62a2dce2c33e1d1dee7a3118327bb1b2f5b482f5834c196164abe8689291cd5d2c8746537df6fae8bf1dd2d21f269c765             5706 main/binary-amd64/Packages
+ b52d500cae5029837e67491a75af70dc9fa2715bbae236e9325980dfa55203935633e0dc24f66d5b73dab3dc93f6d494d56522770980175983ed24d603044bd0             1543 main/binary-amd64/Packages.gz

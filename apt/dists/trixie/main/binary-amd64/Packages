@@ -67,3 +67,26 @@ Description: Copland OS look for Debian XFCE (Serial Experiments Lain)
  animation, boot menu and console colours. Settings are installed as defaults, so
  every user can still change them. Built on upstream Debian 13.
 
+Package: copland-os-desktop
+Architecture: all
+Version: 0.2.0+deb13
+Priority: optional
+Section: x11
+Maintainer: Copland OS project <anas1412@users.noreply.github.com>
+Installed-Size: 18920
+Depends: xfce4, xfce4-whiskermenu-plugin, xfce4-terminal, xfce4-notifyd, adwaita-icon-theme, fonts-urw-base35, fonts-dejavu-core, fonts-dejavu-mono, gtk2-engines-murrine, libgtk-3-bin, python3, fastfetch
+Recommends: xfce4-pulseaudio-plugin, lightdm, lightdm-gtk-greeter, plymouth, console-setup, fonts-terminus, grub-common, btop
+Filename: pool/main/c/copland-os-desktop/copland-os-desktop_0.2.0+deb13_all.deb
+Size: 9773508
+MD5sum: c4c424d6fe6f93f8a547c6cfb6bd0280
+SHA1: 989bd2171ad39f5fe43fc80ac48eb3206e847f53
+SHA256: c71463a3feb63315cdfc88c241192ec57a13784f0db15e2cc438d0040abd1e07
+SHA512: 5cba096e1c14d356a140be1f1abd88fc38c5fdfe0780dc1e7449aa77a99bafb052da4bc26bdf2117da67c8bbffc6b0bd70841b0041e1922af66b599dfca5cb4f
+Homepage: https://github.com/anas1412/copland-os
+Description: Copland OS look for Debian XFCE (Serial Experiments Lain)
+ Applies the Copland OS Enterprise look system-wide: GTK and window theme, Mac OS 9
+ icons, classic Mac cursors, wallpaper, top bar, terminal colours, fastfetch, four
+ named workspaces (layers), keyboard shortcuts, login screen, boot
+ animation, boot menu and console colours. Settings are installed as defaults, so
+ every user can still change them. Built on upstream Debian 13.
+
