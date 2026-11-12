@@ -182,12 +182,19 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
 | Copland OS | the project's name (repo, README title, GitHub description) and the short name on screen: menu button, launcher ("Install Copland OS") |
 | Produced By Tachibana Lab / Tachibana General Laboratories | credits line (wallpaper, fastfetch, installer banner) |
 | Layer:01 … Layer:04 | workspaces (the show's episodes are "Layers") |
-| Present day, present time | fastfetch title line, installer slide |
+| Present day, present time | only where something opens: the fastfetch title line (every new terminal) and the login screen. On the website it is the title of Layer:01, PRESENT DAY |
 | Close the world, Open the nExt | sign-off (fastfetch, end of the installer output, website); the slogan of the 1998 *Serial Experiments Lain* PlayStation game (Wikipedia) |
 | Copland OS Enterprise <version> (Debian 13) | installer title and launcher (`versionedName`); short form "Copland OS <version>" |
 | Copland OS Enterprise (Debian 13) | text console login line (`/etc/issue`) |
 
 Tone: short, calm, a little cryptic; English UI text stays plain and functional.
+
+**"Present day, present time." opens things, nothing else** (decided 2026-11-12). In the
+show the line is spoken at the start of every episode (lain.wiki), so here it appears
+only where something starts: a new terminal (fastfetch), a login (the login screen), the
+website (as Layer:01, PRESENT DAY). Never twice on one screen, and not where nothing
+opens: it was taken off the installer slide and from under the website's title.
+
 No em dashes anywhere (docs, UI strings, descriptions): use a colon, a comma or a
 full stop instead.
 

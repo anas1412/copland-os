@@ -26,8 +26,7 @@ Presentation
             anchors.horizontalCenter: background1.horizontalCenter
             anchors.top: background1.bottom
             anchors.topMargin: 12
-            text: qsTr("Present day, present time.<br/>"+
-                  "Copland OS Enterprise is being installed. The rest is automated and takes a few minutes.")
+            text: qsTr("Copland OS Enterprise is being installed. The rest is automated and takes a few minutes.")
             wrapMode: Text.WordWrap
             width: 600
             horizontalAlignment: Text.Center

@@ -1,7 +1,7 @@
 # Copland OS Enterprise: btop theme
 # Every colour is a Copland palette token from docs/DESIGN.md ("Palette" and the
 # 16 terminal colours, written here as term0 to term15), so btop matches
-# xfce4-terminal, fastfetch and the desktop. "Present day, present time."
+# xfce4-terminal, fastfetch and the desktop.
 
 # Background: navy-deep (drawn only when theme_background = True; Copland keeps it
 # off so the terminal's transparency shows through)
