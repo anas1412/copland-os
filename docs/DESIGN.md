@@ -121,6 +121,11 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
   (logo + C059 label), window list (current layer only), spacer, Layer:01–04, spacer,
   tray, volume, clock (`Wed 11 Nov  13:08`), power. No borders; active items get a
   2 px `cyan` underline.
+- **Copland OS menu (Whisker menu):** 520×560, 92 % opaque, names shown next to apps and
+  categories, categories switch on hover, the alternate positions for categories,
+  profile and search. Taken as a whole from Anas's own menu (2026-11-12): the menu as
+  it is used every day, not a guess. The recent-apps list is left out: it is one
+  person's history. Rows in `core/settings.tsv` (`panel`, `plugin-1`).
 - **Gaps:** 6/4 px margins around the menu button, 2 px between layer buttons, 4 px
   around the clock, spacers at both outer edges (`gtk.css` "panel spacing").
 - **Window titles:** centred, C059 Bold Italic 10, white when focused, `text-dim` when not.
