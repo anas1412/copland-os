@@ -7,8 +7,10 @@
 # --root into a staging folder. The steps that must act on the target system
 # (diversions, the .bashrc line, the console font, the boot theme) are in
 # packaging/debian/{preinst,postinst,postrm}.
-# Version: COPLAND_VERSION plus the Debian release, both from iso/release.conf,
-# for example 0.1.0+deb13.
+# Version: the build's label (packaging/build-version.sh: COPLAND_VERSION for the release
+# build, COPLAND_VERSION~git<time>.<commit> for any other) plus the Debian release, for
+# example 0.1.3+deb13 or 0.1.3~git202611121530.225d1f1+deb13. COPLAND_BUILD_VERSION, when
+# set (the ISO build sets it), is used as the label.
 set -Eeuo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -23,7 +25,9 @@ command -v dpkg-deb >/dev/null || die "dpkg-deb is required."
 # shellcheck source=/dev/null
 . "$REPO/iso/release.conf"
 [ -n "${COPLAND_VERSION:-}" ] || die "iso/release.conf must set COPLAND_VERSION."
-VERSION="${COPLAND_VERSION}+deb${DEBIAN_VERSION}"
+COPLAND_BUILD_VERSION="${COPLAND_BUILD_VERSION:-$("$HERE/build-version.sh")}"
+export COPLAND_BUILD_VERSION   # the staged /usr/share/copland-os/version shows it too
+VERSION="${COPLAND_BUILD_VERSION}+deb${DEBIAN_VERSION}"
 case "$VERSION" in *[!0-9A-Za-z.+~-]*) die "Bad version: $VERSION" ;; esac
 
 STAGE="$(mktemp -d "${TMPDIR:-/tmp}/copland-deb.XXXXXX")"

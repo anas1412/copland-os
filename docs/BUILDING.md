@@ -75,18 +75,33 @@ What `.github/workflows/iso.yml` does, and why:
 
 ## Releasing a version
 
-A release is a version tag: pushing it builds the ISO in CI and publishes the GitHub
-release with it, marked latest. The website's download button follows it at once.
+A release is a version tag, and **one version is one build**: the package CI builds for
+the tag is the one in the image, in the GitHub release and in the apt repository. Two
+different packages with one version made the update icon offer the same update forever
+(0.1.2: the ISO's own build and the one published from a PC). So nothing but the tag's
+CI build ever carries a release version; every other build is labelled
+`<next version>~git<time>.<commit>` (`packaging/build-version.sh`), which apt sorts
+below the release, so the release replaces it with a normal update.
 
-1. Raise `COPLAND_VERSION` in `iso/release.conf` (a published version never changes).
-   Commit and push.
-2. Publish the package of that version to the apt repository: `./packaging/build-deb.sh`,
-   `./packaging/publish-repo.sh` (it names the package it is about to publish), then push
-   `gh-pages`.
-3. Tag and push: `git tag -a v0.1.2 -m "Copland OS 0.1.2" && git push origin v0.1.2`. The
+The version says what kind of release it is:
+
+| Tag | What CI builds | GitHub release | Who gets it |
+|---|---|---|---|
+| `v0.2.0` (minor or major) | the image and the package | ISO, checksum, build record, package list, package; marked latest (the website's download button follows it) | new installs from the ISO; installed systems through the update icon |
+| `v0.2.1` (patch) | the package only | the package; not marked latest, so the website keeps the newest image | installed systems through the update icon; new installs use the latest image, then update |
+
+Anything that changes the image itself (installer, live session, boot menu) needs a
+minor release; changes inside the package can go out as a patch.
+
+1. `COPLAND_VERSION` in `iso/release.conf` already names the coming release (it is raised
+   right after each release). Check it is the one you mean (`x.y.0` or `x.y.z`).
+2. Tag and push: `git tag -a v0.2.0 -m "Copland OS 0.2.0" && git push origin v0.2.0`. The
    workflow stops at once if the tag does not match `COPLAND_VERSION`.
-4. CI builds the ISO and publishes the release with the ISO, its checksum, the build
-   record and the package list; the release notes give the checksum and the CI run.
+3. CI builds and publishes the release (table above).
+4. Publish the package to apt: `./packaging/publish-repo.sh` downloads the package from
+   that release (never a local build), names it, signs the indexes; then push `gh-pages`.
+   It refuses test builds (versions with `~`).
+5. Raise `COPLAND_VERSION` to the next release, commit and push.
 
 ## What the build does
 
@@ -122,10 +137,10 @@ pinned. Debian packages are not: a later build picks up the release's point rele
 security updates, so two builds a month apart differ in package versions. The
 `.packages` file next to each image lists exactly what went in.
 
-The file name carries the Copland OS version and the Debian release, not the date, so
-a published name always says what it is. Rebuilding the same version replaces the
-earlier image in `iso/out/`; the build date is in its `.build-info.txt`. For a new
-release, raise `COPLAND_VERSION` in `iso/release.conf` first.
+The file name carries the build's version and the Debian release: a release build is
+`CoplandOS-0.2.0-deb13-amd64.iso`, any other build carries its commit and time
+(`CoplandOS-0.2.0~git202611121530.225d1f1-deb13-amd64.iso`), so two different images
+never share a name. The package built for the image is copied next to it.
 
 ## Live session
 

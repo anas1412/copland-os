@@ -33,6 +33,11 @@ load_release() {
         || die "iso/release.conf must set COPLAND_VERSION, DEBIAN_CODENAME, DEBIAN_VERSION and COPLAND_APT_URL."
     case "$DEBIAN_CODENAME$DEBIAN_VERSION" in *[!a-z0-9]*) die "iso/release.conf: unexpected characters." ;; esac
     [[ "$COPLAND_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "iso/release.conf: COPLAND_VERSION must look like 0.1.0."
+    # what this image and its package are labelled (packaging/build-version.sh); CI passes
+    # it in, so the runner and the container agree on one name
+    COPLAND_BUILD_VERSION="${COPLAND_BUILD_VERSION:-$("$REPO/packaging/build-version.sh")}" \
+        || die "Could not work out the build's version (packaging/build-version.sh)."
+    export COPLAND_BUILD_VERSION
     if [ -d /usr/share/debootstrap/scripts ] && [ ! -e "/usr/share/debootstrap/scripts/$DEBIAN_CODENAME" ]; then
         die "debootstrap does not know Debian '$DEBIAN_CODENAME'; update debootstrap or fix iso/release.conf."
     fi
@@ -87,7 +92,7 @@ checks() {
 }
 
 # fill FILE: put the release values from iso/release.conf into a staged file
-fill() { sed -i -e "s/@COPLAND_VERSION@/$COPLAND_VERSION/g" -e "s/@DEBIAN_VERSION@/$DEBIAN_VERSION/g" "$1"; }
+fill() { sed -i -e "s/@COPLAND_VERSION@/$COPLAND_BUILD_VERSION/g" -e "s/@DEBIAN_VERSION@/$DEBIAN_VERSION/g" "$1"; }
 
 stage() {
     local inc="$WORK/config/includes.chroot_after_packages"
@@ -150,7 +155,7 @@ record_build() {
         echo "working copy:   ${dirty}"
         echo "live-build:     $(dpkg-query -W -f='${Version}' live-build 2>/dev/null || echo unknown)"
         echo "debootstrap:    $(dpkg-query -W -f='${Version}' debootstrap 2>/dev/null || echo unknown)"
-        echo "copland os:     $COPLAND_VERSION, from iso/release.conf ($(basename "$DEB"))"
+        echo "copland os:     $COPLAND_BUILD_VERSION ($(basename "$DEB")); next release in iso/release.conf: $COPLAND_VERSION"
         echo "apt source:     $COPLAND_APT_URL $DEBIAN_CODENAME main"
         echo "debian release: $DEBIAN_VERSION ($DEBIAN_CODENAME), from iso/release.conf"
         echo "build host:     $(. /etc/os-release && echo "$PRETTY_NAME"), $(uname -m)"
@@ -176,8 +181,10 @@ build() {
     [ -f "$iso" ] || die "The build finished without an ISO. Read $WORK/build.log."
     mkdir -p "$OUT"
     local name
-    name="CoplandOS-${COPLAND_VERSION}-deb${DEBIAN_VERSION}-amd64.iso"
+    name="CoplandOS-${COPLAND_BUILD_VERSION}-deb${DEBIAN_VERSION}-amd64.iso"
     mv "$iso" "$OUT/$name"
+    # the package inside the image, next to it: a release publishes this very file to apt
+    cp "$DEB" "$OUT/"
     (cd "$OUT" && sha256sum "$name" > "$name.sha256")
     record_build "$name"
     # give the result to the user who ran sudo

@@ -266,8 +266,12 @@ Remove it with `sudo apt purge copland-os-desktop`.
 needed): the same files as `--system`, with Debian's package manager tracking them,
 so the look can later be updated with `apt` and removed with
 `sudo apt purge copland-os-desktop` (`purge`, not `remove`: settings under `/etc` are
-kept on a plain remove). The version is `COPLAND_VERSION` plus the Debian release (both in `iso/release.conf`),
-for example `0.1.1+deb13`. CoplandOS.iso is built with it. Unlike `--system`, it does not
+kept on a plain remove). A release's package is `COPLAND_VERSION` plus the Debian release
+(both in `iso/release.conf`), for example `0.2.0+deb13`, built once by CI for the tag; that
+same file is in the ISO, the GitHub release and the apt repository. Any other build is
+labelled `0.2.0~git<time>.<commit>+deb13`, which apt sorts below the release. Minor
+releases bring a new ISO; patch releases only the package, through the update icon
+(docs/BUILDING.md, "Releasing a version"). CoplandOS.iso is built with it. Unlike `--system`, it does not
 set `/etc/skel/.face` or `/etc/issue`: those belong to Debian's desktop-base and
 base-files, and a package may not take them over (the ISO sets both). Version 0.1.0
 could not be installed for that reason; 0.1.1 fixes it. Not yet tested by installing it

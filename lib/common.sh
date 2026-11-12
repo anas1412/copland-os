@@ -19,8 +19,12 @@ trap 'on_err "$LINENO" "$BASH_COMMAND"' ERR
 trap 'printf "\n %sInterrupted. Nothing further was changed.%s\n" "$YL" "$R"; exit 130' INT TERM
 
 # ------------------------------------------------------------------ helpers
-# copland_version: the Copland OS version this copy of the repo installs (iso/release.conf)
-copland_version() { ( . "$SRC/iso/release.conf" 2>/dev/null && printf '%s' "${COPLAND_VERSION:-}" ); }
+# copland_version: the Copland OS version this copy of the repo installs (iso/release.conf),
+# or the build's own label when a package or image build sets COPLAND_BUILD_VERSION
+copland_version() {
+    if [ -n "${COPLAND_BUILD_VERSION:-}" ]; then printf '%s' "$COPLAND_BUILD_VERSION"; return; fi
+    ( . "$SRC/iso/release.conf" 2>/dev/null && printf '%s' "${COPLAND_VERSION:-}" )
+}
 
 # run: execute a command, or only print it in --dry-run
 run() {

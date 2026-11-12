@@ -234,11 +234,17 @@ plain words where it doesn't, so every line still reads at a glance:
 
 ### Version and Debian base
 
-- **Copland OS version:** `COPLAND_VERSION` in `iso/release.conf`, major.minor.patch.
-  It names the ISO (for example `CoplandOS-0.1.2-deb13-amd64.iso`), the installer text and the
-  package (`copland-os-desktop_0.1.2+deb13_all.deb`; a `+`, never a `:`, because a
-  colon is a Debian epoch). Why: without it, two images of the same Debian release
-  could not be told apart, and the package and the ISO would not say they match.
+- **Copland OS version:** `COPLAND_VERSION` in `iso/release.conf`, major.minor.patch,
+  the next release. It names the ISO (for example `CoplandOS-0.2.0-deb13-amd64.iso`),
+  the installer text and the package (`copland-os-desktop_0.2.0+deb13_all.deb`; a `+`,
+  never a `:`, because a colon is a Debian epoch). Why: without it, two images of the
+  same Debian release could not be told apart, and the package and the ISO would not
+  say they match.
+- **One version, one build** (decided 2026-11-12): only the tag's CI build carries a
+  release version, and that one file goes to the image, the release and apt. Other
+  builds are `<version>~git<time>.<commit>`, shown as such in fastfetch and the
+  installer. Minor releases (`x.y.0`) bring an image; patches (`x.y.z`) only the
+  package, through the update icon. Details: docs/BUILDING.md, "Releasing a version".
 - **Debian is named, never hidden:** "(Debian 13)" follows the product name in the
   installer and at the console login. `/etc/os-release` stays Debian's: apt, the
   installer and `lib/common.sh` read `ID=debian` from it, and the project is honest

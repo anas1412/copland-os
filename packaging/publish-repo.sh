@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
 # Publish the Copland OS apt repository (signed) to the gh-pages branch.
 #
-#   ./packaging/publish-repo.sh                 packages and website: commit gh-pages locally
+#   ./packaging/publish-repo.sh                 the release's package and the website: commit gh-pages locally
 #   ./packaging/publish-repo.sh --site-only     the website only; packages and signatures untouched
 #   ./packaging/publish-repo.sh --dir DIR       build into DIR only (no git; for tests)
+#   ./packaging/publish-repo.sh --local         take packaging/out/*.deb instead (tests, with --dir)
 #   ./packaging/publish-repo.sh --key KEYID     sign with another key (tests only)
 #
 # It signs with the key in packaging/copland-os-archive-keyring.gpg (the one the ISO
 # trusts), so that key's secret half must be in your gpg keyring.
 #
-# Takes every .deb in packaging/out/, adds it to the repository's pool (older versions
-# stay), regenerates the indexes, and signs them with your key (gpg asks for its
-# passphrase, if it has one). It never pushes: it prints the push command for you to run.
+# Downloads the copland-os-desktop package attached to the GitHub release of
+# COPLAND_VERSION (iso/release.conf), the very file CI built for that release and put in
+# its image, so the ISO and apt never carry two builds of one version. Adds it to the
+# repository's pool (older versions stay), regenerates the indexes, and signs them with
+# your key (gpg asks for its passphrase, if it has one). Test builds (versions with "~")
+# are never published. It never pushes: it prints the push command for you to run.
 #
 # Layout served by GitHub Pages (COPLAND_APT_URL in iso/release.conf is its apt/ folder):
 #   index.html, assets/                 the project website, from site/
@@ -27,7 +31,7 @@ set -Eeuo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/.." && pwd)"
 KEYRING="$HERE/copland-os-archive-keyring.gpg"
-KEY=""; DIR=""; USE_GIT=1; SITE_ONLY=0
+KEY=""; DIR=""; USE_GIT=1; SITE_ONLY=0; LOCAL=0
 
 say() { printf ' > %s\n' "$*"; }
 die() { printf '\n x %s\n' "$*" >&2; exit 1; }
@@ -37,6 +41,7 @@ while [ $# -gt 0 ]; do
         --key) shift; KEY="${1:-}" ;;
         --dir) shift; DIR="${1:-}"; USE_GIT=0 ;;
         --site-only) SITE_ONLY=1 ;;
+        --local) LOCAL=1 ;;
         -h|--help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;;
         *) die "Unknown option: $1" ;;
     esac
@@ -56,8 +61,28 @@ for t in apt-ftparchive gpg gzip; do command -v "$t" >/dev/null || die "$t is re
 gpg --list-secret-keys "$KEY" >/dev/null 2>&1 || die "No secret key $KEY in your gpg keyring (restore it from your backup: docs/BUILDING.md, 'apt repository')."
 
 shopt -s nullglob
-DEBS=("$HERE"/out/*.deb)
-[ "${#DEBS[@]}" -gt 0 ] || die "No .deb in packaging/out/. Run ./packaging/build-deb.sh first."
+if [ "$LOCAL" -eq 1 ]; then
+    [ "$USE_GIT" -eq 0 ] || die "--local is for tests: use it with --dir."
+    DEBS=("$HERE"/out/*.deb)
+    [ "${#DEBS[@]}" -gt 0 ] || die "No .deb in packaging/out/. Run ./packaging/build-deb.sh first."
+else
+    command -v gh >/dev/null || die "gh (GitHub CLI) is required to fetch the release's package."
+    FETCH="$(mktemp -d "${TMPDIR:-/tmp}/copland-release.XXXXXX")"
+    trap 'rm -rf "$FETCH"' EXIT
+    TAG="v$COPLAND_VERSION"
+    say "Fetching the package of release $TAG"
+    gh release download "$TAG" --repo anas1412/copland-os --pattern 'copland-os-desktop_*_all.deb' --dir "$FETCH" \
+        || die "Release $TAG has no copland-os-desktop package yet (push the tag and wait for CI)."
+    DEBS=("$FETCH"/*.deb)
+    [ "${#DEBS[@]}" -eq 1 ] || die "Expected one package in release $TAG, found ${#DEBS[@]}."
+    case "$(basename "${DEBS[0]}")" in
+        "copland-os-desktop_${COPLAND_VERSION}+deb${DEBIAN_VERSION}_all.deb") ;;
+        *) die "Release $TAG carries $(basename "${DEBS[0]}"), not version ${COPLAND_VERSION}+deb${DEBIAN_VERSION}." ;;
+    esac
+fi
+for d in "${DEBS[@]}"; do
+    case "$(basename "$d")" in *"~"*) die "$(basename "$d") is a test build: only release builds are published." ;; esac
+done
 # a package goes public the moment gh-pages is pushed: say exactly which ones are new
 for d in "${DEBS[@]}"; do say "package to publish: $(basename "$d")"; done
 fi
