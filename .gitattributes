@@ -1,0 +1,4 @@
+# GitHub's language bar counts only code written for this project. The GTK theme is a
+# recolour of Greybird (and of GTK's own dark theme for GTK 4), so it is marked as
+# third-party: the bar then shows the installer's language, Shell.
+core/assets/themes/** linguist-vendored
