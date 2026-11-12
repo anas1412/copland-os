@@ -4,35 +4,35 @@ Hash: SHA512
 Architectures: amd64 all
 Codename: trixie
 Components: main
-Date: Thu, 12 Nov 2026 15:18:37 +0000
+Date: Thu, 12 Nov 2026 16:43:58 +0000
 Description: Copland OS packages for Debian 13 (trixie)
 Label: Copland OS
 Origin: Copland OS
 Suite: trixie
 MD5Sum:
- 936ad337d79e51fd6c4abf21d4029764             5706 main/binary-all/Packages
- 09195bd85015278ea896cd4401090c88             1543 main/binary-all/Packages.gz
- 936ad337d79e51fd6c4abf21d4029764             5706 main/binary-amd64/Packages
- 09195bd85015278ea896cd4401090c88             1543 main/binary-amd64/Packages.gz
+ 4de1cb80ac1f5f1fb197a17db2c2173f             4295 main/binary-all/Packages
+ ff1fe4224d679199607717aa49fde586             1344 main/binary-all/Packages.gz
+ 4de1cb80ac1f5f1fb197a17db2c2173f             4295 main/binary-amd64/Packages
+ ff1fe4224d679199607717aa49fde586             1344 main/binary-amd64/Packages.gz
 SHA1:
- 9ddb39551d10770c1f50fa92d0d269cce4778eec             5706 main/binary-all/Packages
- 02941902df3718d550f3218d5d05bdd5c5797d1e             1543 main/binary-all/Packages.gz
- 9ddb39551d10770c1f50fa92d0d269cce4778eec             5706 main/binary-amd64/Packages
- 02941902df3718d550f3218d5d05bdd5c5797d1e             1543 main/binary-amd64/Packages.gz
+ 0858cff7d01c0a5858f4622a401ecc09b9814039             4295 main/binary-all/Packages
+ c87d2a1e62403d9aeeabebc4a6d2674d31d7247e             1344 main/binary-all/Packages.gz
+ 0858cff7d01c0a5858f4622a401ecc09b9814039             4295 main/binary-amd64/Packages
+ c87d2a1e62403d9aeeabebc4a6d2674d31d7247e             1344 main/binary-amd64/Packages.gz
 SHA256:
- 83832be3f3803c70a67e07828c7d3e4a9386b9839da6c09104279791a37b7d9f             5706 main/binary-all/Packages
- 6a4b390125dbfbab39248de3c72b4b328350c8c1f57b7901c137bab83f61dbc5             1543 main/binary-all/Packages.gz
- 83832be3f3803c70a67e07828c7d3e4a9386b9839da6c09104279791a37b7d9f             5706 main/binary-amd64/Packages
- 6a4b390125dbfbab39248de3c72b4b328350c8c1f57b7901c137bab83f61dbc5             1543 main/binary-amd64/Packages.gz
+ 0bc402ec1c906325298277f0802d105f0314c2e9f8c600e47492b668339999b0             4295 main/binary-all/Packages
+ 19323dcbb2d6418721fa314116bb8b47d9e613a6e74a1c231f31d3d9ffce9541             1344 main/binary-all/Packages.gz
+ 0bc402ec1c906325298277f0802d105f0314c2e9f8c600e47492b668339999b0             4295 main/binary-amd64/Packages
+ 19323dcbb2d6418721fa314116bb8b47d9e613a6e74a1c231f31d3d9ffce9541             1344 main/binary-amd64/Packages.gz
 SHA512:
- fd2e749ad1b10635ed199ed5521db20fd19adf7c6ab4ae3a7a87d216d5349f96f62869ec13945c67b28dec0f4da14b39c0ba62a98cc790b2590af7c34f3a46b4             5706 main/binary-all/Packages
- 297bdc0bdbdf7f93ce25b5623378ec1d02a0534cfe0af96709bdabf0c1f48d84435982d22dee49a5dbbcf079be1f08e62bb79172a14fce746fc294baac38bc35             1543 main/binary-all/Packages.gz
- fd2e749ad1b10635ed199ed5521db20fd19adf7c6ab4ae3a7a87d216d5349f96f62869ec13945c67b28dec0f4da14b39c0ba62a98cc790b2590af7c34f3a46b4             5706 main/binary-amd64/Packages
- 297bdc0bdbdf7f93ce25b5623378ec1d02a0534cfe0af96709bdabf0c1f48d84435982d22dee49a5dbbcf079be1f08e62bb79172a14fce746fc294baac38bc35             1543 main/binary-amd64/Packages.gz
+ 6c9f33d6cbfad101bc49fc6d10e9eb7f92edea3e1d31e403863fee1327a5ad3f13fa5e60b5f0ffa2a4cd7078b1287a1b923762456ca7c040bef0854ec6fea4b5             4295 main/binary-all/Packages
+ bd2b315914ea712858ec4d17dd58b9f1a20eed7bbe93ad5b8bdc73fe380020cefdb1f43eeeeff5787beb31d90af455cb2e9736cc6527e02638eeabe0be8cf07c             1344 main/binary-all/Packages.gz
+ 6c9f33d6cbfad101bc49fc6d10e9eb7f92edea3e1d31e403863fee1327a5ad3f13fa5e60b5f0ffa2a4cd7078b1287a1b923762456ca7c040bef0854ec6fea4b5             4295 main/binary-amd64/Packages
+ bd2b315914ea712858ec4d17dd58b9f1a20eed7bbe93ad5b8bdc73fe380020cefdb1f43eeeeff5787beb31d90af455cb2e9736cc6527e02638eeabe0be8cf07c             1344 main/binary-amd64/Packages.gz
 -----BEGIN PGP SIGNATURE-----
 
-iHUEARYKAB0WIQT2Kfeu7w3TCKTjeEhYgYHXNqJorAUCavXYzQAKCRBYgYHXNqJo
-rPgyAP9nH6rNLgmVHyj8x6GXnIkozNDHjx0u2Z0Colo00qljfgEAyJGI65eWxOUB
-SnR37jb8/YjfP0FgrIPnTN7X65CbKAA=
-=0A9p
+iHUEARYKAB0WIQT2Kfeu7w3TCKTjeEhYgYHXNqJorAUCavXszgAKCRBYgYHXNqJo
+rJVAAP0dYj5obRbeLFa/ynkToQADfeI3uKeRz5X/KNcH3dNyiwD/Uxi+B/JDm6Wb
+1P8SeBAsxjHb42mgSyll996qjiOJlgM=
+=5a1A
 -----END PGP SIGNATURE-----
