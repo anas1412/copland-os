@@ -4,7 +4,7 @@ Hash: SHA512
 Architectures: amd64 all
 Codename: trixie
 Components: main
-Date: Thu, 12 Nov 2026 09:10:23 +0000
+Date: Thu, 12 Nov 2026 09:13:03 +0000
 Description: Copland OS packages for Debian 13 (trixie)
 Label: Copland OS
 Origin: Copland OS
@@ -31,8 +31,8 @@ SHA512:
  0eda6775036094ad49e76405ea03978c6c85115f93cd7f0c13285692da64c2b2c0d0a3ddabec3092ffc4fc1b383606498c1f12649f6471649bc00f5baccac80a             1127 main/binary-amd64/Packages.gz
 -----BEGIN PGP SIGNATURE-----
 
-iHUEARYKAB0WIQT2Kfeu7w3TCKTjeEhYgYHXNqJorAUCavWCfwAKCRBYgYHXNqJo
-rM5mAP9rBEGyekxcYqYld6Qti1WHvmWtzzMyJEGfev1cJtF5fwD/bzlhw3Q3zFiH
-r2njRo3a4qbcAwXJkLQFf3VjMetfqwg=
-=leE+
+iHUEARYKAB0WIQT2Kfeu7w3TCKTjeEhYgYHXNqJorAUCavWDHwAKCRBYgYHXNqJo
+rPVPAQCNpIr6JJ6uF0Wfwbk7a0feuoAw/2xwXHsTQPnrE4eIeQEAoBwxj6W3izpY
+04jGKcgiLJT8Eysz09bd2YD7ljKMIQE=
+=HiGN
 -----END PGP SIGNATURE-----
