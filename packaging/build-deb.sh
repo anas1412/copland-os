@@ -39,6 +39,9 @@ grep -q 'failed' "$STAGE/stage.log" && grep -q '✖ [1-9]' "$STAGE/stage.log" &&
 
 # the installer's own records are not part of the package
 rm -rf "$ROOT/var/lib/copland-os"
+# /etc/skel/.face is a configuration file of Debian's desktop-base: a package may not
+# ship or divert it (the ISO sets it instead, like /etc/issue)
+rm -f "$ROOT/etc/skel/.face"
 rmdir "$ROOT/var/lib" "$ROOT/var" 2>/dev/null || true
 # GRUB reads its theme from /boot; ship it under /usr/share, postinst copies it
 if [ -d "$ROOT/boot/grub/themes/copland" ]; then
@@ -51,6 +54,15 @@ fi
 [ -f "$ROOT/usr/share/copland-os/grub-theme/theme.txt" ] \
     || { cat "$STAGE/stage.log"; die "The boot menu theme was not built (needs grub-common, fonts-urw-base35, fonts-dejavu-mono)."; }
 [ -f "$ROOT/usr/share/plymouth/themes/copland/copland.plymouth" ] || die "The boot animation is missing from staging."
+
+# no file may belong to another Debian package, or dpkg refuses to install this one.
+# Checked against every package installed here; the diverted ones are allowed.
+if [ -d /var/lib/dpkg/info ]; then
+    clash="$( (cd "$ROOT" && find . ! -type d | sed 's|^\.||' | sort -u) \
+        | comm -12 - <(cat /var/lib/dpkg/info/*.list | sort -u) \
+        | grep -vxF -e /usr/share/backgrounds/xfce/xfce-x.svg -e /usr/share/wayland-sessions/xfce-wayland.desktop || true)"
+    [ -z "$clash" ] || die "These files already belong to other packages: $clash"
+fi
 
 # licence and credits
 DOC="$ROOT/usr/share/doc/$PKG"

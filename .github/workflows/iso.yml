@@ -46,18 +46,12 @@ jobs:
           echo "codename=$DEBIAN_CODENAME" >> "$GITHUB_OUTPUT"
           echo "name=CoplandOS-$COPLAND_VERSION-deb$DEBIAN_VERSION-amd64" >> "$GITHUB_OUTPUT"
 
-      # the runner has about 14 GB free; its preinstalled SDKs are not needed here
-      - name: Free disk space
-        run: |
-          df -h / /mnt
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache \
-                      /usr/local/share/boost /usr/share/swift /usr/local/share/powershell
-          sudo docker image prune --all --force > /dev/null
-          df -h / /mnt
-
-      # build on whichever disk has the most room
+      # build on whichever disk has the most room. GitHub's docs promise 14 GB; the first
+      # run found 86 GB free on /, so no SDKs are deleted (that took 7 minutes). If a
+      # runner ever has less, build.sh stops at its free-space check with a clear message.
       - name: Pick the work disk
         run: |
+          df -h / /mnt
           best=/ ; bestfree=0
           for d in / /mnt; do
             free=$(df -Pk "$d" | awk 'NR==2 {print $4}')

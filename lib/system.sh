@@ -152,7 +152,7 @@ sys_wallpaper() {
 
 sys_panel() {
     # the menu shows each user's picture (~/.face): new users start with the Copland logo
-    put_file 644 "$ASSETS/themes/CoplandOS/assets/copland-logo-128.png" /etc/skel/.face
+    set_face
     note "the bar is applied to users who log in to XFCE for the first time"
 }
 
@@ -341,6 +341,20 @@ set_issue() {
     record "issue:/etc/issue"
 }
 
+# /etc/skel/.face, the picture new accounts start with. On Debian it is a configuration
+# file of desktop-base, which may not be diverted: keep the original for --uninstall,
+# as with /etc/issue. The Debian package does not ship it for the same reason.
+set_face() {
+    local f="$TGT/etc/skel/.face" src="$ASSETS/themes/CoplandOS/assets/copland-logo-128.png"
+    if [ "$DRY" -eq 1 ]; then
+        printf '      %s[dry-run]%s copy the Copland logo to %s\n' "$DM" "$R" "$f"; return 0
+    fi
+    install -d -m 755 "$TGT$SYS_STATE" "$(dirname "$f")"
+    [ -f "$f" ] && [ ! -f "$TGT$SYS_STATE/face.orig" ] && cp -a "$f" "$TGT$SYS_STATE/face.orig"
+    install -m 644 "$src" "$f"
+    record "face:/etc/skel/.face"
+}
+
 # /etc/default/grub.d/copland.cfg: splash, Copland name and theme, console colours
 write_grub_dropin() {
     local theme_line="" vt
@@ -433,6 +447,12 @@ system_uninstall() {
             console:*) p=${p#console:}
                        [ -f "$TGT$SYS_STATE/console-setup.orig" ] && cp -a "$TGT$SYS_STATE/console-setup.orig" "$TGT$p" \
                            && rm -f "$TGT$SYS_STATE/console-setup.orig" ;;
+            face:*)   p=${p#face:}
+                      if [ -f "$TGT$SYS_STATE/face.orig" ]; then
+                          cp -a "$TGT$SYS_STATE/face.orig" "$TGT$p" && rm -f "$TGT$SYS_STATE/face.orig"
+                      else
+                          rm -f "$TGT$p"
+                      fi ;;
             issue:*)  p=${p#issue:}
                       [ -f "$TGT$SYS_STATE/issue.orig" ] && cp -a "$TGT$SYS_STATE/issue.orig" "$TGT$p" \
                           && rm -f "$TGT$SYS_STATE/issue.orig" ;;

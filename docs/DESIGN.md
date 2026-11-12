@@ -146,7 +146,7 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
 | Layer:01 … Layer:04 | workspaces (the show's episodes are "Layers") |
 | Present day, present time | fastfetch title line, installer slide |
 | Close the world, Open the nExt | sign-off (fastfetch, end of the installer output) |
-| Copland OS Enterprise 0.1.0 (Debian 13) | installer title and launcher (`versionedName`); short form "Copland OS 0.1.0" |
+| Copland OS Enterprise 0.1.1 (Debian 13) | installer title and launcher (`versionedName`); short form "Copland OS 0.1.1" |
 | Copland OS Enterprise (Debian 13) | text console login line (`/etc/issue`) |
 
 Tone: short, calm, a little cryptic; English UI text stays plain and functional.
@@ -183,9 +183,9 @@ plain words where it doesn't, so every line still reads at a glance:
 
 ### Version and Debian base
 
-- **Copland OS version:** `COPLAND_VERSION` in `iso/release.conf` (0.1.0), major.minor.patch.
-  It names the ISO (`CoplandOS-0.1.0-deb13-amd64.iso`), the installer text and the
-  package (`copland-os-desktop_0.1.0+deb13_all.deb`; a `+`, never a `:`, because a
+- **Copland OS version:** `COPLAND_VERSION` in `iso/release.conf` (0.1.1), major.minor.patch.
+  It names the ISO (`CoplandOS-0.1.1-deb13-amd64.iso`), the installer text and the
+  package (`copland-os-desktop_0.1.1+deb13_all.deb`; a `+`, never a `:`, because a
   colon is a Debian epoch). Why: without it, two images of the same Debian release
   could not be told apart, and the package and the ISO would not say they match.
 - **Debian is named, never hidden:** "(Debian 13)" follows the product name in the

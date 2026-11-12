@@ -58,8 +58,9 @@ What `.github/workflows/iso.yml` does, and why:
   commit builds the same way.
 - **No secrets.** The build only checks the apt repository against the public key in
   `packaging/`; the signing key never goes near CI.
-- **Disk:** the runner has about 14 GB free, so the workflow first deletes preinstalled
-  SDKs the build does not use, then builds on whichever disk has the most room.
+- **Disk:** the build runs on whichever runner disk has the most room. GitHub's docs
+  promise 14 GB, but the first run found 86 GB free, so the workflow no longer spends
+  7 minutes deleting preinstalled SDKs; `build.sh` still stops early if space is short.
 - **Package cache:** every `.deb` live-build downloads is kept with `actions/cache`
   and restored next time, so a rebuild downloads only what changed. The cache key follows
   the package list and `iso/auto/config`; a changed list starts from the closest older

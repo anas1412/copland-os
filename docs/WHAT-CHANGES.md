@@ -179,7 +179,7 @@ writes is recorded in `/var/lib/copland-os/manifest`, and
 `/etc/os-release` at each login). The original is kept in
 `/var/lib/copland-os/issue.orig` and put back by `--uninstall`. `/etc/issue` belongs to
 Debian's `base-files`, so dpkg asks about it when a new Debian release ships its own;
-the `copland-os-desktop` package does not change it.
+the `copland-os-desktop` package does not change it. The same goes for `/etc/skel/.face`, the picture new accounts start with: it belongs to Debian's `desktop-base`, so `--system` keeps the original in `/var/lib/copland-os/face.orig` and `--uninstall` puts it back.
 
 ## In the repo, not yet run by the per-user `install.sh`
 

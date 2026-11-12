@@ -120,8 +120,10 @@ stage() {
     mkdir -p "$inc/etc/apt/sources.list.d"
     printf 'Types: deb\nURIs: %s\nSuites: %s\nComponents: main\nSigned-By: /usr/share/keyrings/copland-os-archive-keyring.gpg\n' \
         "$COPLAND_APT_URL" "$DEBIAN_CODENAME" > "$inc/etc/apt/sources.list.d/copland-os.sources"
-    # /etc/issue belongs to base-files, so the package leaves it alone; the image sets it
+    # /etc/issue (base-files) and /etc/skel/.face (desktop-base) are configuration files
+    # of other packages, so the package leaves them alone; the image sets them
     install -D -m 644 "$REPO/core/config/issue" "$inc/etc/issue"
+    install -D -m 644 "$REPO/core/assets/themes/CoplandOS/assets/copland-logo-128.png" "$inc/etc/skel/.face"
 
     # installer branding, used once by the 0510 hook and removed again
     mkdir -p "$inc/usr/share/copland-os/iso-branding"
