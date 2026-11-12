@@ -4,10 +4,9 @@
 # container with iso/ci-build.sh; no secret is needed (the ISO only carries the
 # public key in packaging/).
 #
-# A version tag (v0.1.1, matching COPLAND_VERSION in iso/release.conf) also builds, then
-# creates a DRAFT GitHub release with the ISO. A draft is not public and is not
-# "latest", so the website's download button ignores it until a person tests the ISO
-# and presses Publish on GitHub.
+# A version tag (v0.1.2, matching COPLAND_VERSION in iso/release.conf) also builds, then
+# publishes a GitHub release with the ISO and marks it latest: pushing the tag is the
+# decision to release, and the website's download button follows it at once.
 name: CoplandOS.iso
 
 on:
@@ -166,8 +165,8 @@ jobs:
             df -h "$WORK" | awk 'NR==2 {print "- work disk after the build: " $4 " free"}'
           } >> "$GITHUB_STEP_SUMMARY"
 
-  # Only for a version tag: put the ISO built above into a draft release. This is the
-  # only job that may write to the repository, and it runs no build code.
+  # Only for a version tag: publish the ISO built above as a release. This is the only
+  # job that may write to the repository, and it runs no build code.
   release:
     if: github.ref_type == 'tag'
     needs: build
@@ -192,7 +191,7 @@ jobs:
         working-directory: out
         run: sha256sum -c "${{ needs.build.outputs.name }}.iso.sha256"
 
-      - name: Create the draft release
+      - name: Publish the release
         working-directory: out
         env:
           GH_TOKEN: ${{ github.token }}
@@ -214,7 +213,7 @@ jobs:
           Built by GitHub Actions from commit $GITHUB_SHA: $run_url
           The build record and the list of every package in the image are attached.
           EOF
-          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft --verify-tag \
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --latest --verify-tag \
             --title "Copland OS $VERSION" --notes-file notes.md \
             "$NAME.iso" "$NAME.iso.sha256" "$NAME.build-info.txt" "$NAME.packages"
-          echo "Draft release created: test the ISO, then publish it on GitHub." >> "$GITHUB_STEP_SUMMARY"
+          echo "Released: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$GITHUB_REF_NAME" >> "$GITHUB_STEP_SUMMARY"

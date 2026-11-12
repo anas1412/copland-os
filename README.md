@@ -30,7 +30,7 @@ What is in it: Debian 13 with a lean XFCE desktop
 LibreOffice), Copland OS installed as the `copland-os-desktop` package (the same
 files as `--system`), and the Calamares installer branded as Copland OS. Installed
 systems get Debian's updates and Copland's with the same `sudo apt update && sudo apt
-upgrade`: the image includes Copland's signed apt source next to Debian's. The image's own boot menu and the
+upgrade` (or one click on the update icon in the top bar, which checks once a day): the image includes Copland's signed apt source next to Debian's. The image's own boot menu and the
 installed system's boot menu both have the Copland look. The live user is `lain`
 (password `live`, live-config's default) and the hostname `coplandos`.
 

@@ -75,21 +75,18 @@ What `.github/workflows/iso.yml` does, and why:
 
 ## Releasing a version
 
-A release is a version tag; CI builds the ISO and prepares a **draft** release, and a
-person publishes it after testing. Nothing reaches users untested: a draft is not public,
-and the website's download button only follows published releases.
+A release is a version tag: pushing it builds the ISO in CI and publishes the GitHub
+release with it, marked latest. The website's download button follows it at once.
 
 1. Raise `COPLAND_VERSION` in `iso/release.conf` (a published version never changes).
    Commit and push.
-2. Publish the package of that version to the apt repository:
-   `./packaging/build-deb.sh`, `./packaging/publish-repo.sh`, then push `gh-pages`.
-3. Tag and push: `git tag v0.1.2 && git push origin v0.1.2`. The workflow stops at once
-   if the tag does not match `COPLAND_VERSION`.
-4. CI builds the ISO and creates a draft release with the ISO, its checksum, the build
-   record and the package list. The release notes give the checksum and the CI run.
-5. Download the ISO from the draft and test it in a VM (live session, install, login,
-   `apt update && apt upgrade`).
-6. Publish the draft on GitHub. From then on the website's download button points at it.
+2. Publish the package of that version to the apt repository: `./packaging/build-deb.sh`,
+   `./packaging/publish-repo.sh` (it names the package it is about to publish), then push
+   `gh-pages`.
+3. Tag and push: `git tag -a v0.1.2 -m "Copland OS 0.1.2" && git push origin v0.1.2`. The
+   workflow stops at once if the tag does not match `COPLAND_VERSION`.
+4. CI builds the ISO and publishes the release with the ISO, its checksum, the build
+   record and the package list; the release notes give the checksum and the CI run.
 
 ## What the build does
 

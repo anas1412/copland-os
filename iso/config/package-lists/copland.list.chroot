@@ -17,6 +17,11 @@ pipewire-audio wireplumber pavucontrol
 # web
 firefox-esr
 
+# updates: a tray icon checks once a day and announces updates; clicking it opens the
+# updater (gpk-update-viewer, Debian's default command for the icon), which installs
+# Debian's and Copland's together. The password prompt comes from mate-polkit, already in.
+package-update-indicator gnome-package-updater
+
 # Copland OS look and tools (same as the installer's package list)
 fonts-urw-base35 fonts-dejavu-core fonts-dejavu-mono fonts-terminus
 adwaita-icon-theme gtk2-engines-murrine libgtk-3-bin python3

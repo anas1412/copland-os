@@ -126,6 +126,10 @@ Smoothing: antialias on, hinting slight, RGB subpixel (`settings.tsv`, `theme`).
   profile and search. Taken as a whole from Anas's own menu (2026-11-12): the menu as
   it is used every day, not a guess. The recent-apps list is left out: it is one
   person's history. Rows in `core/settings.tsv` (`panel`, `plugin-1`).
+- **Updates icon (ISO):** `package-update-indicator` checks once a day and shows a tray icon
+  when updates are ready; clicking it opens Debian's updater (`gpk-update-viewer`). Why:
+  the people this is for should never need a terminal to stay safe, and XFCE has no
+  update notifier of its own (the package says so in its description).
 - **Gaps:** 6/4 px margins around the menu button, 2 px between layer buttons, 4 px
   around the clock, spacers at both outer edges (`gtk.css` "panel spacing").
 - **Window titles:** centred, C059 Bold Italic 10, white when focused, `text-dim` when not.
